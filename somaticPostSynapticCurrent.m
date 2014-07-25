@@ -14,4 +14,6 @@ for i=1:NTotal
     sigmaTotal = sigmaTotal + (WiMat(i)*DiMat(1));
 end
 
-Spsc = -Is + sigmaTotal;
+sigmaWiDi = (sigmaTotal / NTotal);
+
+Spsc = -Is + sigmaWiDi;
