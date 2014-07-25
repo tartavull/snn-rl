@@ -1,7 +1,4 @@
-%%Crea un diccionario
-function dictionary = makeDictionary()
-
-dictionary = {
+Dictionary = {
     'A',[1 0 1;0 1 0;0 0 0;0 1 0;0 1 0];
     'B',[0 0 1;0 1 0;0 0 1;0 1 0;0 0 1];
     'C',[0 0 0;0 1 1;0 1 1;0 1 1;0 0 0];
@@ -30,5 +27,3 @@ dictionary = {
     'Z',[0 0 0;1 1 0;1 0 1;0 1 1;0 0 0];
     'NULL',[0 0 0;0 0 0;0 0 0;0 0 0;0 0 0];
     };
-
-end
