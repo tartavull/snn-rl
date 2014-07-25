@@ -2,7 +2,8 @@ function Di = dirac(Dt, t)
 %Dirac function: Calculates Di
 %   Uses the Dirac function as described in the book 'Theoretical 
 %   Neuroscience' on page 405.  The function can be defined in other 
-%   ways but this is one way to define it.  
+%   ways but this is one way to define it.  This expresses the function
+%   as the limit of a square pulse.
 %   Dt = delta spike time.  
 %   t = spike time.
 %   The formula below represents the limit of the reciprocal of Dt as
