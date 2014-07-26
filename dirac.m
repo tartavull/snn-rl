@@ -6,15 +6,13 @@ function Di = dirac(Dt, t)
 %   as the limit of a square pulse.
 %   Dt = delta spike time.  
 %   t = spike time.
-%   The origional dirac formula represents the limit of the reciprocal 
-%   of Dt as Dt approaches 0.  The limit function is only availible in the
-%   Symbolic Math Toolbox and some other may not have that so I have
-%   excluded it here.
-%   TODO: Now looking into another way to create the limit function or what
-%   effect removing it may cause.
+%   The formula below represents the limit of the reciprocal of Dt as
+%   Dt approaches 0.  
+%   Note: this code should work but it may be a couple of days before
+%   I have access to the limit function to fully test it.
 
-if (t > -Dt / 2) && (t < Dt / 2) && Dt ~= 0
-    Di = 1 / Dt;
+if (t > -Dt / 2) && (t < Dt / 2)
+    Di = limit(1 / Dt, Dt, 0);
 else
     Di = 0;
 end
