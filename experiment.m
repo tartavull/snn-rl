@@ -3,7 +3,7 @@ clear all;
 makeDictionary;
 Dictionary = Dictionary(1:4,:); % Using A,B,C,D
 
-epochs = 1; %Total number of epochs, (an epoch means one full presentation
+epochs = 20; %Total number of epochs, (an epoch means one full presentation
 % of all the four characters) 
 
 presentationTime = 300; %Each character is presented for 300ms
@@ -14,8 +14,21 @@ input = zeros(15,1);
 
 plotFrecuency = 10; %The plot are updated every 10ms
 inputHistory = zeros(15,presentationTime*length(Dictionary)*epochs/plotFrecuency);
-timeHistory = zeros(1,presentationTime*length(Dictionary)*epochs/plotFrecuency);;
+timeHistory = zeros(1,presentationTime*length(Dictionary)*epochs/plotFrecuency);
 
+                %Preallocate plot
+                 subplot(2,1,1);
+                 drawnow;
+                 plot(0,0); hold on;
+                 xlim([0,presentationTime*length(Dictionary)*epochs]); ylim([0,16]);  % static limits
+                 
+                
+                 % Static legend
+%                 set(gca,'LegendColorbarListeners',[]); 
+                 setappdata(gca,'LegendColorbarManualSpace',1);
+                 setappdata(gca,'LegendColorbarReclaimSpace',1);
+                %Preallocate plot end
+                
 index=0;
 for time = 0:timeStep:presentationTime*length(Dictionary)*epochs
     
@@ -49,7 +62,7 @@ for time = 0:timeStep:presentationTime*length(Dictionary)*epochs
         subplot(2,1,1);
         for line = 1:length(input)
             hold on;
-            plot(timeHistory(1:index),inputHistory(line,1:index)*line);
+            plot(timeHistory(1:index),inputHistory(line,1:index)*0.8+line);
         end
         drawnow;
     end
