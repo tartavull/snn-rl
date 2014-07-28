@@ -13,9 +13,6 @@ classdef Monitor < handle
     end
     
     methods
-        function obj = Monitor()
-            obj.figHandle = figure();
-        end
         function setInteractive(obj,parameter)
             obj.interactive = parameter;
         end
@@ -40,10 +37,16 @@ classdef Monitor < handle
                 subplot(obj.subPlot_m,obj.subPlot_n,obj.subPlot_p);
             end
             
-            if (strcmp(obj.plotType,'line'))
-                obj.linePlot;
-            elseif (strcmp(obj.plotType,'squares'))
-                obj.squaresPlot;
+            
+            switch obj.plotType
+                case 'line'
+                    obj.linePlot;
+                case 'squares'
+                    obj.squaresPlot;
+                case 'char'
+                    obj.charPlot;
+                otherwise
+                    warning('Unexpected plot type. No plot created.');
             end
         end
         
@@ -55,14 +58,14 @@ classdef Monitor < handle
                 plot(time,data(line,:)*0.8+line);
             end
             drawnow;
+            obj.figHandle = gcf();
+
         end
         
         function squaresPlot(obj)            
             time = [obj.history{1,:}];
             data = [obj.history{2,:}];
             
-          
-            %start = (index-graphResolution)*(index>graphResolution)+1;
             if( length(time) > 20)
                 start = length(time) - 20;
             else
@@ -75,8 +78,24 @@ classdef Monitor < handle
             axis ij;
             axis square;
             drawnow;
+            obj.figHandle = gcf();
+        end
+        
+        function charPlot(obj)         
+           data = obj.history{2,end};
+           obj.showChar(data);
+           obj.figHandle = gcf();
+
         end
     end
+    
+    methods(Static)
+        function handle = showChar(charArray)
+            handle = imshow(charArray,'InitialMagnification',1000);
+            
+        end
+    end
+
     
 end
 
