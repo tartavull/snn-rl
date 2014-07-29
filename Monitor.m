@@ -31,7 +31,9 @@ classdef Monitor < handle
         function record(obj,time,data)
             obj.history{1,end+1} = time;
             obj.history{2,end} = data;
-            
+        end
+        
+        function plot(obj)
             if(obj.subPlot)  
                 figure(obj.figHandle);
                 subplot(obj.subPlot_m,obj.subPlot_n,obj.subPlot_p);
@@ -77,6 +79,7 @@ classdef Monitor < handle
             colormap([0 0 0 ; 0 1 0]);
             axis ij;
             axis square;
+            %xlim([start,length(data)]); ylim([1,16]);  % static limits
             drawnow;
             obj.figHandle = gcf();
         end
