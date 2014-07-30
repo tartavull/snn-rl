@@ -41,7 +41,7 @@ classdef Monitor < handle
             
             
             switch obj.plotType
-                case 'line'
+                case 'lines'
                     obj.linePlot;
                 case 'squares'
                     obj.squaresPlot;
@@ -53,29 +53,36 @@ classdef Monitor < handle
         end
         
         function linePlot(obj)
-            time = [obj.history{1,:}];
-            data = [obj.history{2,:}];
+            
+            %This doesn't work yet! make something faster
+            if( length([obj.history{1,:}]) > 50)
+                start = length(obj.history) - 50;
+            else
+                start = 1;
+            end
+                        
+            time = [obj.history{1,start:end}];
+            data = [obj.history{2,start:end}];
             for line = 1:length(obj.history{2,1})
-            hold on;
+                hold on;
                 plot(time,data(line,:)*0.8+line);
             end
             drawnow;
             obj.figHandle = gcf();
-
+            
         end
         
         function squaresPlot(obj)            
-            time = [obj.history{1,:}];
-            data = [obj.history{2,:}];
-            
-            if( length(time) > 20)
-                start = length(time) - 20;
+
+            if( length(obj.history) > 20)
+                start = length(obj.history) - 20;
             else
                 start = 1;
             end
             
-            timeFrame = data(:,start:end);
-            pcolor([[timeFrame zeros(size(timeFrame,1),1)] ; zeros(1,size(timeFrame,2)+1)]);
+            data = [obj.history{2,start:end}];
+            
+            pcolor([[data zeros(size(data,1),1)] ; zeros(1,size(data,2)+1)]);
             colormap([0 0 0 ; 0 1 0]);
             axis ij;
             axis square;
