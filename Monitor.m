@@ -10,6 +10,8 @@ classdef Monitor < handle
         subPlot_m;
         subPlot_n;
         subPlot_p;
+        
+        lHandle = 0;
     end
     
     methods
@@ -42,7 +44,7 @@ classdef Monitor < handle
             
             switch obj.plotType
                 case 'lines'
-                    obj.linePlot;
+                    obj.realtimePlot;
                 case 'squares'
                     obj.squaresPlot;
                 case 'char'
@@ -70,6 +72,23 @@ classdef Monitor < handle
             drawnow;
             obj.figHandle = gcf();
             
+        end
+        function realtimePlot(obj)
+            if( obj.lHandle  == 0)
+                obj.lHandle = line(nan, nan); %# Generate a blank line and return the line handle
+            end
+            
+            time = [obj.history{1,end}];
+            data = [obj.history{2,end}];
+            
+            X = get(obj.lHandle, 'XData');
+            Y = get(obj.lHandle, 'YData');
+                
+            X = [X time];
+            Y = [Y data];
+                
+            set(obj.lHandle, 'XData', X, 'YData', Y);
+           
         end
         
         function squaresPlot(obj)            
