@@ -1,5 +1,12 @@
 function Ntsmp = neuronsTSMP(charMatrix, W, O, Tmin, Tmax, stc, Rm)
-% Neurons Total Soma Membrane Potential: Calculates Ntsmp for Each Neuron
+% Individual Neurons Total Soma Membrane Potential: Calculates Ntsmp for Each Neuron
+%   This is a function that calculates the total soma membrane potential for 
+%   each individual neuron.  This code is a work in progress rough version that 
+%   is not fully implemented, mainly I am showing what I am currently working 
+%   on by posting this.  I understand that the Dpsc, Spsc, and Tsmp functions 
+%   need to have rearranged calculations to solve for current and I am working 
+%   on that.  Also, elements such as spike times (t), stmp weight adjustments, 
+%   and other elements need to be added.
 %   charMatrix = charactor matrix
 %   W = Neuron weight matrix
 %   O = Omega threshold value for spike
