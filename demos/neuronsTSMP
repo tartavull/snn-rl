@@ -1,0 +1,33 @@
+function Ntsmp = neuronsTSMP(charMatrix, W, O, Tmin, Tmax, stc, Rm)
+% Neurons Total Soma Membrane Potential: Calculates Ntsmp for Each Neuron
+%   charMatrix = charactor matrix
+%   W = Neuron weight matrix
+%   O = Omega threshold value for spike
+%   Tmin = time constant minimum
+%   Tmax = time constant maximum
+%   stc = Soma time constant
+%   Rm = soma resistance
+
+% todo add stmp weight adjustment code
+
+spikeTimes = 1;
+% todo: make real implementation of spike times
+indicesInCharMatrix = size(charMatrix,1) * size(charMatrix,2);
+DiMat = zeros(1,indicesInCharMatrix);
+for i = indicesInCharMatrix
+    DiMat(i) = dirac2(spikeTimes, spikeTimes);
+end
+
+%For each neuron calculate the total soma membrane potential
+for Y = 1:size(charMatrix,1)
+    for X = 1:size(charMatrix,2)
+        charMatrixIndex = (X+(Y*size(charMatrix,2)));
+        Rd = resistance(timeConstant(Tmax, Tmin, W(charCounter,charMatrixIndex)), 10, 80, 30);
+        
+        Dpsc = dendriticPostSynapticCurrent(charMatrix(Y,X), Rd, W(charCounter,charMatrixIndex), dirac2(spikeTimes, spikeTimes), Td);
+        
+        Spsc = somaticPostSynapticCurrent(W(charCounter,:), DiMat, Ts, t);
+        
+        Ntsmp = totalSomaMembranePotential(t, Rm, Spsc, Dpsc, Tm);
+    end
+end
