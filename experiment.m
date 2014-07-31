@@ -13,7 +13,7 @@ charMonitor.setSubPlot(handle,2,2,1);
 charMonitor.setPlotType('char');
 %Construct LIK Spike Monitor
 spikeMonitor = Monitor;
-spikeMonitor.setSubPlot(handle,2,2,3);
+spikeMonitor.setSubPlot(handle,2,2,[3 4]);
 spikeMonitor.setPlotType('lines');
 
 
@@ -37,9 +37,12 @@ for epochIndex = 1:epochs
         charMatrix = Dictionary{charCounter,2};
         input = reshape(charMatrix,[],1);
         
+        subplot(2,2,1);
         %Record and plot
         charMonitor.record(time,charMatrix);
         charMonitor.plot();
+        
+        subplot(2,2,2);
         monitor.record(time,input);
         monitor.plot();
         
@@ -51,8 +54,9 @@ for epochIndex = 1:epochs
             likFired=find(likV >= threshold);    % indices of spikes
             likV = likV + timeStep  .* 1/capacitance * (likI - likV./ resistance);
             likV(likFired) = restPotential; %Set to resting potential
-
-            spikeMonitor.record(time,likV(end));
+            
+            subplot(2,2,[3 4]);
+            spikeMonitor.record(time,likV);
             spikeMonitor.plot();
             
 

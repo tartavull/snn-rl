@@ -11,7 +11,7 @@ classdef Monitor < handle
         subPlot_n;
         subPlot_p;
         
-        lHandle = 0;
+        lineHandle;
     end
     
     methods
@@ -21,12 +21,16 @@ classdef Monitor < handle
         function setPlotType(obj,string)
             obj.plotType = string;
         end
-        function setSubPlot(obj,figure,m,n,p)
-            obj.figHandle = figure;
+        function setSubPlot(obj,figHandle,m,n,p)
+            obj.figHandle = figHandle;
             obj.subPlot_m = m;
             obj.subPlot_n = n;
             obj.subPlot_p = p;
             obj.subPlot = true;
+            
+            
+            figure(obj.figHandle);
+            %subplot(obj.subPlot_m,obj.subPlot_n,obj.subPlot_p);
         end
         
         
@@ -36,15 +40,15 @@ classdef Monitor < handle
         end
         
         function plot(obj)
-            if(obj.subPlot)  
-                figure(obj.figHandle);
-                subplot(obj.subPlot_m,obj.subPlot_n,obj.subPlot_p);
-            end
+            
+            %if(obj.subPlot)  
+            %    subplot(obj.subPlot_m,obj.subPlot_n,obj.subPlot_p);
+            %end
             
             
             switch obj.plotType
                 case 'lines'
-                    obj.realtimePlot;
+                    obj.linePlot;
                 case 'squares'
                     obj.squaresPlot;
                 case 'char'
@@ -55,39 +59,28 @@ classdef Monitor < handle
         end
         
         function linePlot(obj)
-            
-            %This doesn't work yet! make something faster
-            if( length([obj.history{1,:}]) > 50)
-                start = length(obj.history) - 50;
-            else
-                start = 1;
-            end
-                        
-            time = [obj.history{1,start:end}];
-            data = [obj.history{2,start:end}];
-            for line = 1:length(obj.history{2,1})
-                hold on;
-                plot(time,data(line,:)*0.8+line);
-            end
-            drawnow;
-            obj.figHandle = gcf();
-            
-        end
-        function realtimePlot(obj)
-            if( obj.lHandle  == 0)
-                obj.lHandle = line(nan, nan); %# Generate a blank line and return the line handle
-            end
-            
             time = [obj.history{1,end}];
             data = [obj.history{2,end}];
             
-            X = get(obj.lHandle, 'XData');
-            Y = get(obj.lHandle, 'YData');
+            %Intialize the handles the first time the this is called
+            if(isempty(obj.lineHandle))
+                for index = 1:length(data)
+                    obj.lineHandle(index) = line(nan, nan); %# Generate a blank line and return the line handle
+                end
+            end
+            
+            for index = 1:length(data)
+                oldTime = get(obj.lineHandle(index), 'XData');
+                oldData = get(obj.lineHandle(index), 'YData');
+
+                oldTime = [oldTime time];
+                oldData = [oldData data(index)*0.8+index];
                 
-            X = [X time];
-            Y = [Y data];
-                
-            set(obj.lHandle, 'XData', X, 'YData', Y);
+                timeFrame = 100;
+                start = max([length(oldTime) - timeFrame 1]);
+                set(obj.lineHandle(index), 'XData', oldTime(start:end), 'YData', oldData(start:end));
+            end
+            drawnow;
            
         end
         
@@ -107,21 +100,17 @@ classdef Monitor < handle
             axis square;
             %xlim([start,length(data)]); ylim([1,16]);  % static limits
             drawnow;
-            obj.figHandle = gcf();
         end
         
         function charPlot(obj)         
            data = obj.history{2,end};
            obj.showChar(data);
-           obj.figHandle = gcf();
-
         end
     end
     
     methods(Static)
         function handle = showChar(charArray)
             handle = imshow(charArray,'InitialMagnification',1000);
-            
         end
     end
 
