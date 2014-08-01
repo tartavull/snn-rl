@@ -25,7 +25,7 @@ threshold = 10;
 capacitance = 20;
 resistance = 0.8;
 
-epochs = 50; %an epoch means one full presentation % of all the characters
+epochs = 10; %an epoch means one full presentation % of all the characters
 presentationTime = 300; %Each character is presented for 300ms
 timeStep = 2; %time step for the simulation is 0.2 ms
 time = 0;
@@ -37,12 +37,10 @@ for epochIndex = 1:epochs
         charMatrix = Dictionary{charCounter,2};
         input = reshape(charMatrix,[],1);
         
-        subplot(2,2,1);
         %Record and plot
         charMonitor.record(time,charMatrix);
         charMonitor.plot();
         
-        subplot(2,2,2);
         monitor.record(time,input);
         monitor.plot();
         
@@ -55,7 +53,6 @@ for epochIndex = 1:epochs
             likV = likV + timeStep  .* 1/capacitance * (likI - likV./ resistance);
             likV(likFired) = restPotential; %Set to resting potential
             
-            subplot(2,2,[3 4]);
             spikeMonitor.record(time,likV);
             spikeMonitor.plot();
             

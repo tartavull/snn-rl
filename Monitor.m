@@ -12,6 +12,7 @@ classdef Monitor < handle
         subPlot_p;
         
         lineHandle;
+        subPlotHandle;
     end
     
     methods
@@ -30,7 +31,7 @@ classdef Monitor < handle
             
             
             figure(obj.figHandle);
-            %subplot(obj.subPlot_m,obj.subPlot_n,obj.subPlot_p);
+            obj.subPlotHandle = subplot(obj.subPlot_m,obj.subPlot_n,obj.subPlot_p);
         end
         
         
@@ -41,9 +42,9 @@ classdef Monitor < handle
         
         function plot(obj)
             
-            %if(obj.subPlot)  
-            %    subplot(obj.subPlot_m,obj.subPlot_n,obj.subPlot_p);
-            %end
+            if(obj.subPlot == true && obj.subPlotHandle ~= gca)  
+                subplot(obj.subPlot_m,obj.subPlot_n,obj.subPlot_p);
+            end
             
             
             switch obj.plotType
@@ -77,8 +78,9 @@ classdef Monitor < handle
                 oldData = [oldData data(index)*0.8+index];
                 
                 timeFrame = 100;
-                start = max([length(oldTime) - timeFrame 1]);
-                set(obj.lineHandle(index), 'XData', oldTime(start:end), 'YData', oldData(start:end));
+                startIndex = max([length(oldTime) - mod(length(oldTime),timeFrame) 1]);
+                set(obj.lineHandle(index), 'XData', oldTime(startIndex:end), 'YData', oldData(startIndex:end));
+
             end
             drawnow;
            
