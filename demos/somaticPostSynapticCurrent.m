@@ -2,7 +2,9 @@ function Spsc = somaticPostSynapticCurrent(WiMat, DiMat, stc, t)
 % Somatic Post Synaptic Current: Calculates Spsc
 %   Need some help currently on interpreting how to code 'K' from the
 %   following Mathematica 'out' formula: http://i.imgur.com/Tfa14od.jpg
-%   appears to be this function http://mathworld.wolfram.com/K-Function.html
+%   appears to be this: 'summation index in a symbolic sum' according to
+%   sources such as this and others
+%   http://forums.wolfram.com/mathgroup/archive/2012/Jan/msg00762.html
 %   Trying to figure out how can that be coded in Matlab?
 %   I am also still working on getting the integral function to work.
 %
