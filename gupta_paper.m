@@ -25,6 +25,10 @@ threshold = 10;
 capacitance = 20;
 resistance = 0.8;
 
+% Second layer intialization
+outputNeurons = 4;
+voltageSecLayer = zeros(outputNeurons,1);
+
 epochs = 10; %an epoch means one full presentation % of all the characters 100 
 presentationTime = 300; %Each character is presented for 300ms
 timeStep = 0.2; %time step for the simulation is 0.2 ms
@@ -56,7 +60,10 @@ for epochIndex = 1:epochs
             spikeMonitor.record(time,likV);
             spikeMonitor.plot();
             
-
+			%Call Second layer
+            for neuron = 1:outputNeurons
+                voltageSecLayer(neuron) = neuronsTSMP(likV,weights,thresholds,Tmin,Tmax,stc,Rm);
+            end
             
         end
     end
