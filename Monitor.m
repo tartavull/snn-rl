@@ -50,6 +50,8 @@ classdef Monitor < handle
             switch obj.plotType
                 case 'lines'
                     obj.linePlot;
+                case 'lines3d'
+                    obj.line3dPlot;
                 case 'squares'
                     obj.squaresPlot;
                 case 'char'
@@ -101,6 +103,36 @@ classdef Monitor < handle
             axis ij;
             axis square;
             %xlim([start,length(data)]); ylim([1,16]);  % static limits
+            drawnow;
+        end
+        
+        function line3dPlot(obj)
+            time = [obj.history{1,end}];
+            data = [obj.history{2,end}];
+            
+            %Intialize the handles the first time the this is called
+            if(isempty(obj.lineHandle))
+                for index = 1:length(data)
+                    obj.lineHandle(index) = line(nan, nan, nan); %# Generate a blank line and return the line handle
+                end
+                view(3);
+                grid on;
+            end
+            
+            for index = 1:length(data)
+                oldTime = get(obj.lineHandle(index), 'XData');
+                oldPosition = get(obj.lineHandle(index), 'YData');
+                oldData = get(obj.lineHandle(index), 'ZData');
+
+                oldTime = [oldTime time];
+                oldPosition = [oldPosition index];
+                oldData = [oldData data(index)];
+                
+                timeFrame = 100;
+                startIndex = max([length(oldTime) - mod(length(oldTime),timeFrame) 1]);
+                set(obj.lineHandle(index), 'XData', oldTime(startIndex:end), 'YData', oldPosition(startIndex:end),'ZData',oldData(startIndex:end));
+
+            end
             drawnow;
         end
         

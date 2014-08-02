@@ -14,10 +14,10 @@ charMonitor.setPlotType('char');
 %Construct LIK Spike Monitor
 spikeMonitor = Monitor;
 spikeMonitor.setSubPlot(handle,2,2,[3 4]);
-spikeMonitor.setPlotType('lines');
+spikeMonitor.setPlotType('lines3d');
 
 
-%Leaky integrate and fire
+%Leaky integrate and fire intialization
 restPotential = 0;
 likV = restPotential * ones(15,1);  % Initial values of voltage
 stimulusIntensity = 20;
@@ -25,9 +25,9 @@ threshold = 10;
 capacitance = 20;
 resistance = 0.8;
 
-epochs = 10; %an epoch means one full presentation % of all the characters
+epochs = 10; %an epoch means one full presentation % of all the characters 100 
 presentationTime = 300; %Each character is presented for 300ms
-timeStep = 2; %time step for the simulation is 0.2 ms
+timeStep = 0.2; %time step for the simulation is 0.2 ms
 time = 0;
 for epochIndex = 1:epochs
     for dictionaryIndex = 1:length(Dictionary)
