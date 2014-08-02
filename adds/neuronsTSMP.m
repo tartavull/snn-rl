@@ -31,10 +31,9 @@ for Y = 1:size(charMatrix,1)
         charMatrixIndex = (X+(Y*size(charMatrix,2)));
         Rd = resistance(timeConstant(Tmax, Tmin, W(charCounter,charMatrixIndex)), 10, 80, 30);
         
-        Dpsc = dendriticPostSynapticCurrent(charMatrix(Y,X), Rd, W(charCounter,charMatrixIndex), dirac2(spikeTimes, spikeTimes), Td);
+        K = 1;
+        K2 = 6290;
         
-        Spsc = somaticPostSynapticCurrent(W(charCounter,:), DiMat, Ts, t);
-        
-        Ntsmp = totalSomaMembranePotential(t, Rm, Spsc, Dpsc, Tm);
+        Ntsmp = totalSomaMembranePotential(t, tf, Rm, Rd, Wi, WiMat, DiMat, K, K2, stc)
     end
 end
