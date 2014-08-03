@@ -16,6 +16,9 @@ spikeMonitor = Monitor;
 spikeMonitor.setSubPlot(handle,2,2,[3 4]);
 spikeMonitor.setPlotType('lines3d');
 
+%Initialize the net
+architecture;
+
 time = 0;
 for epochIndex = 1:epochs
     for dictionaryIndex = 1:length(Dictionary)
@@ -45,9 +48,10 @@ for epochIndex = 1:epochs
             spikeMonitor.plot();
             
 			%Call Second layer
-            for neuron = 1:outputNeurons
-                voltageSecLayer(neuron) = neuronsTSMP(likV,weights,thresholds,Tmin,Tmax,stc,Rm);
-            end
+            addsFired=find(addsV >= threshold);
+            currentDendritic = currentDendritic + timeStep * ((-currentDendritic + Rd .* weigthsDendritic .* [likFired likFired likFired])./tauDendritic);
+            currentSomatic = currentSomatic + timeStep * ((-currentSomatic + sum(weightsSomatic .* [addsFired addsFired addsFired addsFired],2))./tauSomatic);
+            
             
         end
     end
