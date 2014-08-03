@@ -40,7 +40,7 @@ for epochIndex = 1:epochs
             
             %Integrate and fire layer
             likI = input * stimulusIntensity;
-            likFired=find(likV >= threshold);    % indices of spikes
+            likFired=find(likV >= firingThreshold);    % indices of spikes
             likV = likV + timeStep  .* 1/capacitance * (likI - likV./ resistance);
             likV(likFired) = restPotential; %Set to resting potential
             
@@ -48,8 +48,8 @@ for epochIndex = 1:epochs
             spikeMonitor.plot();
             
 			%Call Second layer
-            addsFired=find(addsV >= threshold);
-            currentDendritic = currentDendritic + timeStep * ((-currentDendritic + Rd .* weigthsDendritic .* [likFired likFired likFired])./tauDendritic);
+            addsFired=find(voltagesMembrane >= firingThreshold);
+            currentDendritic = currentDendritic + timeStep * ((-currentDendritic + resistenceDendritic .* weightsDendritic .* [likFired likFired likFired])./tauDendritic);
             currentSomatic = currentSomatic + timeStep * ((-currentSomatic + sum(weightsSomatic .* [addsFired addsFired addsFired addsFired],2))./tauSomatic);
             
             
