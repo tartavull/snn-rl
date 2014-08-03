@@ -1,5 +1,6 @@
 close all;
 clear all;
+addpath('adds','datasets');
 makeDictionary;
 Dictionary = Dictionary(1:4,:); % Using A,B,C,D
 
