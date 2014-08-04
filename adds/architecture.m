@@ -24,6 +24,7 @@ aMinus = -0.105;
 tauMax = 30;
 tauMin = 2;
 tauDendritic = zeros(15,4);
+tauSomatic = 2;
 tauMembrane = 2;
 tauPlus = 1;
 tauMinus = 1;
