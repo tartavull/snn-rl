@@ -41,7 +41,7 @@ for epochIndex = 1:epochs
         monitor.record(time,input);
         monitor.plot();
         
-        for stepIndex = 0:timeStep:presentationTime          
+        for stepIndex = 1:presentationTime*timeStep          
             time = time + timeStep;
             
             %Integrate and fire layer
@@ -56,6 +56,7 @@ for epochIndex = 1:epochs
 			%Call Second layer
             LikDirac = zeros(15,1);
             LikDirac(likFired) = 1;
+            LikFirings(stepIndex,:) = LikDirac;
             
             tauDendritic = timeConstant(tauMax, tauMin , weightsDendritic);
             resistenceDendritic = resistanceComputation(tauDendritic, firingThreshold , resistenceMembrane, tauMembrane);
@@ -63,7 +64,7 @@ for epochIndex = 1:epochs
             addsFired=find(voltagesMembrane > firingThreshold);
             addsDirac = zeros(1,4);
             addsDirac(addsFired) = 1;
-            %firings=[firings; addsDirac];
+            addsFirings(stepIndex,:) = addsDirac;
             
             
             currentDendritic = currentDendritic + timeStep * ((-currentDendritic + resistenceDendritic .* weightsDendritic .* [LikDirac LikDirac LikDirac LikDirac])./tauDendritic);

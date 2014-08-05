@@ -34,7 +34,8 @@ currentDendritic = zeros(15,4);
 currentSomatic = zeros(1,4);
 
 %Firings
-firings = zeros(length(Dictionary) * epochs * presentationTime / timeStep , 15);
+LikFirings  = zeros(length(Dictionary) * epochs * presentationTime / timeStep , 15);
+addsFirings = zeros(length(Dictionary) * epochs * presentationTime / timeStep , 4);
 
 %Resistences
 resistenceDendritic = zeros(15,4);
