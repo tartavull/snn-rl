@@ -146,6 +146,9 @@ classdef Monitor < handle
         function handle = showChar(charArray)
             handle = imshow(charArray,'InitialMagnification',1000);
         end
+        function handle = plotFirings( firings )
+            handle = plot(firings(:,1),firings(:,2),'.');
+        end
     end
 
     
