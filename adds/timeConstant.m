@@ -7,6 +7,6 @@ if abs(Wi) > 1
     return;
 end
 
-Td = Tmax - abs(Wi) * (Tmax - Tmin);
+Td = ones(size(Wi)).* Tmax - abs(Wi) .* (Tmax - Tmin);
 end
 

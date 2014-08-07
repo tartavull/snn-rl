@@ -115,6 +115,8 @@ classdef Monitor < handle
                 for index = 1:length(data)
                     obj.lineHandle(index) = line(nan, nan, nan); %# Generate a blank line and return the line handle
                 end
+                zlim('manua');
+                zlim([0 15]);
                 view(3);
                 grid on;
             end
@@ -145,6 +147,9 @@ classdef Monitor < handle
     methods(Static)
         function handle = showChar(charArray)
             handle = imshow(charArray,'InitialMagnification',1000);
+        end
+        function handle = plotFirings( firings )
+            handle = plot(firings(:,1),firings(:,2),'.');
         end
     end
 

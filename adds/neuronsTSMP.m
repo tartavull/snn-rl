@@ -1,4 +1,4 @@
-function Ntsmp = neuronsTSMP(charMatrix, W, O, Tmin, Tmax, stc, Rm)
+function Ntsmp = neuronsTSMP(input, W, O, Tmin, Tmax, stc, Rm)
 % Individual Neurons Total Soma Membrane Potential: Calculates Ntsmp for Each Neuron
 %   This is a function that calculates the total soma membrane potential for 
 %   each individual neuron.  This code is a work in progress rough version that 
@@ -19,13 +19,15 @@ function Ntsmp = neuronsTSMP(charMatrix, W, O, Tmin, Tmax, stc, Rm)
 
 spikeTimes = 1;
 % todo: make real implementation of spike times
-indicesInCharMatrix = size(charMatrix,1) * size(charMatrix,2);
-DiMat = zeros(1,indicesInCharMatrix);
-for i = indicesInCharMatrix
-    DiMat(i) = dirac2(spikeTimes, spikeTimes);
-end
+DiMat = dirac(input);
+%indicesInCharMatrix = size(charMatrix,1) * size(charMatrix,2);
+% DiMat = zeros(1,indicesInCharMatrix);
+% for i = indicesInCharMatrix
+%     DiMat(i) = dirac2(spikeTimes, spikeTimes);
+% end
 
 %For each neuron calculate the total soma membrane potential
+
 for Y = 1:size(charMatrix,1)
     for X = 1:size(charMatrix,2)
         charMatrixIndex = (X+(Y*size(charMatrix,2)));
@@ -36,4 +38,5 @@ for Y = 1:size(charMatrix,1)
         
         Ntsmp = totalSomaMembranePotential(t, tf, Rm, Rd, Wi, WiMat, DiMat, K, K2, stc)
     end
+
 end
