@@ -37,8 +37,8 @@ currentSomatic = zeros(1,4);
 likFirings  = zeros(15,length(Dictionary) * epochs * presentationTime / timeStep );
 addsFirings = zeros(4,length(Dictionary) * epochs * presentationTime / timeStep);
 
-likLastTimeFired= zeros(15,1);
-addsLastTimeFired= zeros(15,1);
+likLastTimeFired= zeros(15,1) * NaN;
+addsLastTimeFired= zeros(4,1) * NaN;
 
 
 %Resistences

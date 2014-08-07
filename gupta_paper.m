@@ -5,7 +5,7 @@ addpath('adds','datasets');
 makeDictionary;
 Dictionary = Dictionary(1:4,:); % Using A,B,C,D
 
-debugScript = false;
+debugScript = true;
 if (debugScript)
     %Construct input Monitor
     meshMonitor = Monitor;
@@ -88,7 +88,10 @@ for epochIndex = 1:epochs
             end
             
             %updateWeights
-            %use  addsLastTimeFired -  likLastTimeFired
+            for addsNeuron = 1:length(Dictionary)
+                deltaSpike = addsLastTimeFired(addsNeuron)*ones(size(likLastTimeFired(end))) -  likLastTimeFired(end);
+                deltaSomaticWeight = deltaWeight(deltaSpike);
+            end
          
             
 

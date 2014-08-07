@@ -115,6 +115,8 @@ classdef Monitor < handle
                 for index = 1:length(data)
                     obj.lineHandle(index) = line(nan, nan, nan); %# Generate a blank line and return the line handle
                 end
+                zlim('manua');
+                zlim([0 15]);
                 view(3);
                 grid on;
             end
