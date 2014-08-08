@@ -1,5 +1,5 @@
 %Simulation time parameters
-epochs = 10; %an epoch means one full presentation % of all the characters 100 
+epochs = 100; %an epoch means one full presentation % of all the characters 100 
 presentationTime = 300; %Each character is presented for 300ms
 timeStep = 0.2; %time step for the simulation is 0.2 ms
 
@@ -11,8 +11,8 @@ capacitance = 20;
 resistance = 0.8;
 
 %Weights
-weightsDendritic = (0.5 * rand(1) + 0.5) * ones(15,4);
-weightsSomatic = -(0.5 * rand(1) + 0.5) * ones(4,4); % We dont know if this initialization is correct
+weightsDendritic = 0.5 .* rand(15,4) + 0.5; 
+weightsSomatic = -0.5 * rand(4,4) + 0.5; % We dont know if this initialization is correct
 weightMaxExcitatory = 1;
 weightMinExcitatory = 0;
 weightMaxInhibitory = 0;

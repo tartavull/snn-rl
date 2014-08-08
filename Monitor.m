@@ -112,10 +112,12 @@ classdef Monitor < handle
             
             %Intialize the handles the first time the this is called
             if(isempty(obj.lineHandle))
+                colorspec = {'r'; 'g'; 'b';'c';'m';'y';'k'};
                 for index = 1:length(data)
                     obj.lineHandle(index) = line(nan, nan, nan); %# Generate a blank line and return the line handle
+                    set(obj.lineHandle(index),'Color',colorspec{mod(index,5)+1});
                 end
-                zlim('manua');
+                zlim('manual');
                 zlim([0 15]);
                 view(3);
                 grid on;
@@ -130,8 +132,8 @@ classdef Monitor < handle
                 oldPosition = [oldPosition index];
                 oldData = [oldData data(index)];
                 
-                timeFrame = 100;
-                startIndex = max([length(oldTime) - mod(length(oldTime),timeFrame) 1]);
+                timeFrame = 500;
+                startIndex = max([(length(oldTime) - timeFrame) 1]);
                 set(obj.lineHandle(index), 'XData', oldTime(startIndex:end), 'YData', oldPosition(startIndex:end),'ZData',oldData(startIndex:end));
 
             end

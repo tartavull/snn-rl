@@ -50,7 +50,7 @@ for epochIndex = 1:epochs
             
             %Integrate and fire layer
             likI = input * stimulusIntensity;
-            likFired=find(likV >= firingThreshold);    % indices of spikes
+            likFired=find(likV > firingThreshold);    % indices of spikes
             likV = likV + timeStep  .* 1/capacitance * (likI - likV./ resistance);
             likV(likFired) = restPotential; %Set to resting potential
             
@@ -59,13 +59,13 @@ for epochIndex = 1:epochs
                 spikeMonitor.plot();
             end
             
-			%Call Second layer
             likDirac = zeros(15,1);
             likDirac(likFired) = 1;
             likFirings(:,stepIndex) = likDirac; %Something isn't working here, almost all zeros check Monitor.plotFirings
             likLastTimeFired = [likLastTimeFired likLastTimeFired(:,end)];
             likLastTimeFired(likFired,end) = time;
             
+            %Second layer
             addsFired=find(voltagesMembrane > firingThreshold);
             addsDirac = zeros(1,4);
             addsDirac(addsFired) = 1;
@@ -76,7 +76,7 @@ for epochIndex = 1:epochs
             tauDendritic = timeConstant(tauMax, tauMin , weightsDendritic);
             resistenceDendritic = resistanceComputation(tauDendritic, firingThreshold , resistenceMembrane, tauMembrane);        
             
-            currentDendritic = currentDendritic + timeStep * ((-currentDendritic + resistenceDendritic .* weightsDendritic .* [likDirac likDirac likDirac likDirac])./tauDendritic);
+            currentDendritic = currentDendritic + timeStep * ((-currentDendritic + resistenceDendritic .* weightsDendritic .* [likDirac likDirac likDirac likDirac] .* 2)./tauDendritic);
             currentSomatic = currentSomatic + timeStep * ((-currentSomatic + sum(weightsSomatic .* [addsDirac; addsDirac; addsDirac; addsDirac],1))./tauSomatic);
             
             voltagesMembrane =  voltagesMembrane + timeStep * ((-voltagesMembrane + resistenceMembrane .* ( sum(currentDendritic,1) + currentSomatic))/tauMembrane);
@@ -92,11 +92,7 @@ for epochIndex = 1:epochs
                 deltaSpike = addsLastTimeFired(addsNeuron)*ones(size(likLastTimeFired(end))) -  likLastTimeFired(end);
                 deltaSomaticWeight = deltaWeight(deltaSpike);
             end
-         
-            
 
-            
-            
              
         end
     end
