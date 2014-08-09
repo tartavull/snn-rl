@@ -36,6 +36,8 @@ for epochIndex = 1:epochs
         charCounter= mod(dictionaryIndex,length(Dictionary))+1;
         charMatrix = Dictionary{charCounter,2};
         input = reshape(charMatrix,[],1);
+        voltagesMembraneTotal = 0;
+        addsDiracInEpoch=zeros(1,4);        
         
         if (debugScript)
             %Record and plot
@@ -69,6 +71,7 @@ for epochIndex = 1:epochs
             addsFired=find(voltagesMembrane > firingThreshold);
             addsDirac = zeros(1,4);
             addsDirac(addsFired) = 1;
+            addsDiracInEpoch(addsFired) = 1;            
             addsFirings(:,stepIndex) = addsDirac;
             addsLastTimeFired = [addsLastTimeFired addsLastTimeFired(:,end)];
             addsLastTimeFired(addsFired,end) = time;
@@ -93,8 +96,10 @@ for epochIndex = 1:epochs
                 deltaSomaticWeight = deltaWeight(deltaSpike);
             end
 
-             
+            voltagesMembraneTotal = voltagesMembraneTotal + voltagesMembrane;             
         end
+        
+        logResults(Dictionary{dictionaryIndex}, epochIndex, voltagesMembraneTotal, addsDiracInEpoch);        
     end
     %Print epoch number
     fprintf('Epoch %d of %d \n',epochIndex,epochs);
