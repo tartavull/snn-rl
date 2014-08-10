@@ -25,7 +25,7 @@ if (debugScript)
     addsMonitor.setSubPlot(handle,3,2,[5 6]);
     addsMonitor.setPlotType('lines3d');
 end
-
+debugScript = true;
 logging = false;
 if (logging)
    %Clear output and open for writing
@@ -105,8 +105,14 @@ for epochIndex = 1:epochs
             
             %updateWeights
             for addsNeuron = 1:length(Dictionary)
-                deltaSpike = addsLastTimeFired(addsNeuron)*ones(size(likLastTimeFired(end))) -  likLastTimeFired(end);
-                deltaSomaticWeight = deltaWeight(deltaSpike);
+                deltaSynapticSpike = addsLastTimeFired(addsNeuron,end)*ones(size(likLastTimeFired(end))) -  likLastTimeFired(:,end);
+                deltaSynapticWeight = deltaWeight(deltaSynapticSpike);
+                weightsDendritic(:,addsNeuron) = weightsDendritic(:,addsNeuron) + deltaSynapticWeight;
+                
+                somaticSynapseWeigthIndexes = setdiff(1:length(Dictionary),addsNeuron);
+                deltaSomaticSpike = addsLastTimeFired(addsNeuron,end)*ones(length(Dictionary)-1,1) -  addsLastTimeFired(somaticSynapseWeigthIndexes,end);
+                deltaSomaticWeight = deltaWeight(deltaSomaticSpike);
+                weightsSomatic(somaticSynapseWeigthIndexes,addsNeuron) = weightsSomatic(somaticSynapseWeigthIndexes,addsNeuron) + deltaSomaticWeight;
             end
 
             voltagesMembraneTotal = voltagesMembraneTotal + voltagesMembrane;             
@@ -131,6 +137,9 @@ for epochIndex = 1:epochs
         if (epochIndex == 1 || epochIndex == 2 || epochIndex == 3 || epochIndex == 25 || epochIndex == 50 || epochIndex == 75 || epochIndex == 100)
             presentResults(uniqueSpikePercentageTotal, topVsClosestNtmpTotal, topVsAllNtmpTotal, length(Dictionary));
         end
+    end
+    if (epochIndex > 95)
+        debugScript = true;
     end
 end
 

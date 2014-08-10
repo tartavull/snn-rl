@@ -11,8 +11,12 @@ capacitance = 20;
 resistance = 0.8;
 
 %Weights
-weightsDendritic = 0.5 .* rand(15,4) + 0.5; 
-weightsSomatic = -0.5 * rand(4,4) + 0.5; % We dont know if this initialization is correct
+lenAdds = 4;
+weightsDendritic = 0.5 .* rand(15,lenAdds) + 0.5; 
+weightsSomatic = -0.5 * rand(lenAdds,lenAdds) + 0.5; 
+%We should keep the diagonal as zeroes so we dont autoinhibate the spikes
+weightsSomatic(1:lenAdds+1:lenAdds*lenAdds) = 0;
+
 weightMaxExcitatory = 1;
 weightMinExcitatory = 0;
 weightMaxInhibitory = 0;
@@ -23,30 +27,30 @@ aMinus = -0.105;
 %Time constants
 tauMax = 30;
 tauMin = 2;
-tauDendritic = zeros(15,4);
+tauDendritic = zeros(15,lenAdds);
 tauSomatic = 2;
 tauMembrane = 2;
 tauPlus = 1;
 tauMinus = 1;
 
 %Currents
-currentDendritic = zeros(15,4);
-currentSomatic = zeros(1,4);
+currentDendritic = zeros(15,lenAdds);
+currentSomatic = zeros(1,lenAdds);
 
 %Firings
 likFirings  = zeros(15,length(Dictionary) * epochs * presentationTime / timeStep );
 addsFirings = zeros(4,length(Dictionary) * epochs * presentationTime / timeStep);
 
 likLastTimeFired= zeros(15,1) * NaN;
-addsLastTimeFired= zeros(4,1) * NaN;
+addsLastTimeFired= zeros(lenAdds,1) * NaN;
 
 
 %Resistences
-resistenceDendritic = zeros(15,4);
+resistenceDendritic = zeros(15,lenAdds);
 resistenceMembrane = 80;
 
 %Voltages
-voltagesMembrane = zeros(1,4);
+voltagesMembrane = zeros(1,lenAdds);
 
 %Firing threshold
 firingThreshold = 10;

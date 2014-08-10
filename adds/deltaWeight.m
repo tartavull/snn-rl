@@ -12,8 +12,10 @@ AMinus = -0.105; % parameter based on appendix I
 TimeConstantPlus = 1.0; % time constant in ms parameter based on appendix I
 TimeConstantMinus = 1.0; % time constant in ms parameter based on appendix I
 ln = 2.71828182845904523536028747135266249775724709369995; % natural log
-
+   
+   Dw = zeros(length(Dt),1);
    negatives =  find(Dt < 0);
-   Dw(negatives) =  APlus * (ln ^ (Dt(negatives)./TimeConstantPlus));
-   Dw(~negatives) =  AMinus * (ln ^ (-Dt(~negatives)./TimeConstantMinus));
+   positives =  find(Dt > 0);
+   Dw(negatives) =  APlus .* (ln .^ (Dt(negatives)./TimeConstantPlus));
+   Dw(positives) =  AMinus .* (ln .^ (-Dt(positives)./TimeConstantMinus));
 end
