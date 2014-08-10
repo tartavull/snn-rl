@@ -5,6 +5,7 @@ addpath('adds','datasets');
 makeDictionary;
 Dictionary = Dictionary(1:4,:); % Using A,B,C,D
 
+results = true;
 debugScript = true;
 if (debugScript)
     %Construct input Monitor
@@ -25,11 +26,22 @@ if (debugScript)
     addsMonitor.setPlotType('lines3d');
 end
 
+logging = false;
+if (logging)
+   %Clear output and open for writing
+   fid = fopen('logOfResults.tsv','w'); 
+   fclose(fid);
+   fid = fopen('logOfResults.tsv','a');
+end
+
 %Initialize the net
 architecture;
 
 time = 0;
 for epochIndex = 1:epochs
+    uniqueSpikePercentageTotal = 0;
+    topVsClosestNtmpTotal = 0;
+    topVsAllNtmpTotal = 0;
     for dictionaryIndex = 1:length(Dictionary)
         %Each character is presented one at a time sequentially during
         %the training process
@@ -37,7 +49,8 @@ for epochIndex = 1:epochs
         charMatrix = Dictionary{charCounter,2};
         input = reshape(charMatrix,[],1);
         voltagesMembraneTotal = 0;
-        addsDiracInEpoch=zeros(1,4);        
+        addsDiracForChar=zeros(1,4);   
+        
         
         if (debugScript)
             %Record and plot
@@ -71,7 +84,7 @@ for epochIndex = 1:epochs
             addsFired=find(voltagesMembrane > firingThreshold);
             addsDirac = zeros(1,4);
             addsDirac(addsFired) = 1;
-            addsDiracInEpoch(addsFired) = 1;            
+            addsDiracForChar(addsFired) = 1;            
             addsFirings(:,stepIndex) = addsDirac;
             addsLastTimeFired = [addsLastTimeFired addsLastTimeFired(:,end)];
             addsLastTimeFired(addsFired,end) = time;
@@ -99,9 +112,29 @@ for epochIndex = 1:epochs
             voltagesMembraneTotal = voltagesMembraneTotal + voltagesMembrane;             
         end
         
-        logResults(Dictionary{dictionaryIndex}, epochIndex, voltagesMembraneTotal, addsDiracInEpoch);        
+        if (logging)
+            logResults(Dictionary{dictionaryIndex}, epochIndex, voltagesMembraneTotal, addsDiracForChar, fid);        
+        end
+        
+        if (results)
+            [ percentageOfUniqueSpikes, topVsClosestNtmp, topVsAllNtmp ] = scoreResults( Dictionary{dictionaryIndex}, epochIndex, voltagesMembraneTotal, addsDiracForChar );
+            uniqueSpikePercentageTotal = uniqueSpikePercentageTotal + percentageOfUniqueSpikes;
+            topVsClosestNtmpTotal = topVsClosestNtmpTotal + topVsClosestNtmp;
+            topVsAllNtmpTotal = topVsAllNtmpTotal + topVsAllNtmp;
+        end
     end
     %Print epoch number
     fprintf('Epoch %d of %d \n',epochIndex,epochs);
+    
+    %Print selected results
+    if (results)
+        if (epochIndex == 1 || epochIndex == 2 || epochIndex == 3 || epochIndex == 25 || epochIndex == 50 || epochIndex == 75 || epochIndex == 100)
+            presentResults(uniqueSpikePercentageTotal, topVsClosestNtmpTotal, topVsAllNtmpTotal, length(Dictionary));
+        end
+    end
 end
 
+if (logging)
+    %Close output file
+    fclose(fid);
+end
