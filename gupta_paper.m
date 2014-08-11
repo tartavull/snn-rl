@@ -42,6 +42,7 @@ for epochIndex = 1:epochs
     uniqueSpikePercentageTotal = 0;
     topVsClosestNtmpTotal = 0;
     topVsAllNtmpTotal = 0;
+    numberOfSpikesPerChar = zeros(1,4);
     for dictionaryIndex = 1:length(Dictionary)
         %Each character is presented one at a time sequentially during
         %the training process
@@ -127,6 +128,10 @@ for epochIndex = 1:epochs
             uniqueSpikePercentageTotal = uniqueSpikePercentageTotal + percentageOfUniqueSpikes;
             topVsClosestNtmpTotal = topVsClosestNtmpTotal + topVsClosestNtmp;
             topVsAllNtmpTotal = topVsAllNtmpTotal + topVsAllNtmp;
+            
+            % Record spikes for each Char
+            numberOfSpikesForChar = size(find(addsDiracForChar == 1), 2);
+            numberOfSpikesPerChar(1, dictionaryIndex) = numberOfSpikesForChar;
         end
     end
     %Print epoch number
@@ -135,7 +140,7 @@ for epochIndex = 1:epochs
     %Print selected results
     if (results)
         if (epochIndex == 1 || epochIndex == 2 || epochIndex == 3 || epochIndex == 25 || epochIndex == 50 || epochIndex == 75 || epochIndex == 100)
-            presentResults(uniqueSpikePercentageTotal, topVsClosestNtmpTotal, topVsAllNtmpTotal, length(Dictionary));
+            presentResults(uniqueSpikePercentageTotal, numberOfSpikesPerChar, Dictionary(1:length(Dictionary),1), topVsClosestNtmpTotal, topVsAllNtmpTotal, length(Dictionary));
         end
     end
     if (epochIndex > 95)
