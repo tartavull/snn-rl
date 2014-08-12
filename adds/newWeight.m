@@ -7,8 +7,9 @@ function Wnew = newWeight(Dw, Wold, Wmin, Wmax, n)
 %   Wmax = maximum weight parameter
 %   n = learning rate
 
-if (Dw >= 0)
-   Wnew = Wold+n*Dw*(Wmax-Wold);
-elseif (Dw < 0)
-   Wnew = Wold+n*Dw*(Wold-Wmin);
-end
+positives = find(Dw >= 0);
+Wnew(positives) = Wold(positives) + n .* Dw(positives) .* ( Wmax - Wold(positives) );
+
+negatives = find(Dw < 0);
+Wnew(negatives) = Wold(negatives) + n .* Dw(negatives) .* ( Wold(negatives) - Wmin );
+

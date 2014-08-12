@@ -1,9 +1,10 @@
 
 close all;
 clear all;
-addpath('adds','datasets');
-makeDictionary;
-Dictionary = Dictionary(1:4,:); % Using A,B,C,D
+addpath('adds','datasets','auxiliar');
+
+%Initialize the net
+architecture;
 
 results = true;
 debugScript = true;
@@ -25,7 +26,7 @@ if (debugScript)
     addsMonitor.setSubPlot(handle,3,2,[5 6]);
     addsMonitor.setPlotType('lines3d');
 end
-debugScript = true;
+debugScript = false;
 logging = false;
 if (logging)
    %Clear output and open for writing
@@ -34,8 +35,7 @@ if (logging)
    fid = fopen('logOfResults.tsv','a');
 end
 
-%Initialize the net
-architecture;
+
 
 time = 0;
 for epochIndex = 1:epochs
@@ -108,12 +108,12 @@ for epochIndex = 1:epochs
             for addsNeuron = 1:length(Dictionary)
                 deltaSynapticSpike = addsLastTimeFired(addsNeuron,end)*ones(size(likLastTimeFired(end))) -  likLastTimeFired(:,end);
                 deltaSynapticWeight = deltaWeight(deltaSynapticSpike);
-                weightsDendritic(:,addsNeuron) = weightsDendritic(:,addsNeuron) + deltaSynapticWeight;
+                weightsDendritic(:,addsNeuron) = newWeight(deltaSynapticWeight,weightsDendritic(:,addsNeuron), weightMinExcitatory, weightMaxExcitatory,learningRate);
                 
                 somaticSynapseWeigthIndexes = setdiff(1:length(Dictionary),addsNeuron);
                 deltaSomaticSpike = addsLastTimeFired(addsNeuron,end)*ones(length(Dictionary)-1,1) -  addsLastTimeFired(somaticSynapseWeigthIndexes,end);
                 deltaSomaticWeight = deltaWeight(deltaSomaticSpike);
-                weightsSomatic(somaticSynapseWeigthIndexes,addsNeuron) = weightsSomatic(somaticSynapseWeigthIndexes,addsNeuron) + deltaSomaticWeight;
+                weightsSomatic(somaticSynapseWeigthIndexes,addsNeuron) =newWeight(deltaSomaticWeight, weightsSomatic(somaticSynapseWeigthIndexes,addsNeuron), weightMinInhibitory, weightMaxInhibitory,learningRate);
             end
 
             voltagesMembraneTotal = voltagesMembraneTotal + voltagesMembrane;             
