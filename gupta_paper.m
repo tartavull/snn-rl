@@ -6,27 +6,12 @@ addpath('adds','datasets','auxiliar');
 %Initialize the net
 architecture;
 
-results = true;
-debugScript = true;
-if (debugScript)
-    %Construct input Monitor
-    meshMonitor = Monitor;
-    handle = figure(1);
-    meshMonitor.setSubPlot(handle,3,2,2);
-    %Construct Char Monitor
-    charMonitor = Monitor;
-    charMonitor.setSubPlot(handle,3,2,1);
-    charMonitor.setPlotType('char');
-    %Construct LIK Spike Monitor
-    spikeMonitor = Monitor;
-    spikeMonitor.setSubPlot(handle,3,2,[3 4]);
-    spikeMonitor.setPlotType('lines3d');
-    %Construct adds Spike Monitor
-    addsMonitor = Monitor;
-    addsMonitor.setSubPlot(handle,3,2,[5 6]);
-    addsMonitor.setPlotType('lines3d');
-end
+init_monitors;
 debugScript = false;
+
+results = true;
+
+
 logging = false;
 if (logging)
    %Clear output and open for writing
@@ -52,15 +37,9 @@ for epochIndex = 1:epochs
         voltagesMembraneTotal = 0;
         addsDiracForChar=zeros(1,4);   
         
-        
-        if (debugScript)
-            %Record and plot
-            charMonitor.record(time,charMatrix);
-            charMonitor.plot();
-            meshMonitor.record(time,input);
-            meshMonitor.plot();
-        end
-        
+        record_dictionaryloop;
+                
+        %Main code
         for stepIndex = 1:presentationTime*timeStep          
             time = time + timeStep;
             
@@ -69,11 +48,6 @@ for epochIndex = 1:epochs
             likFired=find(likV > firingThreshold);    % indices of spikes
             likV = likV + timeStep  .* 1/capacitance * (likI - likV./ resistance);
             likV(likFired) = restPotential; %Set to resting potential
-            
-            if (debugScript)
-                spikeMonitor.record(time,likV);
-                spikeMonitor.plot();
-            end
             
             likDirac = zeros(15,1);
             likDirac(likFired) = 1;
@@ -93,16 +67,13 @@ for epochIndex = 1:epochs
             tauDendritic = timeConstant(tauMax, tauMin , weightsDendritic);
             resistenceDendritic = resistanceComputation(tauDendritic, firingThreshold , resistenceMembrane, tauMembrane);        
             
-            currentDendritic = currentDendritic + timeStep * ((-currentDendritic + resistenceDendritic .* weightsDendritic .* [likDirac likDirac likDirac likDirac] .* 2)./tauDendritic);
+            currentDendritic = currentDendritic + timeStep * ((-currentDendritic + resistenceDendritic .* weightsDendritic .* [likDirac likDirac likDirac likDirac] .* 1.8)./tauDendritic);
             currentSomatic = currentSomatic + timeStep * ((-currentSomatic + sum(weightsSomatic .* [addsDirac; addsDirac; addsDirac; addsDirac],1))./tauSomatic);
             
             voltagesMembrane =  voltagesMembrane + timeStep * ((-voltagesMembrane + resistenceMembrane .* ( sum(currentDendritic,1) + currentSomatic))/tauMembrane);
             voltagesMembrane(addsFired) = restPotential;
                        
-            if (debugScript)
-                addsMonitor.record(time,voltagesMembrane);
-                addsMonitor.plot();
-            end
+            record_timeloop;
             
             %updateWeights
             for addsNeuron = 1:length(Dictionary)
@@ -113,7 +84,7 @@ for epochIndex = 1:epochs
                 somaticSynapseWeigthIndexes = setdiff(1:length(Dictionary),addsNeuron);
                 deltaSomaticSpike = addsLastTimeFired(addsNeuron,end)*ones(length(Dictionary)-1,1) -  addsLastTimeFired(somaticSynapseWeigthIndexes,end);
                 deltaSomaticWeight = deltaWeight(deltaSomaticSpike);
-                weightsSomatic(somaticSynapseWeigthIndexes,addsNeuron) =newWeight(deltaSomaticWeight, weightsSomatic(somaticSynapseWeigthIndexes,addsNeuron), weightMinInhibitory, weightMaxInhibitory,learningRate);
+                weightsSomatic(somaticSynapseWeigthIndexes,addsNeuron) = newWeight(deltaSomaticWeight, weightsSomatic(somaticSynapseWeigthIndexes,addsNeuron), weightMinInhibitory, weightMaxInhibitory,learningRate);
             end
 
             voltagesMembraneTotal = voltagesMembraneTotal + voltagesMembrane;             
@@ -142,9 +113,6 @@ for epochIndex = 1:epochs
         if (epochIndex == 1 || epochIndex == 2 || epochIndex == 3 || epochIndex == 25 || epochIndex == 50 || epochIndex == 75 || epochIndex == 100)
             presentResults(uniqueSpikePercentageTotal, numberOfSpikesPerChar, Dictionary(1:length(Dictionary),1), topVsClosestNtmpTotal, topVsAllNtmpTotal, length(Dictionary));
         end
-    end
-    if (epochIndex > 95)
-        debugScript = true;
     end
 end
 
