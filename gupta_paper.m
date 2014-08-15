@@ -1,4 +1,3 @@
-
 close all;
 clear all;
 addpath('adds','datasets','auxiliar');
@@ -6,12 +5,11 @@ addpath('adds','datasets','auxiliar');
 %Initialize the net
 architecture;
 
-init_monitors;
-debugScript = false;
+%Initialize monitors for plotting
+combinedMonitors = CombinedMonitors();
+combinedMonitors.enabled = true;
 
 results = true;
-
-
 logging = false;
 if (logging)
    %Clear output and open for writing
@@ -20,24 +18,28 @@ if (logging)
    fid = fopen('logOfResults.tsv','a');
 end
 
-
-
 time = 0;
 for epochIndex = 1:epochs
+    
+    %Used to print useful information 
     uniqueSpikePercentageTotal = 0;
     topVsClosestNtmpTotal = 0;
     topVsAllNtmpTotal = 0;
     numberOfSpikesPerChar = zeros(1,4);
+    
     for dictionaryIndex = 1:length(Dictionary)
         %Each character is presented one at a time sequentially during
         %the training process
         charCounter= mod(dictionaryIndex,length(Dictionary))+1;
         charMatrix = Dictionary{charCounter,2};
         input = reshape(charMatrix,[],1);
+        
+        %Used to print useful information 
         voltagesMembraneTotal = 0;
         addsDiracForChar=zeros(1,4);   
         
-        record_dictionaryloop;
+        %Used to plot current character
+        combinedMonitors.record_DictionaryLoop(time,charMatrix,input);
                 
         %Main code
         for stepIndex = 1:presentationTime*timeStep          
@@ -72,9 +74,7 @@ for epochIndex = 1:epochs
             
             voltagesMembrane =  voltagesMembrane + timeStep * ((-voltagesMembrane + resistenceMembrane .* ( sum(currentDendritic,1) + currentSomatic))/tauMembrane);
             voltagesMembrane(addsFired) = restPotential;
-                       
-            record_timeloop;
-            
+                                   
             %updateWeights
             for addsNeuron = 1:length(Dictionary)
                 deltaSynapticSpike = addsLastTimeFired(addsNeuron,end)*ones(size(likLastTimeFired(end))) -  likLastTimeFired(:,end);
@@ -86,7 +86,11 @@ for epochIndex = 1:epochs
                 deltaSomaticWeight = deltaWeight(deltaSomaticSpike);
                 weightsSomatic(somaticSynapseWeigthIndexes,addsNeuron) = newWeight(deltaSomaticWeight, weightsSomatic(somaticSynapseWeigthIndexes,addsNeuron), weightMinInhibitory, weightMaxInhibitory,learningRate);
             end
-
+            
+            %Used to plot membrane potentials
+            combinedMonitors.record_StepLoop(time,likV,voltagesMembrane);
+            
+            %Used to print useful information 
             voltagesMembraneTotal = voltagesMembraneTotal + voltagesMembrane;             
         end
         
@@ -94,6 +98,7 @@ for epochIndex = 1:epochs
             logResults(Dictionary{dictionaryIndex}, epochIndex, voltagesMembraneTotal, addsDiracForChar, fid);        
         end
         
+        %Used to print useful information 
         if (results)
             [ percentageOfUniqueSpikes, topVsClosestNtmp, topVsAllNtmp ] = scoreResults( Dictionary{dictionaryIndex}, epochIndex, voltagesMembraneTotal, addsDiracForChar );
             uniqueSpikePercentageTotal = uniqueSpikePercentageTotal + percentageOfUniqueSpikes;
