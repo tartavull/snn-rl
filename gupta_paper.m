@@ -7,16 +7,12 @@ architecture;
 
 %Initialize monitors for plotting
 combinedMonitors = CombinedMonitors();
-combinedMonitors.enabled = true;
+combinedMonitors.enabled = false;
 
 results = true;
-logging = false;
-if (logging)
-   %Clear output and open for writing
-   fid = fopen('logOfResults.tsv','w'); 
-   fclose(fid);
-   fid = fopen('logOfResults.tsv','a');
-end
+
+logger = Logger();
+%logger.enabled = false;
 
 time = 0;
 for epochIndex = 1:epochs
@@ -94,10 +90,8 @@ for epochIndex = 1:epochs
             voltagesMembraneTotal = voltagesMembraneTotal + voltagesMembrane;             
         end
         
-        if (logging)
-            logResults(Dictionary{dictionaryIndex}, epochIndex, voltagesMembraneTotal, addsDiracForChar, fid);        
-        end
-        
+        logger.record_DictionaryLoop(Dictionary{charCounter,1}, epochIndex, voltagesMembraneTotal, addsDiracForChar);
+      
         %Used to print useful information 
         if (results)
             [ percentageOfUniqueSpikes, topVsClosestNtmp, topVsAllNtmp ] = scoreResults( Dictionary{dictionaryIndex}, epochIndex, voltagesMembraneTotal, addsDiracForChar );
@@ -119,9 +113,4 @@ for epochIndex = 1:epochs
             presentResults(uniqueSpikePercentageTotal, numberOfSpikesPerChar, Dictionary(1:length(Dictionary),1), topVsClosestNtmpTotal, topVsAllNtmpTotal, length(Dictionary));
         end
     end
-end
-
-if (logging)
-    %Close output file
-    fclose(fid);
 end
