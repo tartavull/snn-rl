@@ -7,7 +7,7 @@ architecture;
 
 %Initialize monitors for plotting
 combinedMonitors = CombinedMonitors();
-combinedMonitors.enabled = false;
+%combinedMonitors.enabled = false;
 
 %Save variables of interest to disk
 logger = Logger();
@@ -15,7 +15,7 @@ logger.enabled = false;
 
 %Print info about net performance
 presenter = Presenter();
-%presenter.enabled = false;
+presenter.enabled = false;
 
 
 time = 0;
@@ -67,7 +67,7 @@ for epochIndex = 1:epochs
             tauDendritic = timeConstant(tauMax, tauMin , weightsDendritic);
             resistenceDendritic = resistanceComputation(tauDendritic, firingThreshold , resistenceMembrane, tauMembrane);
             
-            currentDendritic = currentDendritic + timeStep * ((-currentDendritic + resistenceDendritic .* weightsDendritic .* [likDirac likDirac likDirac likDirac] .* 1.8)./tauDendritic);
+            currentDendritic = dendriticPostSynapticCurrent(timeStep, currentDendritic , resistenceDendritic, weightsDendritic, tauDendritic, likDirac);
             currentSomatic = currentSomatic + timeStep * ((-currentSomatic + sum(weightsSomatic .* [addsDirac; addsDirac; addsDirac; addsDirac],1))./tauSomatic);
             
             voltagesMembrane =  voltagesMembrane + timeStep * ((-voltagesMembrane + resistenceMembrane .* ( sum(currentDendritic,1) + currentSomatic))/tauMembrane);
