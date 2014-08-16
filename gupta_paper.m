@@ -9,19 +9,19 @@ architecture;
 combinedMonitors = CombinedMonitors();
 combinedMonitors.enabled = false;
 
-results = true;
-
+%Save variables of interest to disk
 logger = Logger();
-%logger.enabled = false;
+logger.enabled = false;
+
+%Print info about net performance
+presenter = Presenter();
+%presenter.enabled = false;
+
 
 time = 0;
 for epochIndex = 1:epochs
     
-    %Used to print useful information 
-    uniqueSpikePercentageTotal = 0;
-    topVsClosestNtmpTotal = 0;
-    topVsAllNtmpTotal = 0;
-    numberOfSpikesPerChar = zeros(1,4);
+    presenter.record_EpochLoop();
     
     for dictionaryIndex = 1:length(Dictionary)
         %Each character is presented one at a time sequentially during
@@ -30,15 +30,15 @@ for epochIndex = 1:epochs
         charMatrix = Dictionary{charCounter,2};
         input = reshape(charMatrix,[],1);
         
-        %Used to print useful information 
+        %Used to print useful information
         voltagesMembraneTotal = 0;
-        addsDiracForChar=zeros(1,4);   
+        addsDiracForChar=zeros(1,4);
         
         %Used to plot current character
         combinedMonitors.record_DictionaryLoop(time,charMatrix,input);
-                
+        
         %Main code
-        for stepIndex = 1:presentationTime*timeStep          
+        for stepIndex = 1:presentationTime*timeStep
             time = time + timeStep;
             
             %Integrate and fire layer
@@ -57,20 +57,22 @@ for epochIndex = 1:epochs
             addsFired=find(voltagesMembrane > firingThreshold);
             addsDirac = zeros(1,4);
             addsDirac(addsFired) = 1;
-            addsDiracForChar(addsFired) = 1;            
             addsFirings(:,stepIndex) = addsDirac;
             addsLastTimeFired = [addsLastTimeFired addsLastTimeFired(:,end)];
             addsLastTimeFired(addsFired,end) = time;
             
+            %For logger and presenter
+            addsDiracForChar(addsFired) = 1;
+            
             tauDendritic = timeConstant(tauMax, tauMin , weightsDendritic);
-            resistenceDendritic = resistanceComputation(tauDendritic, firingThreshold , resistenceMembrane, tauMembrane);        
+            resistenceDendritic = resistanceComputation(tauDendritic, firingThreshold , resistenceMembrane, tauMembrane);
             
             currentDendritic = currentDendritic + timeStep * ((-currentDendritic + resistenceDendritic .* weightsDendritic .* [likDirac likDirac likDirac likDirac] .* 1.8)./tauDendritic);
             currentSomatic = currentSomatic + timeStep * ((-currentSomatic + sum(weightsSomatic .* [addsDirac; addsDirac; addsDirac; addsDirac],1))./tauSomatic);
             
             voltagesMembrane =  voltagesMembrane + timeStep * ((-voltagesMembrane + resistenceMembrane .* ( sum(currentDendritic,1) + currentSomatic))/tauMembrane);
             voltagesMembrane(addsFired) = restPotential;
-                                   
+            
             %updateWeights
             for addsNeuron = 1:length(Dictionary)
                 deltaSynapticSpike = addsLastTimeFired(addsNeuron,end)*ones(size(likLastTimeFired(end))) -  likLastTimeFired(:,end);
@@ -86,31 +88,22 @@ for epochIndex = 1:epochs
             %Used to plot membrane potentials
             combinedMonitors.record_StepLoop(time,likV,voltagesMembrane);
             
-            %Used to print useful information 
-            voltagesMembraneTotal = voltagesMembraneTotal + voltagesMembrane;             
+            %Used to print useful information
+            voltagesMembraneTotal = voltagesMembraneTotal + voltagesMembrane;
         end
         
+        
+        %Used to print useful information
         logger.record_DictionaryLoop(Dictionary{charCounter,1}, epochIndex, voltagesMembraneTotal, addsDiracForChar);
-      
-        %Used to print useful information 
-        if (results)
-            [ percentageOfUniqueSpikes, topVsClosestNtmp, topVsAllNtmp ] = scoreResults( Dictionary{dictionaryIndex}, epochIndex, voltagesMembraneTotal, addsDiracForChar );
-            uniqueSpikePercentageTotal = uniqueSpikePercentageTotal + percentageOfUniqueSpikes;
-            topVsClosestNtmpTotal = topVsClosestNtmpTotal + topVsClosestNtmp;
-            topVsAllNtmpTotal = topVsAllNtmpTotal + topVsAllNtmp;
-            
-            % Record spikes for each Char
-            numberOfSpikesForChar = size(find(addsDiracForChar == 1), 2);
-            numberOfSpikesPerChar(1, dictionaryIndex) = numberOfSpikesForChar;
-        end
+        presenter.record_DictionaryLoop(dictionaryIndex, voltagesMembraneTotal, addsDiracForChar);
+        
     end
     %Print epoch number
     fprintf('Epoch %d of %d \n',epochIndex,epochs);
     
     %Print selected results
-    if (results)
-        if (epochIndex == 1 || epochIndex == 2 || epochIndex == 3 || epochIndex == 25 || epochIndex == 50 || epochIndex == 75 || epochIndex == 100)
-            presentResults(uniqueSpikePercentageTotal, numberOfSpikesPerChar, Dictionary(1:length(Dictionary),1), topVsClosestNtmpTotal, topVsAllNtmpTotal, length(Dictionary));
-        end
+    if (epochIndex == 1 || epochIndex == 2 || epochIndex == 3 || epochIndex == 25 || epochIndex == 50 || epochIndex == 75 || epochIndex == 100)
+        presenter.presentResults(length(Dictionary),Dictionary(:,1));
     end
+    
 end
