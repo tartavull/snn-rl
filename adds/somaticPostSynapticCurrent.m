@@ -1,4 +1,4 @@
-function Spsc = somaticPostSynapticCurrent(WiMat, DiMat, stc, t)
+function Spsc = somaticPostSynapticCurrent(timeStep, SpscOld , Ws, tf, Ts)
 % Somatic Post Synaptic Current: Calculates Spsc
 %   Need some help currently on interpreting how to code 'K' from the
 %   following Mathematica 'out' formula: http://i.imgur.com/Tfa14od.jpg
@@ -20,23 +20,31 @@ function Spsc = somaticPostSynapticCurrent(WiMat, DiMat, stc, t)
 %   DiMat = Matrix of pre-synaptic spike times filtered as dirac pulses
 %   size(WiMat) is used to determine the total number of input neurons
 
-sigmaTotal = 0;
-indicesInWeightMat = size(WiMat, 2);
+%sigmaTotal = 0;
+%indicesInWeightMat = size(WiMat, 2);
 
-for i=1:indicesInWeightMat
-    sigmaTotal = sigmaTotal + (WiMat(i)*DiMat(i));
-end
+%for i=1:indicesInWeightMat
+%    sigmaTotal = sigmaTotal + (WiMat(i)*DiMat(i));
+%end
 
-sigmaWiDi = (sigmaTotal / indicesInWeightMat);
+%sigmaWiDi = (sigmaTotal / indicesInWeightMat);
 
-K = 1;
+%K = 1;
 
 % Todo: acertain if K' is included in the integral.  Add in K' instead
 % of K.
-function integralFunct
-    disp(((log(1/stc).*sigmaWiDi)/stc).*K);
-end
+%function integralFunct
+%    disp(((log(1/stc).*sigmaWiDi)/stc).*K);
+%end
 
-Spsc = log(-t/stc)+(log(-t/stc)*integral(@integralFunct, 1, t));
+
+%Integral form
+%Spsc = log(-t/stc)+(log(-t/stc)*integral(@integralFunct, 1, t));
+
+
+addsDirac = [tf; tf; tf; tf];
+
+Spsc = SpscOld + timeStep * ((- SpscOld + sum(Ws .* addsDirac ,1))./Ts);
+
 
 end
