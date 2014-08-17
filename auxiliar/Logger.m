@@ -8,14 +8,19 @@ classdef Logger < handle
     end
     
     methods
-        function obj = Logger()
-            %Clear output and open for writing
-            obj.fid = fopen('logOfResults.tsv','w');
-            fclose(obj.fid);
-            obj.fid = fopen('logOfResults.tsv','a');
+        function obj = Logger(enabled)
+            obj.enabled = enabled;
+            if(enabled)
+                %Clear output and open for writing
+                obj.fid = fopen('logOfResults.tsv','w');
+                fclose(obj.fid);
+                obj.fid = fopen('logOfResults.tsv','a');
+            end
         end
         function delete(obj)
-            fclose(obj.fid);
+            if(enabled)
+                fclose(obj.fid);
+            end
         end
         function record_DictionaryLoop(obj,letter,epochIndex,voltagesMembraneTotal,addsDiracForChar)
             if(obj.enabled)

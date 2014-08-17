@@ -118,7 +118,7 @@ classdef Monitor < handle
                     set(obj.lineHandle(index),'Color',colorspec{mod(index,5)+1});
                 end
                 zlim('manual');
-                zlim([0 15]);
+                zlim([-1 15]);
                 view(3);
                 grid on;
             end

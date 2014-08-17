@@ -6,17 +6,15 @@ addpath('adds','datasets','auxiliar');
 architecture;
 
 %Initialize monitors for plotting
-combinedMonitors = CombinedMonitors();
-%combinedMonitors.enabled = false;
+combinedMonitors = CombinedMonitors(true);
+combinedMonitors.enabled = false;
 
 %Save variables of interest to disk
-logger = Logger();
-logger.enabled = false;
+logger = Logger(false);
 
 %Print info about net performance
 presenter = Presenter();
 %presenter.enabled = false;
-
 
 time = 0;
 for epochIndex = 1:epochs
@@ -67,7 +65,7 @@ for epochIndex = 1:epochs
             tauDendritic = timeConstant(tauMax, tauMin , weightsDendritic);
             resistenceDendritic = resistanceComputation(tauDendritic, firingThreshold , resistenceMembrane, tauMembrane);
             
-            currentDendritic = dendriticPostSynapticCurrent(timeStep, currentDendritic , resistenceDendritic, weightsDendritic, tauDendritic, likDirac);            
+            currentDendritic = dendriticPostSynapticCurrent(timeStep, currentDendritic , resistenceDendritic, weightsDendritic, tauDendritic, likDirac);
             currentSomatic = somaticPostSynapticCurrent(timeStep,currentSomatic,weightsSomatic, addsDirac , tauSomatic);
             
             voltagesMembrane =  voltagesMembrane + timeStep * ((-voltagesMembrane + resistenceMembrane .* ( sum(currentDendritic,1) + currentSomatic))/tauMembrane);
@@ -75,15 +73,16 @@ for epochIndex = 1:epochs
             
             %updateWeights
             for addsNeuron = 1:length(Dictionary)
-                deltaSynapticSpike = addsLastTimeFired(addsNeuron,end)*ones(size(likLastTimeFired(end))) -  likLastTimeFired(:,end);
-                deltaSynapticWeight = deltaWeight(deltaSynapticSpike);
-                weightsDendritic(:,addsNeuron) = newWeight(deltaSynapticWeight,weightsDendritic(:,addsNeuron), weightMinExcitatory, weightMaxExcitatory,learningRate);
+                deltaDendriticSpike = likLastTimeFired(:,end) - addsLastTimeFired(addsNeuron,end)*ones(size(likLastTimeFired(end)));
+                deltaDendriticWeight = deltaWeight(deltaDendriticSpike);
+                weightsDendritic(:,addsNeuron) = newWeight(deltaDendriticWeight,weightsDendritic(:,addsNeuron), weightMinExcitatory, weightMaxExcitatory,learningRate);
                 
                 somaticSynapseWeigthIndexes = setdiff(1:length(Dictionary),addsNeuron);
                 deltaSomaticSpike = addsLastTimeFired(addsNeuron,end)*ones(length(Dictionary)-1,1) -  addsLastTimeFired(somaticSynapseWeigthIndexes,end);
                 deltaSomaticWeight = deltaWeight(deltaSomaticSpike);
                 weightsSomatic(somaticSynapseWeigthIndexes,addsNeuron) = newWeight(deltaSomaticWeight, weightsSomatic(somaticSynapseWeigthIndexes,addsNeuron), weightMinInhibitory, weightMaxInhibitory,learningRate);
             end
+            
             
             %Used to plot membrane potentials
             combinedMonitors.record_StepLoop(time,likV,voltagesMembrane);
@@ -104,6 +103,10 @@ for epochIndex = 1:epochs
     %Print selected results
     if (epochIndex == 1 || epochIndex == 2 || epochIndex == 3 || epochIndex == 25 || epochIndex == 50 || epochIndex == 75 || epochIndex == 100)
         presenter.presentResults(length(Dictionary),Dictionary(:,1));
+        
+    end
+    if(epochIndex == 95)
+        combinedMonitors.enabled = true;
     end
     
 end

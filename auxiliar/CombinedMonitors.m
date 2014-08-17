@@ -9,23 +9,26 @@ classdef CombinedMonitors < handle
     end
     
     methods
-        function obj = CombinedMonitors()
-            
-            %Construct input Monitor
-            obj.monitors.meshMonitor = Monitor;
-            obj.monitors.meshMonitor.setSubPlot(obj.handle,3,2,2);
-            %Construct Char Monitor
-            obj.monitors.charMonitor = Monitor;
-            obj.monitors.charMonitor.setSubPlot(obj.handle,3,2,1);
-            obj.monitors.charMonitor.setPlotType('char');
-            %Construct LIK Spike Monitor
-            obj.monitors.spikeMonitor = Monitor;
-            obj.monitors.spikeMonitor.setSubPlot(obj.handle,3,2,[3 4]);
-            obj.monitors.spikeMonitor.setPlotType('lines3d');
-            %Construct adds Spike Monitor
-            obj.monitors.addsMonitor = Monitor;
-            obj.monitors.addsMonitor.setSubPlot(obj.handle,3,2,[5 6]);
-            obj.monitors.addsMonitor.setPlotType('lines3d');
+        function obj = CombinedMonitors(enabled)
+            obj.enabled = enabled;
+            if (enabled)
+                
+                %Construct input Monitor
+                obj.monitors.meshMonitor = Monitor;
+                obj.monitors.meshMonitor.setSubPlot(obj.handle,3,2,2);
+                %Construct Char Monitor
+                obj.monitors.charMonitor = Monitor;
+                obj.monitors.charMonitor.setSubPlot(obj.handle,3,2,1);
+                obj.monitors.charMonitor.setPlotType('char');
+                %Construct LIK Spike Monitor
+                obj.monitors.spikeMonitor = Monitor;
+                obj.monitors.spikeMonitor.setSubPlot(obj.handle,3,2,[3 4]);
+                obj.monitors.spikeMonitor.setPlotType('lines3d');
+                %Construct adds Spike Monitor
+                obj.monitors.addsMonitor = Monitor;
+                obj.monitors.addsMonitor.setSubPlot(obj.handle,3,2,[5 6]);
+                obj.monitors.addsMonitor.setPlotType('lines3d');
+            end
             
         end
         
