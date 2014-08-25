@@ -107,6 +107,8 @@ for epochIndex = 1:epochs
         presentResults(presenter, length(Dictionary), Dictionary(:,1));
     endif
     
+    %Print messages
+    fflush(stdout);
 endfor
 
 if (logger.enabled == 1) 
