@@ -4,22 +4,24 @@ addpath('adds','datasets','auxiliar');
 
 %Initialize the net
 architecture;
+format long;
 
 %Initialize monitors for plotting
-combinedMonitors = CombinedMonitors(true);
-combinedMonitors.enabled = false;
+%combinedMonitors = CombinedMonitors();
+%combinedMonitors.enabled = false;
 
 %Save variables of interest to disk
-logger = Logger(false);
+logger = @Logger();
+logger.enabled = true;
 
 %Print info about net performance
-presenter = Presenter();
+presenter = @Presenter();
 %presenter.enabled = false;
 
 time = 0;
 for epochIndex = 1:epochs
     
-    presenter.record_EpochLoop();
+    presenter = record_EpochLoop(presenter);
     
     for dictionaryIndex = 1:length(Dictionary)
         %Each character is presented one at a time sequentially during
@@ -33,7 +35,7 @@ for epochIndex = 1:epochs
         addsDiracForChar=zeros(1,4);
         
         %Used to plot current character
-        combinedMonitors.record_DictionaryLoop(time,charMatrix,input);
+        %combinedMonitors.record_DictionaryLoop(time,charMatrix,input);
         
         %Main code
         for stepIndex = 1:presentationTime*timeStep
@@ -43,6 +45,7 @@ for epochIndex = 1:epochs
             likI = input * stimulusIntensity;
             likFired=find(likV > firingThreshold);    % indices of spikes
             likV = likV + timeStep  .* 1/capacitance * (likI - likV./ resistance);
+            
             likV(likFired) = restPotential; %Set to resting potential
             
             likDirac = zeros(15,1);
@@ -65,48 +68,47 @@ for epochIndex = 1:epochs
             tauDendritic = timeConstant(tauMax, tauMin , weightsDendritic);
             resistenceDendritic = resistanceComputation(tauDendritic, firingThreshold , resistenceMembrane, tauMembrane);
             
-            currentDendritic = dendriticPostSynapticCurrent(timeStep, currentDendritic , resistenceDendritic, weightsDendritic, tauDendritic, likDirac);
+            currentDendritic = dendriticPostSynapticCurrent(timeStep, currentDendritic , resistenceDendritic, weightsDendritic, tauDendritic, likDirac);            
             currentSomatic = somaticPostSynapticCurrent(timeStep,currentSomatic,weightsSomatic, addsDirac , tauSomatic);
             
             voltagesMembrane =  voltagesMembrane + timeStep * ((-voltagesMembrane + resistenceMembrane .* ( sum(currentDendritic,1) + currentSomatic))/tauMembrane);
-            voltagesMembrane(addsFired) = restPotential;
+            voltagesMembrane(addsFired) = restPotential;            
             
             %updateWeights
             for addsNeuron = 1:length(Dictionary)
-                deltaDendriticSpike = likLastTimeFired(:,end) - addsLastTimeFired(addsNeuron,end)*ones(size(likLastTimeFired(end)));
-                deltaDendriticWeight = deltaWeight(deltaDendriticSpike);
-                weightsDendritic(:,addsNeuron) = newWeight(deltaDendriticWeight,weightsDendritic(:,addsNeuron), weightMinExcitatory, weightMaxExcitatory,learningRate);
+                deltaSynapticSpike = addsLastTimeFired(addsNeuron,end)*ones(size(likLastTimeFired(end))) -  likLastTimeFired(:,end);
+                deltaSynapticWeight = deltaWeight(deltaSynapticSpike);
+                weightsDendritic(:,addsNeuron) = newWeight(deltaSynapticWeight,weightsDendritic(:,addsNeuron), weightMinExcitatory, weightMaxExcitatory,learningRate);
                 
                 somaticSynapseWeigthIndexes = setdiff(1:length(Dictionary),addsNeuron);
                 deltaSomaticSpike = addsLastTimeFired(addsNeuron,end)*ones(length(Dictionary)-1,1) -  addsLastTimeFired(somaticSynapseWeigthIndexes,end);
                 deltaSomaticWeight = deltaWeight(deltaSomaticSpike);
                 weightsSomatic(somaticSynapseWeigthIndexes,addsNeuron) = newWeight(deltaSomaticWeight, weightsSomatic(somaticSynapseWeigthIndexes,addsNeuron), weightMinInhibitory, weightMaxInhibitory,learningRate);
-            end
-            
+            endfor
             
             %Used to plot membrane potentials
-            combinedMonitors.record_StepLoop(time,likV,voltagesMembrane);
+            %combinedMonitors.record_StepLoop(time,likV,voltagesMembrane);
             
             %Used to print useful information
             voltagesMembraneTotal = voltagesMembraneTotal + voltagesMembrane;
-        end
+        endfor
         
         
         %Used to print useful information
-        logger.record_DictionaryLoop(Dictionary{charCounter,1}, epochIndex, voltagesMembraneTotal, addsDiracForChar);
-        presenter.record_DictionaryLoop(dictionaryIndex, voltagesMembraneTotal, addsDiracForChar);
+        logger = record_LoggerDictionaryLoop(logger, Dictionary{charCounter,1}, epochIndex, voltagesMembraneTotal, addsDiracForChar);
+        presenter = record_PresenterDictionaryLoop(presenter, dictionaryIndex, voltagesMembraneTotal, addsDiracForChar);
         
-    end
+    endfor
     %Print epoch number
     fprintf('Epoch %d of %d \n',epochIndex,epochs);
     
     %Print selected results
     if (epochIndex == 1 || epochIndex == 2 || epochIndex == 3 || epochIndex == 25 || epochIndex == 50 || epochIndex == 75 || epochIndex == 100)
-        presenter.presentResults(length(Dictionary),Dictionary(:,1));
-        
-    end
-    if(epochIndex == 95)
-        combinedMonitors.enabled = true;
-    end
+        presentResults(presenter, length(Dictionary), Dictionary(:,1));
+    endif
     
-end
+endfor
+
+if (logger.enabled == 1) 
+	delete(logger);
+endif
