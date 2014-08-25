@@ -47,4 +47,4 @@ addsDirac = [tf; tf; tf; tf];
 Spsc = SpscOld + timeStep * ((- SpscOld + sum(Ws .* addsDirac ,1))./Ts);
 
 
-end
+endfunction
