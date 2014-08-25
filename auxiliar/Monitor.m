@@ -1,7 +1,6 @@
-classdef Monitor < handle
+function Monitor(handle)
     %MONITOR record and plot net activity
-    
-    properties
+
         interactive = true;
         history;
         plotType = 'squares';
@@ -13,40 +12,35 @@ classdef Monitor < handle
         
         lineHandle;
         subPlotHandle;
-    end
-    
-    methods
+
         function setInteractive(obj,parameter)
             obj.interactive = parameter;
-        end
+        endfunction
         function setPlotType(obj,string)
             obj.plotType = string;
-        end
+        endfunction
         function setSubPlot(obj,figHandle,m,n,p)
             obj.figHandle = figHandle;
             obj.subPlot_m = m;
             obj.subPlot_n = n;
             obj.subPlot_p = p;
             obj.subPlot = true;
-            
-            
+ 
             figure(obj.figHandle);
             obj.subPlotHandle = subplot(obj.subPlot_m,obj.subPlot_n,obj.subPlot_p);
-        end
-        
-        
+        endfunction
+
         function record(obj,time,data)
             obj.history{1,end+1} = time;
             obj.history{2,end} = data;
-        end
+        endfunction
         
         function plot(obj)
             
             if(obj.subPlot == true && obj.subPlotHandle ~= gca)  
                 subplot(obj.subPlot_m,obj.subPlot_n,obj.subPlot_p);
-            end
-            
-            
+            endif
+
             switch obj.plotType
                 case 'lines'
                     obj.linePlot;
@@ -58,8 +52,8 @@ classdef Monitor < handle
                     obj.charPlot;
                 otherwise
                     warning('Unexpected plot type. No plot created.');
-            end
-        end
+            endswitch
+        endfunction
         
         function linePlot(obj)
             time = [obj.history{1,end}];
@@ -69,8 +63,8 @@ classdef Monitor < handle
             if(isempty(obj.lineHandle))
                 for index = 1:length(data)
                     obj.lineHandle(index) = line(nan, nan); %# Generate a blank line and return the line handle
-                end
-            end
+                endfor
+            endif
             
             for index = 1:length(data)
                 oldTime = get(obj.lineHandle(index), 'XData');
@@ -83,10 +77,10 @@ classdef Monitor < handle
                 startIndex = max([length(oldTime) - mod(length(oldTime),timeFrame) 1]);
                 set(obj.lineHandle(index), 'XData', oldTime(startIndex:end), 'YData', oldData(startIndex:end));
 
-            end
+            endfor
             drawnow;
            
-        end
+        endfunction
         
         function squaresPlot(obj)            
 
@@ -94,7 +88,7 @@ classdef Monitor < handle
                 start = length(obj.history) - 20;
             else
                 start = 1;
-            end
+            endif
             
             data = [obj.history{2,start:end}];
             
@@ -104,7 +98,7 @@ classdef Monitor < handle
             axis square;
             %xlim([start,length(data)]); ylim([1,16]);  % static limits
             drawnow;
-        end
+        endfunction
         
         function line3dPlot(obj)
             time = [obj.history{1,end}];
@@ -116,12 +110,12 @@ classdef Monitor < handle
                 for index = 1:length(data)
                     obj.lineHandle(index) = line(nan, nan, nan); %# Generate a blank line and return the line handle
                     set(obj.lineHandle(index),'Color',colorspec{mod(index,5)+1});
-                end
+                endfor
                 zlim('manual');
-                zlim([-1 15]);
+                zlim([0 15]);
                 view(3);
                 grid on;
-            end
+            endif
             
             for index = 1:length(data)
                 oldTime = get(obj.lineHandle(index), 'XData');
@@ -136,25 +130,21 @@ classdef Monitor < handle
                 startIndex = max([(length(oldTime) - timeFrame) 1]);
                 set(obj.lineHandle(index), 'XData', oldTime(startIndex:end), 'YData', oldPosition(startIndex:end),'ZData',oldData(startIndex:end));
 
-            end
+            endfor
             drawnow;
-        end
+        endfunction
         
         function charPlot(obj)         
            data = obj.history{2,end};
            obj.showChar(data);
-        end
-    end
-    
-    methods(Static)
+        endfunction
+
         function handle = showChar(charArray)
             handle = imshow(charArray,'InitialMagnification',1000);
-        end
+        endfunction
         function handle = plotFirings( firings )
             handle = plot(firings(:,1),firings(:,2),'.');
-        end
-    end
+        endfunction
 
-    
-end
+endfunction
 
