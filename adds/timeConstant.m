@@ -5,8 +5,8 @@ function Td = timeConstant(Tmax, Tmin, Wi)
 if abs(Wi) > 1
     fprintf('Error: weights must be -1< Wi <1');
     return;
-end
+endif
 
 Td = ones(size(Wi)).* Tmax - abs(Wi) .* (Tmax - Tmin);
-end
+endfunction
 
