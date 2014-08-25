@@ -17,4 +17,6 @@ if (t > -Dt / 2) && (t < Dt / 2)
     Di = limit(1 / DiSymbolicVariable, DiSymbolicVariable, 0);
 else
     Di = 0;
-end
+endif
+
+endfunction
