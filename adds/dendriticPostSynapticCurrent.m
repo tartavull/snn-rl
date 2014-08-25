@@ -20,3 +20,4 @@ Dirac = [tf tf tf tf] .* 1.8; %We are multypling it by 1.8 to get some spikes,
 
 Dpsc =  DpscOld + timeStep * ((-DpscOld + Rd .* Wd .* Dirac )./Td);
 
+endfunction
