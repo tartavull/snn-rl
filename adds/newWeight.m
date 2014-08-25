@@ -12,4 +12,4 @@ Wnew(positives) = Wold(positives) + n .* Dw(positives) .* ( Wmax - Wold(positive
 
 negatives = find(Dw < 0);
 Wnew(negatives) = Wold(negatives) + n .* Dw(negatives) .* ( Wold(negatives) - Wmin );
-
+endfunction
