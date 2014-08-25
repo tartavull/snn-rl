@@ -37,6 +37,6 @@ for Y = 1:size(charMatrix,1)
         K2 = 6290;
         
         Ntsmp = totalSomaMembranePotential(t, tf, Rm, Rd, Wi, WiMat, DiMat, K, K2, stc)
-    end
+    endfor
 
-end
+endfor
