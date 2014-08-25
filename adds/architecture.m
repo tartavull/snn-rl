@@ -19,7 +19,6 @@ resistance = 0.8;
 
 %Weights
 weightsDendritic = 0.5 .* rand(lenLik,lenAdds) + 0.5;
-%weightsDendritic = rand(lenLik,lenAdds);
 
 weightsSomatic = 0.5 * rand(lenAdds,lenAdds) -0.75; 
 %We should keep the diagonal as zeroes so we dont autoinhibate the spikes
