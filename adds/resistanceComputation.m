@@ -6,5 +6,5 @@ Tm = ones(size(Td)) .* Tm;
 
 Rd =  (Td .* theta ./ Rm) .* (Tm ./ Td).^(Tm ./ (Tm-Td));
 
-end
+endfunction
 
