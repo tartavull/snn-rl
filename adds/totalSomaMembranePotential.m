@@ -33,7 +33,7 @@ indicesInWeightMat = size(WiMat, 2);
 
 for i=1:indicesInWeightMat
     sigmaTotal = sigmaTotal + (WiMat(i)*DiMat(i));
-end
+endfor
 
 sigmaWiDi = (sigmaTotal / indicesInWeightMat);
 
@@ -44,12 +44,12 @@ K2 = 6290;
 % of K.
 function outerIntegralFunct
     ((-3*Rm*t-log(tf/stc)*Rd*Rm*Wi*heaviside(-tf+K2)-Rm*t*integral(@innerIntegralFunct, 1, K2)*K)/(stc^2));
-end
+endfunction
 
 function innerIntegralFunct
     ((log(K/stc).*sigmaWiDi)/stc);
-end
+endfunction
 
 Tsmp = log(-t/stc)+(log(-t/stc)*integral(@outerIntegralFunct, 1, t)*K2);
 
-end
+endfunction
