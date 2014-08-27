@@ -15,7 +15,7 @@ LIK = SpikeGeneratorGroup(15, spiketimes)
 taum = 20 * ms
 taue = 1 * ms
 taui = 10 * ms
-Vt = 10 * mV
+Vt = 5 * mV
 Vr = 0 * mV
 
 eqs = Equations('''
@@ -26,15 +26,18 @@ eqs = Equations('''
 ADDS = NeuronGroup(N=4, model=eqs,threshold=Vt, reset=Vr)
 
 
-exhitatory = Connection(LIK, ADDS , 'ge')
-Wexhitatory = np.random.uniform(0,100,[15,4]) * mV
+exhitatory = Connection(LIK, ADDS , 'ge',delay=10*ms,structure='dense')
+Wexhitatory = np.random.uniform(10,50,[15,4]) * mV
 exhitatory.connect(LIK,ADDS,Wexhitatory)
+Ap = 1 * mV
+Am = 1 * mV
+stdp=ExponentialSTDP(exhitatory,taue,taum,Ap,Am,wmax=50 * mV,interactions='all',update='additive')
 
-inhibitory = Connection(ADDS, ADDS , 'gi')
 
+inhibitory = Connection(ADDS, ADDS , 'gi',delay=5*ms,structure='dense')
 #Connect adds layer via lateral inhibitory connections
-#the diagonal should be 0 to 
-Winhibitory = np.random.uniform(0,10,[4,4]) * mV
+#the diagonal should be 0 to not auto-inhibate
+Winhibitory = np.random.uniform(0,5,[4,4]) * mV
 diagonal = np.diag_indices(Winhibitory.shape[0])
 Winhibitory[diagonal] = 0;
 
@@ -45,7 +48,7 @@ Mv = StateMonitor(ADDS, 'V', record=True)
 Mge = StateMonitor(ADDS, 'ge', record=True)
 Mgi = StateMonitor(ADDS, 'gi', record=True)
 
-run(totalTime)
+run(10000*ms,threads=2, report='text')
 
 neuronToPlot = 1
 subplot(211)
