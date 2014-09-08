@@ -1,4 +1,10 @@
 from brian import *
+
+#In the matlab implementation the fisrt layer consited of 15 leaky integrate and fire in which 
+#the input was a constant current in case the pixel was "on" or a null current in case the pixel 
+#was "off". In the case the pixel was on, the nueron that represented that pixel would fire around 3 times 
+#in that epoch.
+#In this implementation,
 class dictionary():
 	def spikeTimes(self, dictionaryLongitude, spikeInterval, spikesPerChar, epochs):
 
