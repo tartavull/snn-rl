@@ -4,7 +4,11 @@ from brian import *
 #the input was a constant current in case the pixel was "on" or a null current in case the pixel 
 #was "off". In the case the pixel was on, the nueron that represented that pixel would fire around 3 times 
 #in that epoch.
-#In this implementation,
+#In this implementation, we use the class SpikeGeneratorGroup, to generate spikes at spicified times. 
+#By doing it this way, we have more control over the real neurons ('second layer') we are trying to train.
+#and a simpler implementation. This "dictionary" class is responsable for generating the array which contains
+#the firing time for the 15 neurons.
+ 
 class dictionary():
 	def spikeTimes(self, dictionaryLongitude, spikeInterval, spikesPerChar, epochs):
 
