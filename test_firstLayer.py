@@ -5,6 +5,6 @@ spiketimes = dictionary.spikeTimes(dictionaryLongitude, spikeInterval, spikesPer
 LIK = SpikeGeneratorGroup(15, spiketimes)
 M = SpikeMonitor(LIK)
 
-run(10000*ms, report='text')
+run(spikesPerChar * dictionaryLongitude * spikeInterval , report='text')
 raster_plot(M, title='First layer', newfigure=False)
 show()
