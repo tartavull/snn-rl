@@ -36,6 +36,10 @@ class report_results_and_logging:
 		print SortedMvForEpoch[3]-(sum(SortedMvForEpoch[0:(self.dictionaryLongitude-1)])/(self.dictionaryLongitude-1))
 
 	def logger(self, outputFile):
+		# The output represents: char presented | epoch number | total neuron membrane voltages in epoch | if neuron had a spike
+		if self.epochIndex == 0:
+			outputStatement = ['Char\tEpoch\tMembraneVoltage\tSpike\n']
+			outputFile.writelines(outputStatement)
 		for neuronIndex in range(self.dictionaryLongitude):
-			outputStatement = [str(self.dictionary.dictionary[neuronIndex][0]), ' ', str(self.epochIndex), ' ', str(sum(self.Mv[neuronIndex][(self.epochIndex*15):(15+(self.epochIndex*15))])), ' ', str(self.SpikeNumberInEpoch[neuronIndex]), '\n']
+			outputStatement = [str(self.dictionary.dictionary[neuronIndex][0]), '\t', str(self.epochIndex), '\t', str(sum(self.Mv[neuronIndex][(self.epochIndex*15):(15+(self.epochIndex*15))])), '\t', str(self.SpikeNumberInEpoch[neuronIndex]), '\n']
 			outputFile.writelines(outputStatement)
