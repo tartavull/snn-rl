@@ -18,7 +18,6 @@ Ap = 1 * mV
 Am = 1 * mV
 stdp=ExponentialSTDP(exhitatory,taue,taum,Ap,Am,wmax=50 * mV,interactions='all',update='additive')
 
-
 inhibitory = Connection(ADDS, ADDS , 'gi',delay=5*ms,structure='dense')
 #Connect adds layer via lateral inhibitory connections
 #the diagonal should be 0 to not auto-inhibate
@@ -38,13 +37,13 @@ run(10000*ms,threads=2, report='text')
 # Present results and logging
 if presentResults == True:
 	for epochIndex in epochsToPrint:
-		reportResultsAndLogging = report_results_and_logging(dictionaryLongitude, epochsToPrint, M, Mv, epochIndex, spikeIntervalUnformatted, dictionary)
+		reportResultsAndLogging = report_results_and_logging(dictionaryLongitude, epochsToPrint, M, Mv, epochIndex, spikeIntervalUnformatted, dictionary, epochMsDuration)
 		reportResultsAndLogging.presenter()	
 
 if logger == True:
 	outputFile = open('snnResults.txt', 'w')	
 	for epochIndex in range(epochs):
-		reportResultsAndLogging = report_results_and_logging(dictionaryLongitude, epochsToPrint, M, Mv, epochIndex, spikeIntervalUnformatted, dictionary)
+		reportResultsAndLogging = report_results_and_logging(dictionaryLongitude, epochsToPrint, M, Mv, epochIndex, spikeIntervalUnformatted, dictionary, epochMsDuration)
 		reportResultsAndLogging.logger(outputFile)
 	outputFile.close()
 
