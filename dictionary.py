@@ -46,8 +46,6 @@ class dictionary():
 
 		time = 0 * ms
 
-		#file = open("newfile.txt", "w")
-
 		for indexEpoch in range (0, epochs):
 			for indexDictionary in range(0,dictionaryLongitude):
 				
@@ -61,13 +59,6 @@ class dictionary():
 						
 							spike = array([indexPixel, time])
 							spikeArray = vstack([spikeArray,spike])
-							#file.write('indexPixel: ')
-							#file.write(str(indexPixel))
-							#file.write(' time: ')
-							#file.write(str(time))
-							#file.write('\n')
-
-		#file.close()
 
 		return spikeArray 
 

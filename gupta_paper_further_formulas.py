@@ -1,13 +1,35 @@
-from architecture import *
+from architecture_further_formulas import *
 
 dictionary = dictionary()
 spiketimes = dictionary.spikeTimes(dictionaryLongitude, spikeInterval, spikesPerChar, epochs)
 LIK = SpikeGeneratorGroup(15, spiketimes)
 
+class tauDUpdate:
+	# Every call to the class iterates the neuronIndex by 1 to return the relevant neuron's values.
+	# A W matrix stores the weight values which are updated every time returnTauD is called.
+	#Todo: The Resistance loop will be seperate from the Weight loop because it uses results from the Weight loop.
+	neuronIndex = 0
+
+	def returnTauD(self):
+		neuronIndex = self.neuronIndex + 1
+		if neuronIndex == 5: neuronIndex = 1
+		self.neuronIndex = neuronIndex
+
+		# Weight loop
+		for WIndex in range(len(W[neuronIndex])):
+			if abs(W[neuronIndex][WIndex]) <= 1:
+				tauD[neuronIndex][WIndex] = tauMax - abs(W[neuronIndex][WIndex])*(tauMax-tauMin)
+
+		#Stub value for now
+		return 0 * mV;
+
+tauDValue = tauDUpdate()
+
 eqs = Equations('''
 	  dV/dt  = (-V+ge-gi)/taum : volt
 	  dge/dt = -ge/taue        : volt
 	  dgi/dt = -gi/taui        : volt
+	  updatedTauD = tauDValue.returnTauD()   : volt
 	  ''')
 ADDS = NeuronGroup(N=4, model=eqs,threshold=Vt, reset=Vr)
 
