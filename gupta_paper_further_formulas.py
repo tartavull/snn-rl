@@ -34,8 +34,16 @@ class UmUpdate:
 			w = W[IdIndex][neuronIndex]
 			tPreSyn = spiketimes[IdIndex + (neuronIndex * len(Id))][0]
 			Id2 = Id[IdIndex][neuronIndex]
+			Dt = t - tPreSyn
+			DiracFun = 1/Dt
 
-			Id[IdIndex][neuronIndex] = ((-Id2**2)/(2*tauDen))+((Id2*r*w)/tPreSyn)
+			# dirac test
+			# t in dirac forumula means curent time or last spike time?
+			if (t > -(Dt/2) and t < (Dt/2)):
+				Id[IdIndex][neuronIndex] = ((-Id2**2)/(2*tauDen))+((Id2*r*w)*DiracFun)
+			else:
+				DiracFun = 0
+				Id[IdIndex][neuronIndex] = ((-Id2**2)/(2*tauDen))+((Id2*r*w)*DiracFun)
 
 		### Synapse directly to soma ###
 		# Solving for Id in the formula in the article yeilded the below equation
@@ -43,10 +51,17 @@ class UmUpdate:
 		# That is implemented below
 		# To calculate the DiracWeightedSum the spike times with the dirac function applied are multipled by the synapse weight 
 		# and summed then divided by the number of synapses for the neuron 
+		DiracWeightedSum = 0
 		for DiracIndex in range(len(Is)):
 			tPreSyn = spiketimes[DiracIndex + (neuronIndex * len(Is))][0]
-			DiracFunctionWithSpikeTimes = (-t+tPreSyn)/tauDen
-			DiracWeightedSum = W[WIndex][neuronIndex] * DiracFunctionWithSpikeTimes
+			Dt = t - tPreSyn
+			DiracFun = 1/Dt
+			# dirac test  # TODO: not sure dirac is implemented correctly here
+			if (t > -(Dt/2) and t < (Dt/2)):
+				DiracFunctionWithSpikeTimes = DiracFun # (-t+tPreSyn)/tauDen
+			else:
+				DiracFunctionWithSpikeTimes = 0
+			DiracWeightedSum = DiracWeightedSum + W[WIndex][neuronIndex] * DiracFunctionWithSpikeTimes
 		DiracWeightedSum = DiracWeightedSum / len(Id)
 
 		Is2 = Is[neuronIndex]
