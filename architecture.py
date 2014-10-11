@@ -19,3 +19,6 @@ taue = 1 * ms
 taui = 10 * ms
 Vt = 5 * mV
 Vr = 0 * mV
+
+SimulationDuration = 10000
+epochMsDuration = (SimulationDuration / epochs) * 10 # Times 10 is to adjust to Ms scale
