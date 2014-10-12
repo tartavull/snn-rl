@@ -15,6 +15,7 @@ totalTime = epochs * spikesPerChar * dictionaryLongitude * spikeInterval
 epochsToPrint = [0,1,2,25,50,75]
 presentResults = True
 logger = True
+displayAllNeuronMemPotentials = True
 
 taum = 20 * ms
 taue = 1 * ms
