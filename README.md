@@ -26,10 +26,17 @@ spiking 3 times when the character is shown, as the image below.
 ![scatterplot](https://raw.githubusercontent.com/tartavull/snn-rl/master/img/readme_2.png)
 
 ======
-
-Authors:
-   
+Authors:  
 * Nate Sutton
 * Ignacio Tartavull
 
-## This is **work in progress** and is currently to be treated as a Proof of Concept. If you find this project interesting please join us and help out.
+This is **work in progress** and is currently to be treated as a Proof of Concept. If you find this project interesting please **join us** and help out.
+
+======
+Getting Started
+
+1. introduction.ipynb have some further explanations of what are we trying to achive. We are basing our work in [this paper](http://www.personal.psu.edu/lnl/papers/Gupta_Long_2007.pdf).
+
+2. simulation.ipynb and gupta_paper_further_formulas.py is where the actual simulation is performed. We are using a clock-driven simulator for spiking neural networks called [brian](https://github.com/brian-team/brian).
+
+3. analysis.ipynb is what we run after the simulation finished, it help us to analice the performance of the network.
