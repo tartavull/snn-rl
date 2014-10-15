@@ -27,8 +27,9 @@ spiking 3 times when the character is shown, as the image below.
 
 ======
 
-  Authors:
-    * Nate Sutton
-    * Ignacio Tartavull
+Authors:
+   
+* Nate Sutton
+* Ignacio Tartavull
 
-   This is *work in progress* and is currently to be treated as a Proof of Concept. If you find this project interesting please join us and help out.
+## This is **work in progress** and is currently to be treated as a Proof of Concept. If you find this project interesting please join us and help out.
