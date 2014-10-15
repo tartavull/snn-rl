@@ -35,8 +35,8 @@ This is **work in progress** and is currently to be treated as a Proof of Concep
 ======
 Getting Started
 
-1. introduction.ipynb have some further explanations of what are we trying to achive. We are basing our work in [this paper](http://www.personal.psu.edu/lnl/papers/Gupta_Long_2007.pdf).
+1. introduction.ipynb has some further explanations of what we are trying to achive. We are basing our work in [this paper](http://www.personal.psu.edu/lnl/papers/Gupta_Long_2007.pdf).
 
-2. simulation.ipynb and gupta_paper_further_formulas.py is where the actual simulation is performed. We are using a clock-driven simulator for spiking neural networks called [brian](https://github.com/brian-team/brian).
+2. simulation.ipynb and gupta_paper_further_formulas.py are where the actual simulation is performed. We are using a clock-driven simulator for spiking neural networks called [brian](https://github.com/brian-team/brian).
 
-3. analysis.ipynb is what we run after the simulation finished, it help us to analice the performance of the network.
+3. analysis.ipynb is what we run after the simulation is finished, it helps us to analyse the performance of the network.
