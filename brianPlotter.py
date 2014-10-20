@@ -42,6 +42,10 @@ class brianPlotter:
     
     def plotLine(self, group, start, end):
 
+        #because timestep is 0.1 mseconds, and start and end is expressed in seconds.
+        start = int(start * 10000)
+        end = int(end * 10000)
+
         data = self.getDownsampleData(group, start, end)
         length = self.getGroupLength(group)
         
@@ -83,7 +87,14 @@ class brianPlotter:
         bestLevel = self.getBestLevel(group, start , end, screenSize)
         
         data = self.getData(group,bestLevel)
-        print "data has been downsampled "+ str(bestLevel) + " times"
+        print group + " has been downsampled "+ str(bestLevel) + " times"
+        start = int(start/bestLevel)
+        end = int(end/bestLevel)
+        if (end > data.shape[0]):
+            print data.shape
+            print "WARNING: you requested end = "+str(float(end))+" seconds but data length is "+str(float(data.shape[0] *bestLevel/10000))+" seconds"
+            end=data.shape[0] -1
+
         return data[start:end]
             
     def getLevels(self, group):
@@ -116,6 +127,5 @@ class brianPlotter:
         return 1200000
     
     def binary_search(self, a, x, lo=0, hi=None): 
-        x = x/1000
         hi = hi if hi is not None else len(a)  
         return bisect_left(a,x,lo,hi) 
