@@ -54,9 +54,10 @@ class brianPlotter:
         fig, axes = plt.subplots(ncols=1, nrows=nrows, figsize=(16,nrows*2.5),sharey=True,sharex = True)
         fig.suptitle(group, fontsize=20)
 
-        for index in range(nrows):     
-            legend = 'neuron '+str(index)
-            if (len(data.shape) == 3):
+        for index in range(nrows):  
+            if (group == 'voltage')  : 
+                legend = ['neuron '+str(index)+ ' voltage','ge','gi']
+            elif (group == 'excitatory' or group == 'inhibitory'):
                 legend = []
                 for l in range(data.shape[2]):
                     legend.append('Synapse '+str(index)+ '-'+str(l))
