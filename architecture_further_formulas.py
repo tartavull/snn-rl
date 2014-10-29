@@ -13,9 +13,9 @@ dictionaryLongitude = 4
 spikesPerChar=3
 totalTime = epochs * spikesPerChar * dictionaryLongitude * spikeInterval 
 epochsToPrint = [0,1,2,25,50,75]
-presentResults = True
-logger = True
-displayAllNeuronMemPotentials = True
+presentResults = False
+logger = False
+displayAllNeuronMemPotentials = False
 
 taum = 20 * ms
 taue = 1 * ms
@@ -51,3 +51,10 @@ Is = [1] * dictionaryLongitude
 Um = [1] * dictionaryLongitude
 
 Ureset = -.001
+
+APlus = 0.1
+AMinus = -0.105
+TauPlus = 1
+TauMinus = 1
+LearningRate = 0.1
+ActionPotentialThreshold = .01
