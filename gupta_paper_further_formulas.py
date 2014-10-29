@@ -8,6 +8,8 @@ class gupta_paper:
 	neuronIndex = 0
 	neuronCounter = -1
 	t = 1
+
+	SpikeFired = False
 	def run_model(self):
 		
 		dictionary = self.dictionary
@@ -86,12 +88,76 @@ class gupta_paper:
 			## -Um**2/(2*Tm) + Um*(Rm*SummedDendriteGroupX + Rm*SynapseToSomaX)/Tm
 			# That is implemented below
 			Um2 = Um[neuronIndex]
+			#print '1', Um2
 			SummedDendriteGroup = sum(Id[ 0:len(Id) ][neuronIndex])
 			SynapseToSoma = Is[neuronIndex]
 
 			Um[neuronIndex] = -Um2**2/(2*tauM) + Um2*(Rm*SummedDendriteGroup + Rm*SynapseToSoma)/tauM
+			#Um[neuronIndex] = Um[neuronIndex] + .0001;
+			#print '2', Um[neuronIndex]
 
-			if Um[neuronIndex] == 0: Um[neuronIndex] = Ureset
+			# Check for spike
+			self.SpikeFired = False
+			if Um[neuronIndex] >= ActionPotentialThreshold:
+				Um[neuronIndex] = Ureset
+				self.SpikeFired = True
+
+			#print '3', Um[neuronIndex]
+
+			## adjust weights ##
+			# weight adjusting needs both presynaptic spike time and post synaptic spike time,
+			# therefore it is placed here.
+			# W is weight
+			synapseType = 'excitatory'
+			# Default 'excitatory' values
+			WMin = 0;
+			WMax = 1;
+			if synapseType == 'inhibitory':
+				WMin = -1;
+				WMax = 0;				
+
+			## General STDP learning rule implementation ##
+			# To find the SpikePostSyn and SpikePreSyn iterate backward through the spikes
+			# list and choose the latest spikes for the relevant neuron.  Those represent
+			# the latest pre and post spikes
+			# TODO: check this is surely the case
+			SpikePreSyn = 0
+			SpikePostSyn = 0
+			SpikeFound = False
+			NumberOfSpikes = shape(M.spikes)[0]
+			for i in range(NumberOfSpikes):
+				CurrentSpike = M.spikes[((NumberOfSpikes - 1) - i)]
+				if SpikeFound == False and CurrentSpike[0] == self.neuronIndex:
+					SpikePreSyn = CurrentSpike[1]
+					SpikeFound = True
+				if SpikeFound == True and CurrentSpike[0] == self.neuronIndex:
+					# Shift spikes found to pre then post from just pre
+					SpikePostSyn = SpikePreSyn
+					SpikePreSyn = CurrentSpike[1]
+					#exit once both found
+					break;
+			## include logic for processing if SpikePostSyn or SpikePreSyn were not found.
+			## That only occurs in first several seconds though and I don't know it effects
+			## the weighting much
+
+			DeltaSpikeTime = SpikePreSyn - SpikePostSyn
+			# TODO: figure out if DeltaW = 0 is really fine for init value
+			DeltaW = 0
+			if DeltaSpikeTime < 0:
+				DeltaW = APlus * (e ** (DeltaSpikeTime / TauPlus))
+			elif DeltaSpikeTime > 0:
+				DeltaW = AMinus * (e ** (-DeltaSpikeTime / TauMinus))			
+
+			## Relaxation rule implementation ##
+			WOld = W[IdIndex][neuronIndex];
+			if DeltaW >= 0:				
+				WNew = WOld + (LearningRate * (DeltaW * (WMax - WOld)))
+				
+			elif DeltaW < 0:	
+				WNew = WOld + (LearningRate * (DeltaW * (WOld - WMin)))
+
+			W[IdIndex][neuronIndex] = WNew;
+			##
 
 			### After all neurons are cycled through the time is iterated by one
 			neuronIndex = neuronIndex + 1
@@ -112,6 +178,14 @@ class gupta_paper:
 				self.neuronCounter = 0
 
 			ADDS[self.neuronCounter][0].V = returnUm(self)
+
+			#print self.SpikeFired, '\t' , ADDS[self.neuronCounter][0].V, '\t', self.neuronCounter, '\t', (self.t * ms)
+
+			## Record spikes
+			if self.SpikeFired == True:
+				newSpike = [self.neuronCounter, (self.t * ms)]
+				M.spikes.append(newSpike)
+				print self.SpikeFired, '\t' , ADDS[self.neuronCounter][0].V, '\t', self.neuronCounter, '\t', (self.t * ms)
 
 		M = SpikeMonitor(ADDS)
 		Mv = StateMonitor(ADDS, 'V', record=True)
