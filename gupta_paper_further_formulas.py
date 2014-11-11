@@ -7,24 +7,59 @@ class gupta_paper:
 
 	neuronIndex = 0
 	neuronCounter = -1
-	t = 1
+	t = 0.001
 
 	SpikeFired = False
+
+	SummedDendriteGroup = 0;
+	SynapseToSoma = 0;
+
+	SigmaWDSyn = .0375 * mV
+	SigmaWDSynMod = .5
+
+	RmEq = Rm #Rm * mV
+	DendR = .0375 * mV
+	DendW = 1
+	DendDirac = 1	
+
+	currentEpoch = 0
+
 	def run_model(self):
 		
 		dictionary = self.dictionary
 		spiketimes = self.spiketimes
 
+		# add epoch every epoch ms duration
+		if self.t % .1 == 0 & self.neuronIndex == 1:
+			self.currentEpoch = self.currentEpoch + 1
+
 		eqs = Equations('''
-		      V : volt
-			  ''')
+	        V : volt
+	        DendI : volt
+	        SynI : volt
+	        dendriV1 : volt
+	        dendriV2 : volt
+	        dendriV3 : volt
+	        dendriV4 : volt
+	        dendriV5 : volt
+	        dendriV6 : volt
+	        dendriV7 : volt
+	        dendriV8 : volt
+	        dendriV9 : volt
+	        dendriV10 : volt
+	        dendriV11 : volt
+	        dendriV12 : volt
+	        dendriV13 : volt
+	        dendriV14 : volt
+		    ''')
 
 		ADDS = NeuronGroup(N=4, model=eqs,threshold=Vt, reset=Vr)
 
 		def returnUm(self):
-		
+
 			dictionary = self.dictionary
 			neuronIndex = self.neuronIndex
+
 			t = self.t
 			spiketimes = self.spiketimes
 			
@@ -35,40 +70,38 @@ class gupta_paper:
 
 			#Resistance loop
 			for RIndex in range(len(R)):
-				R[RIndex][neuronIndex] = ((tauD[RIndex][neuronIndex]*neuronFiringThreshold) / Rm) * ((tauM / tauD[RIndex][neuronIndex]) ** (tauM / tauM - tauD[RIndex][neuronIndex]))
+				R[RIndex][neuronIndex] = (((tauD[RIndex][neuronIndex]*.001)*neuronFiringThreshold) / Rm) * ((tauM / (tauD[RIndex][neuronIndex]*.001) ) ** (tauM / (tauM - (tauD[RIndex][neuronIndex]*.001) )))
 
 			#Dedritic total post-synaptic current
 			# Solving for Id in the formula in the article yeilded the below equation
-			# -Id**2/(2*Td) + Id*Rd*W/Tfd
-			# That is implemented below
 			e = math.e
 			
 			for IdIndex in range(len(Id)):
 				tauDen = tauD[IdIndex][neuronIndex]
 				r = R[IdIndex][neuronIndex]
 				w = W[IdIndex][neuronIndex]
-				tPreSyn = spiketimes[IdIndex + (neuronIndex * len(Id))][0]
+				tPreSyn = spiketimes[IdIndex + (neuronIndex * len(Id)) + (self.currentEpoch*(dictionaryLongitude*numberOfPixels))][0]
 				Id2 = Id[IdIndex][neuronIndex]
 				Dt = t - tPreSyn
 				DiracFun = 1/Dt
 
 				# dirac test
 				# t in dirac forumula means curent time or last spike time?
+				SpikeModCoeff = (r*w*DiracFun)
 				if (t > -(Dt/2) and t < (Dt/2)):
-					Id[IdIndex][neuronIndex] = ((-Id2**2)/(2*tauDen))+((Id2*r*w)*DiracFun)
+					Id[IdIndex][neuronIndex] = -(SpikeModCoeff - Id2) * (e ** (-t/tauDen)) + SpikeModCoeff
 				else:
 					DiracFun = 0
-					Id[IdIndex][neuronIndex] = ((-Id2**2)/(2*tauDen))+((Id2*r*w)*DiracFun)
+					Id[IdIndex][neuronIndex] = -(SpikeModCoeff - Id2) * (e ** (-t/tauDen)) + SpikeModCoeff
 
 			### Synapse directly to soma ###
 			# Solving for Id in the formula in the article yeilded the below equation
-			# -Is_1**2/(2*Ts_1) + (Is_1*DiracWeightedSum)/Ts_1
-			# That is implemented below
 			# To calculate the DiracWeightedSum the spike times with the dirac function applied are multipled by the synapse weight 
 			# and summed then divided by the number of synapses for the neuron 
 			DiracWeightedSum = 0
 			for DiracIndex in range(len(Is)):
-				tPreSyn = spiketimes[DiracIndex + (neuronIndex * len(Is))][0]
+				#tPreSyn = spiketimes[DiracIndex + (neuronIndex * len(Is))][0]
+				tPreSyn = spiketimes[DiracIndex + (neuronIndex * len(Is)) + (self.currentEpoch*(dictionaryLongitude*numberOfPixels))][0]
 				Dt = t - tPreSyn
 				DiracFun = 1/Dt
 				# dirac test  # TODO: not sure dirac is implemented correctly here
@@ -81,28 +114,30 @@ class gupta_paper:
 
 			Is2 = Is[neuronIndex]
 
-			Is[neuronIndex] = (-Is2**2)/(2*tauS) + ((Is2*DiracWeightedSum)/tauS)
+			Is[neuronIndex] = -(DiracWeightedSum - Is2) * (e ** (-t/tauS)) + DiracWeightedSum
 
 			### Soma membrane potential ###
 			# Solving for Um in the formula in the article yeilded the below equation
-			## -Um**2/(2*Tm) + Um*(Rm*SummedDendriteGroupX + Rm*SynapseToSomaX)/Tm
-			# That is implemented below
 			Um2 = Um[neuronIndex]
-			#print '1', Um2
+
 			SummedDendriteGroup = sum(Id[ 0:len(Id) ][neuronIndex])
 			SynapseToSoma = Is[neuronIndex]
 
-			Um[neuronIndex] = -Um2**2/(2*tauM) + Um2*(Rm*SummedDendriteGroup + Rm*SynapseToSoma)/tauM
-			#Um[neuronIndex] = Um[neuronIndex] + .0001;
-			#print '2', Um[neuronIndex]
+			self.SummedDendriteGroup = SummedDendriteGroup;
+			self.SynapseToSoma = SynapseToSoma;
+
+			#print 'neuronIndex', neuronIndex, 't', t, 'Um2', Um2, 'SummedDendriteGroup', SummedDendriteGroup, 'SynapseToSoma', SynapseToSoma, 'tauM', tauM
+			#print 'weights', W[0][neuronIndex], ' ', W[1][neuronIndex], ' ', W[2][neuronIndex], ' ', W[3][neuronIndex], ' ', W[4][neuronIndex], ' ', W[5][neuronIndex], ' ', W[6][neuronIndex], ' ', W[7][neuronIndex], ' ', W[8][neuronIndex], ' ', W[9][neuronIndex], ' ', W[10][neuronIndex], ' ', W[11][neuronIndex], ' ', W[12][neuronIndex], ' ', W[13][neuronIndex], ' ', W[14][neuronIndex]
+			#print 'resistance', R[0][neuronIndex], ' ', R[1][neuronIndex], ' ', R[2][neuronIndex], ' ', R[3][neuronIndex]
+
+			NeuronInputCoeff = Rm*(SummedDendriteGroup + SynapseToSoma)
+			Um[neuronIndex] = -(NeuronInputCoeff - Um2) * (e ** (-t/tauM)) + NeuronInputCoeff
 
 			# Check for spike
 			self.SpikeFired = False
 			if Um[neuronIndex] >= ActionPotentialThreshold:
 				Um[neuronIndex] = Ureset
 				self.SpikeFired = True
-
-			#print '3', Um[neuronIndex]
 
 			## adjust weights ##
 			# weight adjusting needs both presynaptic spike time and post synaptic spike time,
@@ -163,9 +198,11 @@ class gupta_paper:
 			neuronIndex = neuronIndex + 1
 			if neuronIndex == 4: 
 				neuronIndex = 0
-				t = t + 1
+				t = t + 0.001
 			self.neuronIndex = neuronIndex
 			self.t = t
+
+			#self.ADDS = ADDS
 
 			return Um[neuronIndex] * mV;	
 
@@ -179,18 +216,51 @@ class gupta_paper:
 
 			ADDS[self.neuronCounter][0].V = returnUm(self)
 
-			#print self.SpikeFired, '\t' , ADDS[self.neuronCounter][0].V, '\t', self.neuronCounter, '\t', (self.t * ms)
-
 			## Record spikes
 			if self.SpikeFired == True:
 				newSpike = [self.neuronCounter, (self.t * ms)]
 				M.spikes.append(newSpike)
-				print self.SpikeFired, '\t' , ADDS[self.neuronCounter][0].V, '\t', self.neuronCounter, '\t', (self.t * ms)
+
+			ADDS[self.neuronCounter][0].dendriV1 = Id[1][self.neuronCounter]
+			ADDS[self.neuronCounter][0].dendriV2 = Id[2][self.neuronCounter]
+			ADDS[self.neuronCounter][0].dendriV3 = Id[3][self.neuronCounter]
+			ADDS[self.neuronCounter][0].dendriV4 = Id[4][self.neuronCounter]
+			ADDS[self.neuronCounter][0].dendriV5 = Id[5][self.neuronCounter]
+			ADDS[self.neuronCounter][0].dendriV6 = Id[6][self.neuronCounter]
+			ADDS[self.neuronCounter][0].dendriV7 = Id[7][self.neuronCounter]
+			ADDS[self.neuronCounter][0].dendriV8 = Id[8][self.neuronCounter]
+			ADDS[self.neuronCounter][0].dendriV9 = Id[9][self.neuronCounter]
+			ADDS[self.neuronCounter][0].dendriV10 = Id[10][self.neuronCounter]
+			ADDS[self.neuronCounter][0].dendriV11 = Id[11][self.neuronCounter]
+			ADDS[self.neuronCounter][0].dendriV12 = Id[12][self.neuronCounter]
+			ADDS[self.neuronCounter][0].dendriV13 = Id[13][self.neuronCounter]
+			ADDS[self.neuronCounter][0].dendriV14 = Id[14][self.neuronCounter]
+
+			#print 'neuron\t', self.neuronCounter, '\tADDS[self.neuronCounter][0].Yy\t', ADDS[self.neuronCounter][0].Yy
+			#print 'ADDS[self.neuronCounter][0].DendI\t', ADDS[self.neuronCounter][0].DendI
+
+			#print 'ADDS[self.neuronCounter][0].dendriV', ADDS[self.neuronCounter][0].dendriV
 
 		M = SpikeMonitor(ADDS)
 		Mv = StateMonitor(ADDS, 'V', record=True)
+		MDendI = StateMonitor(ADDS, 'DendI', record=True)
+		MSynI = StateMonitor(ADDS, 'SynI', record=True)
+		MdendriV1 = StateMonitor(ADDS, 'dendriV1', record=True)
+		MdendriV2 = StateMonitor(ADDS, 'dendriV2', record=True)
+		MdendriV3 = StateMonitor(ADDS, 'dendriV3', record=True)
+		MdendriV4 = StateMonitor(ADDS, 'dendriV4', record=True)
+		MdendriV5 = StateMonitor(ADDS, 'dendriV5', record=True)
+		MdendriV6 = StateMonitor(ADDS, 'dendriV6', record=True)
+		MdendriV7 = StateMonitor(ADDS, 'dendriV7', record=True)
+		MdendriV8 = StateMonitor(ADDS, 'dendriV8', record=True)
+		MdendriV9 = StateMonitor(ADDS, 'dendriV9', record=True)
+		MdendriV10 = StateMonitor(ADDS, 'dendriV10', record=True)
+		MdendriV11 = StateMonitor(ADDS, 'dendriV11', record=True)
+		MdendriV12 = StateMonitor(ADDS, 'dendriV12', record=True)
+		MdendriV13 = StateMonitor(ADDS, 'dendriV13', record=True)
+		MdendriV14 = StateMonitor(ADDS, 'dendriV14', record=True)
 
-		totalRunTime = 1000
+		totalRunTime = 100
 
 		run(totalRunTime*ms,threads=2, report='text')
 
@@ -216,13 +286,38 @@ class gupta_paper:
 				reportResultsAndLogging.logger(outputFile)
 			outputFile.close()
 
+		#subplot(224)
+		#plot(MYy.times / ms, MYy[neuronToPlot] / mV)
+		#xlabel('Time (ms)')
+		#ylabel('Yy (mV)')
+
 		neuronToPlot = 1
 		subplot(211)
 		raster_plot(M, title='The gupta network', newfigure=False)
 		subplot(223)
+		plot(Mv.times / ms, Mv[0] / mV)		
 		plot(Mv.times / ms, Mv[neuronToPlot] / mV)
+		plot(Mv.times / ms, Mv[2] / mV)
+		plot(Mv.times / ms, Mv[3] / mV)
 		xlabel('Time (ms)')
-		ylabel('V (mV)')
+		ylabel('Membrane Potential (mV)')
+		subplot(224)
+		plot(MdendriV1.times / ms, MdendriV1[neuronToPlot] / mV)
+		plot(MdendriV2.times / ms, MdendriV2[neuronToPlot] / mV)
+		plot(MdendriV3.times / ms, MdendriV3[neuronToPlot] / mV)
+		plot(MdendriV4.times / ms, MdendriV4[neuronToPlot] / mV)
+		plot(MdendriV5.times / ms, MdendriV5[neuronToPlot] / mV)
+		plot(MdendriV6.times / ms, MdendriV6[neuronToPlot] / mV)
+		plot(MdendriV7.times / ms, MdendriV7[neuronToPlot] / mV)
+		plot(MdendriV8.times / ms, MdendriV8[neuronToPlot] / mV)
+		plot(MdendriV9.times / ms, MdendriV9[neuronToPlot] / mV)
+		plot(MdendriV10.times / ms, MdendriV10[neuronToPlot] / mV)
+		plot(MdendriV11.times / ms, MdendriV11[neuronToPlot] / mV)
+		plot(MdendriV12.times / ms, MdendriV12[neuronToPlot] / mV)
+		plot(MdendriV13.times / ms, MdendriV13[neuronToPlot] / mV)
+		plot(MdendriV14.times / ms, MdendriV14[neuronToPlot] / mV)
+		xlabel('Time (ms)')
+		ylabel('Dendrite Input Current (mV)')
 		show()
 
 	def __init__(self):
