@@ -24,6 +24,8 @@ class gupta_paper:
 
 	currentEpoch = 0
 
+	refractoryPeriod = False
+
 	def run_model(self):
 		
 		dictionary = self.dictionary
@@ -75,24 +77,68 @@ class gupta_paper:
 			#Dedritic total post-synaptic current
 			# Solving for Id in the formula in the article yeilded the below equation
 			e = math.e
-			
+
 			for IdIndex in range(len(Id)):
 				tauDen = tauD[IdIndex][neuronIndex]
 				r = R[IdIndex][neuronIndex]
 				w = W[IdIndex][neuronIndex]
-				tPreSyn = spiketimes[IdIndex + (neuronIndex * len(Id)) + (self.currentEpoch*(dictionaryLongitude*numberOfPixels))][0]
+				# * .001 below is for ms conversion
+				#tPreSyn = (spiketimes[IdIndex + (neuronIndex * len(Id)) + (self.currentEpoch*(dictionaryLongitude*numberOfPixels))][1])
+				# find most recent spike for neuron
+				tPreSyn = 0.0
+				for presynInd in range(shape(spiketimes)[0]):
+					comparedSpikeTime = spiketimes[presynInd][1]*0.001
+					if spiketimes[presynInd][0] == IdIndex and comparedSpikeTime < t:
+						## * 0.001 below is conversion to ms
+						tPreSyn = comparedSpikeTime
+					#print 'IdIndex\t',IdIndex,'\tspiketimes[presynInd][0]\t',spiketimes[presynInd][0],'\tt\t',t,'\tcomparedSpikeTime\t',comparedSpikeTime,'\ttPreSyn\t',tPreSyn
+					if comparedSpikeTime > t:
+						break
+
 				Id2 = Id[IdIndex][neuronIndex]
 				Dt = t - tPreSyn
+				# converted Dt to units which seem to make more sense for dirac function used, not sure if right to do that
+				# though
+				Dt = Dt * 1000
 				DiracFun = 1/Dt
 
-				# dirac test
-				# t in dirac forumula means curent time or last spike time?
 				SpikeModCoeff = (r*w*DiracFun)
+				#print 'spiketimes',shape(spiketimes)
+				#print 'spiketimes',spiketimes[1][:]
+				#print spiketimes[1].index(0.1)
+				'''print '_______'
+				print 'spike time',tPreSyn
+				print 't',t
+				print 'r',r
+				print 'w',w
+				print 'tPreSyn',tPreSyn
+				print 'DiracFun',DiracFun
+				print 'SpikeModCoeff',SpikeModCoeff'''
+
+				# dirac test
+				# t in dirac forumula means curent time or last spike time?		
 				if (t > -(Dt/2) and t < (Dt/2)):
+					#SpikeModCoeff = (r*w*DiracFun)
+					SpikeModCoeff = .011
+					SpikeModCoeff = (SpikeModCoeff*DiracFun)
+					tauDen = .03					
+					'''print 'r',r
+					print 'w',w
+					print 'tPreSyn',tPreSyn
+					print 'DiracFun',DiracFun
+					print 'SpikeModCoeff',SpikeModCoeff'''
 					Id[IdIndex][neuronIndex] = -(SpikeModCoeff - Id2) * (e ** (-t/tauDen)) + SpikeModCoeff
 				else:
 					DiracFun = 0
+					#SpikeModCoeff = (r*w*DiracFun)
+					SpikeModCoeff = .011
+					SpikeModCoeff = (SpikeModCoeff*DiracFun)					
+					tauDen = .03										
 					Id[IdIndex][neuronIndex] = -(SpikeModCoeff - Id2) * (e ** (-t/tauDen)) + SpikeModCoeff
+
+				# Reset threshold.  I assume this current is constricted by this the same as others
+				if Id[IdIndex][neuronIndex] >= ActionPotentialThreshold:
+					Id[IdIndex][neuronIndex] = Ureset
 
 			### Synapse directly to soma ###
 			# Solving for Id in the formula in the article yeilded the below equation
@@ -126,18 +172,48 @@ class gupta_paper:
 			self.SummedDendriteGroup = SummedDendriteGroup;
 			self.SynapseToSoma = SynapseToSoma;
 
-			#print 'neuronIndex', neuronIndex, 't', t, 'Um2', Um2, 'SummedDendriteGroup', SummedDendriteGroup, 'SynapseToSoma', SynapseToSoma, 'tauM', tauM
-			#print 'weights', W[0][neuronIndex], ' ', W[1][neuronIndex], ' ', W[2][neuronIndex], ' ', W[3][neuronIndex], ' ', W[4][neuronIndex], ' ', W[5][neuronIndex], ' ', W[6][neuronIndex], ' ', W[7][neuronIndex], ' ', W[8][neuronIndex], ' ', W[9][neuronIndex], ' ', W[10][neuronIndex], ' ', W[11][neuronIndex], ' ', W[12][neuronIndex], ' ', W[13][neuronIndex], ' ', W[14][neuronIndex]
-			#print 'resistance', R[0][neuronIndex], ' ', R[1][neuronIndex], ' ', R[2][neuronIndex], ' ', R[3][neuronIndex]
 
-			NeuronInputCoeff = Rm*(SummedDendriteGroup + SynapseToSoma)
+			#SummedDendriteGroup = 0.00006875
+			#SynapseToSoma = 0.00006875
+
+			#NeuronInputCoeff = Rm*(SummedDendriteGroup + SynapseToSoma)
+			NeuronInputCoeff = Rm*(SummedDendriteGroup)
+			NeuronInputCoeff = .011
+			#tauM = .03
 			Um[neuronIndex] = -(NeuronInputCoeff - Um2) * (e ** (-t/tauM)) + NeuronInputCoeff
 
+
 			# Check for spike
-			self.SpikeFired = False
-			if Um[neuronIndex] >= ActionPotentialThreshold:
+			# when identifying a spike, refractoryPeriodEndPoint is used as an alternative condition to refractoryPeriod being
+			# over to allow a spike right at that end point
+
+			# Refractory period
+			refractoryPeriodEndPoint = (self.t - 0.001) % spikeIntervalUnformatted <= 0.00001			
+			if self.SpikeFired == True and (self.t - 0.001) % spikeIntervalUnformatted > 0.00001:
+				self.refractoryPeriod = True
+				print 'refrac activated!'
+			elif self.refractoryPeriod == True and refractoryPeriodEndPoint:
+				# 0.001 added above for time step compatibility.   0.00001 instead of 0.0 used for some kind of 
+				# modulo computational result offset in python which was producing a value from the modulo calc
+				# just slightly over 0
+				self.refractoryPeriod = False
+				print 'refrac over!'
+			#print 'self.refractoryPeriod == True and refractoryPeriodEndPoint', self.refractoryPeriod == True, refractoryPeriodEndPoint, (self.refractoryPeriod == True and refractoryPeriodEndPoint), self.t % (spikeIntervalUnformatted + 0.001) <= 0.00001
+			if self.refractoryPeriod == True:
 				Um[neuronIndex] = Ureset
-				self.SpikeFired = True
+				#print self.t
+
+			# Spike firing detection positioned here to allow Ureset value to occur on next timestep above.
+			# This allows spike to be recorded in plot instead of value immediately going to Ureset.
+			self.SpikeFired = False
+			if Um[neuronIndex] >= ActionPotentialThreshold and (self.refractoryPeriod == False or refractoryPeriodEndPoint):
+				#Um[neuronIndex] = Ureset
+				self.SpikeFired = True				
+			#print self.t, 'self.SpikeFired', self.SpikeFired, (spikeIntervalUnformatted), (self.t-0.001) % spikeIntervalUnformatted, ((self.t-0.001) % spikeIntervalUnformatted <= 0.00001), self.refractoryPeriod
+			#print 'neuronIndex', neuronIndex, 't', t, 'Um2', Um2#, 'SummedDendriteGroup', SummedDendriteGroup, 'SynapseToSoma', SynapseToSoma, 'tauM', tauM
+			#print 'neuronIndex', neuronIndex, 't', t, 'weights', W[0][neuronIndex], ' ', W[1][neuronIndex], ' ', W[2][neuronIndex], ' ', W[3][neuronIndex], ' ', W[4][neuronIndex], ' ', W[5][neuronIndex], ' ', W[6][neuronIndex], ' ', W[7][neuronIndex], ' ', W[8][neuronIndex], ' ', W[9][neuronIndex], ' ', W[10][neuronIndex], ' ', W[11][neuronIndex], ' ', W[12][neuronIndex], ' ', W[13][neuronIndex], ' ', W[14][neuronIndex]
+			#print 'resistance', R[0][neuronIndex], ' ', R[1][neuronIndex], ' ', R[2][neuronIndex], ' ', R[3][neuronIndex]
+
 
 			## adjust weights ##
 			# weight adjusting needs both presynaptic spike time and post synaptic spike time,
@@ -156,49 +232,57 @@ class gupta_paper:
 			# list and choose the latest spikes for the relevant neuron.  Those represent
 			# the latest pre and post spikes
 			# TODO: check this is surely the case
-			SpikePreSyn = 0
-			SpikePostSyn = 0
+			SpikePreSyn = 0.0*usecond
+			SpikePostSyn = 0.0*usecond
 			SpikeFound = False
 			NumberOfSpikes = shape(M.spikes)[0]
 			for i in range(NumberOfSpikes):
 				CurrentSpike = M.spikes[((NumberOfSpikes - 1) - i)]
-				if SpikeFound == False and CurrentSpike[0] == self.neuronIndex:
-					SpikePreSyn = CurrentSpike[1]
-					SpikeFound = True
 				if SpikeFound == True and CurrentSpike[0] == self.neuronIndex:
 					# Shift spikes found to pre then post from just pre
 					SpikePostSyn = SpikePreSyn
 					SpikePreSyn = CurrentSpike[1]
 					#exit once both found
 					break;
+				if SpikeFound == False and CurrentSpike[0] == self.neuronIndex:
+					SpikePreSyn = CurrentSpike[1]
+					SpikeFound = True
 			## include logic for processing if SpikePostSyn or SpikePreSyn were not found.
 			## That only occurs in first several seconds though and I don't know it effects
 			## the weighting much
+			#print 'spikes\t', M.spikes
+			#print 'NumberOfSpikes', NumberOfSpikes, '\tSpikePreSyn\t', SpikePreSyn, '\tSpikePostSyn\t',SpikePostSyn
 
 			DeltaSpikeTime = SpikePreSyn - SpikePostSyn
 			# TODO: figure out if DeltaW = 0 is really fine for init value
 			DeltaW = 0
 			if DeltaSpikeTime < 0:
-				DeltaW = APlus * (e ** (DeltaSpikeTime / TauPlus))
+				DeltaW = APlus * (e ** (DeltaSpikeTime / (TauPlus*ms)))
 			elif DeltaSpikeTime > 0:
-				DeltaW = AMinus * (e ** (-DeltaSpikeTime / TauMinus))			
+				DeltaW = AMinus * (e ** (-DeltaSpikeTime / (TauMinus*ms)))			
 
+			#print 'DeltaW', DeltaW
 			## Relaxation rule implementation ##
-			WOld = W[IdIndex][neuronIndex];
-			if DeltaW >= 0:				
-				WNew = WOld + (LearningRate * (DeltaW * (WMax - WOld)))
-				
-			elif DeltaW < 0:	
-				WNew = WOld + (LearningRate * (DeltaW * (WOld - WMin)))
+			for IdIndex in range(len(Id)):
+				WOld = W[IdIndex][neuronIndex];
+				if DeltaW >= 0:				
+					WNew = WOld + (LearningRate * (DeltaW * (WMax - WOld)))
+					
+				elif DeltaW < 0:	
+					WNew = WOld + (LearningRate * (DeltaW * (WOld - WMin)))
+				#print 'WOld', WOld
+				#print 'WNew', WNew
 
-			W[IdIndex][neuronIndex] = WNew;
+				W[IdIndex][neuronIndex] = WNew;
 			##
 
 			### After all neurons are cycled through the time is iterated by one
 			neuronIndex = neuronIndex + 1
 			if neuronIndex == 4: 
 				neuronIndex = 0
-				t = t + 0.001
+				#t = t + 0.0002
+				# changed time step time for testing
+				t = t + 0.002
 			self.neuronIndex = neuronIndex
 			self.t = t
 
