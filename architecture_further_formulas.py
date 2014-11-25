@@ -38,15 +38,15 @@ epochMsDuration = (SimulationDuration / epochs) * 10 # Times 10 is to adjust to 
 numberOfPixels = 15
 #neuronFiringThreshold = 10 * mV
 neuronFiringThreshold = 10 # removed mV for compatibility
-W = np.random.uniform(0.5,1.0,[15,4]) # Initial weights
+W = np.random.uniform(0.5,1.0,[4,15]) # Initial weights
 # none to 1 below
 numberOfNeurons = 4
-R = [[1] * dictionaryLongitude for i in range(numberOfPixels)] # Initial Resistance Values
+R = [[1] * numberOfPixels]*dictionaryLongitude # Initial Resistance Values
 ## Added 1 init below but I don't really know what the right init value is
-Id = [[-.001] * dictionaryLongitude for i in range(numberOfPixels)] # Initial Dendritic Post Synaptic Current
+Id = [[-.001] * numberOfPixels]*dictionaryLongitude # Initial Dendritic Post Synaptic Current
 ## Added 1 init below but I don't really know what the right init value is
-tauD = [[1] * dictionaryLongitude for i in range(numberOfPixels)] # Initial tauD
-tF = [[None] * dictionaryLongitude for i in range(numberOfPixels)] # Initial pre-synaptic spike times
+tauD = [[1] * numberOfPixels]*dictionaryLongitude # Initial tauD
+tF = [[None] * numberOfPixels]*dictionaryLongitude # Initial pre-synaptic spike times
 
 Is = [-.001] * dictionaryLongitude
 Um = [-.001] * dictionaryLongitude
