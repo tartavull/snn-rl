@@ -4,6 +4,7 @@ import numpy as np
 from sympy import * # used for differentiation
 import math # used for natural log
 #from random import random # for random gen
+from decimal import Decimal # Used for results reporting calculations
 from brian import *
 
 epochs = 100 
@@ -44,12 +45,14 @@ numberOfNeurons = 4
 R = [[1] * numberOfPixels]*dictionaryLongitude # Initial Resistance Values
 ## Added 1 init below but I don't really know what the right init value is
 Id = [[-.001] * numberOfPixels]*dictionaryLongitude # Initial Dendritic Post Synaptic Current
+testId = [[-.001] * numberOfPixels]*dictionaryLongitude # Initial Dendritic Post Synaptic Current
 ## Added 1 init below but I don't really know what the right init value is
 tauD = [[1] * numberOfPixels]*dictionaryLongitude # Initial tauD
 tF = [[None] * numberOfPixels]*dictionaryLongitude # Initial pre-synaptic spike times
 
 Is = [-.001] * dictionaryLongitude
 Um = [-.001] * dictionaryLongitude
+testUm = [-.001] * dictionaryLongitude
 
 Ureset = -.001
 
