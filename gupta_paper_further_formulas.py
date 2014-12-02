@@ -194,8 +194,8 @@ class gupta_paper:
 				#if Dt <= spikeIntervalUnformatted:
 				r = 1
 				# for testing .025 below is scaling factor to get spikeCoeff to be at least .011 which is enough to cause spikes.
-				SpikeModCoeff = (r*(w*.025))
-				#SpikeModCoeff = (r*(w*.012))
+				#SpikeModCoeff = (r*(w*.025))
+				SpikeModCoeff = (r*(w*.012))
 				
 				#print '***ni:\t',neuronIndex,'\tIdIndex\t',IdIndex,'\t***w:\t',w
 				
@@ -207,7 +207,7 @@ class gupta_paper:
 					#SpikeModCoeff = (r*w*DiracFun)
 					#SpikeModCoeff = .011
 					#SpikeModCoeff = .005
-					SpikeModCoeff = .011
+					#SpikeModCoeff = .011
 					SpikeModCoeff = (SpikeModCoeff*DiracFun)
 					tauDen = .03	
 					IDend[neuronIndex][IdIndex] = -(SpikeModCoeff - Id2) * (e ** (-tNorm/tauDen)) + SpikeModCoeff
@@ -216,7 +216,7 @@ class gupta_paper:
 					#SpikeModCoeff = (r*w*DiracFun)
 					#SpikeModCoeff = .011
 					#SpikeModCoeff = .005
-					SpikeModCoeff = .011
+					#SpikeModCoeff = .011
 					SpikeModCoeff = (SpikeModCoeff*DiracFun)					
 					tauDen = .03										
 					IDend[neuronIndex][IdIndex] = -(SpikeModCoeff - Id2) * (e ** (-tNorm/tauDen)) + SpikeModCoeff
