@@ -6,26 +6,7 @@ class gupta_paper:
 	testSpiketimes = spiketimes
 	LIK = SpikeGeneratorGroup(15, spiketimes)
 	neuronIndex = 0
-	neuronCounter = -1
 	t = 0.001
-	IdSpikeFired = np.array([[False]*numberOfPixels]*dictionaryLongitude); 
-	testIdSpikeFired = np.array([[False]*numberOfPixels]*dictionaryLongitude); 
-	#testIdSpikeFired = IdSpikeFired
-	IsSpikeFired = np.array([False]*dictionaryLongitude); 
-	testIsSpikeFired = np.array([False]*dictionaryLongitude);	
-	#testIsSpikeFired = IsSpikeFired
-	UmSpikeFired = np.array([False]*dictionaryLongitude); 
-	testUmSpikeFired = np.array([False]*dictionaryLongitude); 
-	#testUmSpikeFired = UmSpikeFired
-	IdRefractoryPeriod = np.array([[False]*numberOfPixels]*dictionaryLongitude); 
-	testIdRefractoryPeriod = np.array([[False]*numberOfPixels]*dictionaryLongitude); 
-	#testIdRefractoryPeriod = IdRefractoryPeriod
-	IsRefractoryPeriod = np.array([False]*dictionaryLongitude); 
-	testIsRefractoryPeriod = np.array([False]*dictionaryLongitude); 
-	#testIsRefractoryPeriod = IsRefractoryPeriod
-	UmRefractoryPeriod = np.array([False]*dictionaryLongitude); 
-	testUmRefractoryPeriod = np.array([False]*dictionaryLongitude); 
-	#testUmRefractoryPeriod = UmRefractoryPeriod
 	SummedDendriteGroup = 0;
 	SynapseToSoma = 0;
 	SigmaWDSyn = .0375 * mV
@@ -46,6 +27,18 @@ class gupta_paper:
 	falseNegativeSpikeResults = 0
 	totalSpikeIntervals = 12
 	testSpikesFiredInInterval = np.array([[False]*(totalSpikeIntervals+1)]*dictionaryLongitude)
+	IdSpikeFired = np.array([[False]*numberOfPixels]*dictionaryLongitude); 
+	testIdSpikeFired = np.array([[False]*numberOfPixels]*dictionaryLongitude); 
+	IsSpikeFired = np.array([False]*dictionaryLongitude); 
+	testIsSpikeFired = np.array([False]*dictionaryLongitude);	
+	UmSpikeFired = np.array([False]*dictionaryLongitude); 
+	testUmSpikeFired = np.array([False]*dictionaryLongitude); 
+	IdRefractoryPeriod = np.array([[False]*numberOfPixels]*dictionaryLongitude); 
+	testIdRefractoryPeriod = np.array([[False]*numberOfPixels]*dictionaryLongitude); 
+	IsRefractoryPeriod = np.array([False]*dictionaryLongitude); 
+	testIsRefractoryPeriod = np.array([False]*dictionaryLongitude); 
+	UmRefractoryPeriod = np.array([False]*dictionaryLongitude); 
+	testUmRefractoryPeriod = np.array([False]*dictionaryLongitude); 
 
 	correctSpikes = np.array([[1]*totalSpikeIntervals]*dictionaryLongitude);#[[1] * totalSpikeIntervals]*dictionaryLongitude
 	correctSpikes[0][3:12] = 0
@@ -184,7 +177,8 @@ class gupta_paper:
 				# converted Dt to units which seem to make more sense for dirac function used, not sure if right to do that
 				# though
 				# simplify dirac for testing
-				DiracFun = 0
+				#DiracFun = 0
+				DiracFun = 1/Dt
 
 				SpikeModCoeff = (r*w*DiracFun)
 
@@ -192,10 +186,12 @@ class gupta_paper:
 				# t in dirac forumula means curent time or last spike time?		
 				#if (t > -(Dt/2) and t < (Dt/2)):
 				#if Dt <= spikeIntervalUnformatted:
-				r = 1
 				# for testing .025 below is scaling factor to get spikeCoeff to be at least .011 which is enough to cause spikes.
 				#SpikeModCoeff = (r*(w*.025))
-				SpikeModCoeff = (r*(w*.012))
+				#SpikeModCoeff = (r*(w*.012))
+				#SpikeModCoeff = (r*(w*.0026))
+				r = .00375
+				SpikeModCoeff = (r*w)
 				
 				#print '***ni:\t',neuronIndex,'\tIdIndex\t',IdIndex,'\t***w:\t',w
 				
@@ -203,7 +199,8 @@ class gupta_paper:
 				# relative to the spike interval it seems and therefore that approach is applied to the formula here.	
 				tNorm = t - (floor(t/spikeIntervalUnformatted) * spikeIntervalUnformatted) 
 				if Dt <= 0.0:
-					DiracFun = 1
+					#DiracFun = 1
+					DiracFun = 0.95
 					#SpikeModCoeff = (r*w*DiracFun)
 					#SpikeModCoeff = .011
 					#SpikeModCoeff = .005
@@ -271,12 +268,15 @@ class gupta_paper:
 			SynapseToSoma = ISoma[neuronIndex]
 			#print 'self.epochIndex\t',self.epochIndex,'\tneuronIndex\t',neuronIndex,'\tSummedDendriteGroup\t',SummedDendriteGroup,'\tIDend\t',IDend
 
-			self.SummedDendriteGroup = SummedDendriteGroup;
-			self.SynapseToSoma = SynapseToSoma;
+			#self.SummedDendriteGroup = SummedDendriteGroup;
+			#self.SynapseToSoma = SynapseToSoma;
 
-			NeuronInputCoeff = Rm*(SummedDendriteGroup)
+			#NeuronInputCoeff = Rm*(SummedDendriteGroup)
+			NeuronInputCoeff = SummedDendriteGroup
 
 			newTSMP = -(NeuronInputCoeff - Um2) * (e ** (-tNorm/tauM)) + NeuronInputCoeff			
+
+			#print 'self.t',self.t,'\tSummedDendriteGroup\t',SummedDendriteGroup,'neuronIndex\t',neuronIndex,'\ttestId[neuronIndex]\t',testId[neuronIndex]
 
 			return newTSMP
 
@@ -420,17 +420,8 @@ class gupta_paper:
 			# for each charactor input below test the classfication results
 			for neuronIndex in range(dictionaryLongitude):
 				testId[neuronIndex], self.testIdSpikeFired[neuronIndex], self.testIdRefractoryPeriod[neuronIndex] = dentritePostSynapticCurrent(neuronIndex, testId, self.testIdSpikeFired, self.testIdRefractoryPeriod, testR, testW, self.testSpiketimes)
-				#print 'neuronIndex\t',neuronIndex,'\tW[neuronIndex]\t',W[neuronIndex]
-				#print 'neuronIndex\t',neuronIndex,'\ttestId[neuronIndex]\t',testId[neuronIndex]
-				SummedDendriteGroup = sum(testId[neuronIndex])
 
-				NeuronInputCoeff = Rm*(SummedDendriteGroup)
-
-				Um2 = testUm[neuronIndex]
-				#NeuronInputCoeff = .011
-				#NeuronInputCoeff = .005
-				#tauM = .03
-				testUm[neuronIndex] = -(NeuronInputCoeff - Um2) * (e ** (-tNorm/tauM)) + NeuronInputCoeff
+				testUm[neuronIndex] = totalSomaMembranePotential(neuronIndex, testUm, testId, Is, tNorm)
 				
 				testUm[neuronIndex], self.testUmSpikeFired[neuronIndex], self.testUmRefractoryPeriod[neuronIndex] = refractoryPeriodEvaluation(testUm[neuronIndex], self.testUmSpikeFired[neuronIndex], self.testUmRefractoryPeriod[neuronIndex])
 				testUm[neuronIndex], self.testUmSpikeFired[neuronIndex], self.testUmRefractoryPeriod[neuronIndex] = spikeFiredEvaluation(testUm[neuronIndex], self.testUmSpikeFired[neuronIndex], self.testUmRefractoryPeriod[neuronIndex])
@@ -516,14 +507,6 @@ class gupta_paper:
 			spikeIntervalCounter = (floor(self.t/spikeIntervalUnformatted) * spikeIntervalUnformatted)*10
 
 			## Record spikes
-			'''self.neuronCounter = self.neuronCounter + 1
-			if self.neuronCounter == 4:
-				self.neuronCounter = 0
-
-			if self.UmSpikeFired[self.neuronCounter] == True:
-				newSpike = [self.neuronCounter, (self.t * ms)]
-				M.spikes.append(newSpike)'''
-
 			if self.UmSpikeFired[self.neuronIndex] == True:
 				newSpike = [self.neuronIndex, (self.t * ms)]
 				M.spikes.append(newSpike)
@@ -588,6 +571,7 @@ class gupta_paper:
 		MdendriV13 = StateMonitor(ADDS, 'dendriV13', record=True)
 		MdendriV14 = StateMonitor(ADDS, 'dendriV14', record=True)
 
+		#totalRunTime = 7
 		totalRunTime = 101
 
 		run(totalRunTime*ms,threads=2, report='text')
