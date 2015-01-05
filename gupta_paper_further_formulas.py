@@ -3,10 +3,11 @@ from architecture_further_formulas import *
 class gupta_paper:
 	dictionary = dictionary()
 	spiketimes = dictionary.spikeTimes(dictionaryLongitude, spikeInterval, spikesPerChar, epochs)
+	#print 'st info:\t',spiketimes[0:310,0],'\t__\t',spiketimes[0:310,1]
 	testSpiketimes = spiketimes
 	LIK = SpikeGeneratorGroup(N=15, indices=spiketimes[:,0], times=spiketimes[:,1]*ms)
 	neuronIndex = 0
-	t = 0.001
+	t = 0.0000
 	SummedDendriteGroup = 0;
 	SynapseToSoma = 0;
 	SigmaWDSyn = .0375 * mV
@@ -24,6 +25,8 @@ class gupta_paper:
 	lastSpikeInterval = 0.0
 	currentEpoch = 0
 	refractoryPointCounter = 0.0
+	#refractoryPointCounter = -0.008 # for workaround adjusting this variable
+	#refractoryPointCounter = -0.03 # for workaround adjusting this variable
 	refractoryPointSwitch = False
 	neuronIndexCounter = 0.0
 	neuronIndexSwitch = False
@@ -46,6 +49,7 @@ class gupta_paper:
 	testIsRefractoryPeriod = np.array([False]*dictionaryLongitude); 
 	UmRefractoryPeriod = np.array([False]*dictionaryLongitude); 
 	testUmRefractoryPeriod = np.array([False]*dictionaryLongitude); 
+	refractoryGraphingSwitch = False
 
 	correctSpikes = np.array([[1]*totalSpikeIntervals]*dictionaryLongitude);#[[1] * totalSpikeIntervals]*dictionaryLongitude
 	correctSpikes[0][3:12] = 0
@@ -64,13 +68,14 @@ class gupta_paper:
 		#tauMZ*dv/dt = -v + RmZ*(IdVZ) : volt
 		#dv/dt = (-v + (RmZ/mV)*IdVZ)/(tauMZ) : volt
 		eqs = Equations('''
-			dv/dt = (-v + IdVZ)/(tauMZ) : volt (unless refractory)
+			dv/dt = (-v+(IdVZ))/(20*ms) : volt (unless refractory)
 			RmZ = 80*mV : volt
 			tauMZ = 20*ms : second
 			IdVZ : volt
 	        V : volt
 	        DendI : volt
 	        SynI : volt
+	        v2 : volt
 	        dendriV1 : volt
 	        dendriV2 : volt
 	        dendriV3 : volt
@@ -87,9 +92,10 @@ class gupta_paper:
 	        dendriV14 : volt			
 		    ''')			
 
+		#			dv/dt = (-v + (IdVZ))/(tauMZ) : volt
 		myclock=Clock(dt=1*ms)
 
-		ADDS = NeuronGroup(N=4, model=eqs,threshold='v>10*mV', reset='v=-0.001 * mV; IdVZ = 0*mV',refractory=50*ms)#,clock=myclock)
+		ADDS = NeuronGroup(N=4, model=eqs,threshold='v>.01*mV', reset='v=-0.002 * mV; dv=0; IdVZ = 0*mV;v2=10*mV',refractory=10*ms,clock=myclock)
 
 		def returnUm(self):
 			# Main logic of the neuron simulation model is performed here
@@ -114,7 +120,7 @@ class gupta_paper:
 			#Dedritic total post-synaptic current
 			#Id[neuronIndex], self.IdSpikeFired[neuronIndex], self.IdRefractoryPeriod[neuronIndex] = dentritePostSynapticCurrent(self.neuronIndex)
 			Id[neuronIndex], self.IdSpikeFired[neuronIndex], self.IdRefractoryPeriod[neuronIndex] = dentritePostSynapticCurrent(neuronIndex, Id, self.IdSpikeFired, self.IdRefractoryPeriod, R, W, spiketimes)
-			#print 'neuronIndex',neuronIndex,'self.t',self.t,'Id[neuronIndex]',Id[neuronIndex]
+			#print 'neuronIndex',neuronIndex,'self.t',self.t,'ADDS.t',ADDS.t,'Id[neuronIndex]',Id[neuronIndex]
 			# Direct to soma 
 			#Id[neuronIndex], self.IdSpikeFired[neuronIndex], self.IdRefractoryPeriod[neuronIndex] = dentritePostSynapticCurrent(neuronIndex, Id, self.IdSpikeFired, self.IdRefractoryPeriod, R, W, spiketimes)
 
@@ -177,9 +183,11 @@ class gupta_paper:
 				w = W[neuronIndex][IdIndex]
 
 				# set tpresyn initially too far to trigger dirac
-				tPreSyn = -t - 1
+				#tPreSyn = -t - 1
+				tPreSyn = t + 1
 				for presynInd in range(shape(spiketimes)[0]):
 					comparedSpikeTime = spiketimes[presynInd][1]
+					#print 'comparedSpikeTime:::\t',comparedSpikeTime,'\t::self.lastSpikeInterval\t',self.lastSpikeInterval
 					'''# spikeIntervalUnformatted included below to have offset where skiping input starting at .1 becomes 0.0, representing input spikes right from
 					# 0.0 to 300 ms, as the input is intended
 					# changed <= to < below to see if that works better
@@ -196,6 +204,7 @@ class gupta_paper:
 					if comparedSpikeTime > self.lastSpikeInterval:
 						break
 
+				#print 'tPreSyn000:',tPreSyn
 				Id2 = IDend[neuronIndex][IdIndex]
 				Dt = t - tPreSyn
 				# self.t == lines below are a workaround for initialization values
@@ -261,10 +270,15 @@ class gupta_paper:
 				#print 'factors\tSpikeModCoeff\t',SpikeModCoeff,'self.t',self.t,'neuronIndex',neuronIndex,'\tId2\t',Id2,'\ttPreSyn\t',tPreSyn,'\tDiracFun\t',DiracFun,'Dt <= 0.0',(Dt <= 0.0),'Dt',Dt,'\tneuronIndex\t',neuronIndex,'\tIdIndex\t',IdIndex,'-(SpikeModCoeff - Id2)',-(SpikeModCoeff - Id2),'-(SpikeModCoeff - Id2) * (e ** (-tNorm/tauDen))',-(SpikeModCoeff - Id2) * (e ** (-tNorm/tauDen))
 
 				# Refractory and spike evaluation: Id
-				refractResults = refractoryPeriodEvaluation(IDend[neuronIndex][IdIndex], IDendSpikes[neuronIndex][IdIndex], IDendRefract[neuronIndex][IdIndex])
+				#refractResults = refractoryPeriodEvaluation(IDend[neuronIndex][IdIndex], IDendSpikes[neuronIndex][IdIndex], IDendRefract[neuronIndex][IdIndex])
 				#print 'part2: \t',refractResults
-				spikeEvalResults = spikeFiredEvaluation(refractResults[0], refractResults[1], refractResults[2])
+				#spikeEvalResults = spikeFiredEvaluation(refractResults[0], refractResults[1], refractResults[2])
 				#print 'part3: \t',spikeEvalResults
+				spikeEvalResults = IDend[neuronIndex][IdIndex], IDendSpikes[neuronIndex][IdIndex], IDendRefract[neuronIndex][IdIndex]
+				if self.t > (self.lastSpikeInterval+0.02):
+					refractResults = refractoryPeriodEvaluation(IDend[neuronIndex][IdIndex], IDendSpikes[neuronIndex][IdIndex], IDendRefract[neuronIndex][IdIndex])
+					spikeEvalResults = spikeFiredEvaluation(refractResults[0], refractResults[1], refractResults[2])
+				
 				IDend[neuronIndex][IdIndex] = spikeEvalResults[0]
 				IDendSpikes[neuronIndex][IdIndex] = spikeEvalResults[1]
 				IDendRefract[neuronIndex][IdIndex] = spikeEvalResults[2]
@@ -306,7 +320,7 @@ class gupta_paper:
 
 			SummedDendriteGroup = sum(IDend[neuronIndex])
 			#print 'neuronIndex', neuronIndex, 'self.t', self.t, 'tNorm',tNorm,'SummedDendriteGroup', SummedDendriteGroup
-			ADDS.IdVZ[neuronIndex] = SummedDendriteGroup*volt# * 1 # the * 1000 is for a scaling adjustment
+			ADDS.IdVZ[neuronIndex] = SummedDendriteGroup*volt*10#*10 added 12/29/14 for scaling adjustment test # * 1 # the * 1000 is for a scaling adjustment
 			SynapseToSoma = ISoma[neuronIndex]
 			#print 'self.epochIndex\t',self.epochIndex,'\tneuronIndex\t',neuronIndex,'\tSummedDendriteGroup\t',SummedDendriteGroup,'\tIDend\t',IDend
 
@@ -349,24 +363,29 @@ class gupta_paper:
 
 					# exit loop once values below current time elapsed have all been checked
 					if CurrentSpikeTime > (self.t*second):
+						print 'eeww1:\tspiketimes\t',spiketimes,'\tqq\t',CurrentSpikeTime
 						break
 
 					# (self.t*second-.1*second) is to check if in relevant time window below.
 					# Note: that may not be a good cut off and I should check it
-					if CurrentSpikeNueron == inputNeuronIndex and CurrentSpikeTime > (self.t*second-.1*second):
+					# added < self.t just for testing
+					if CurrentSpikeNueron == inputNeuronIndex and CurrentSpikeTime > (self.t*second-.1*second):# and CurrentSpikeTime < (self.t*second):
 						SpikePreSyn = CurrentSpikeTime
 						preSynSpikeFound = True
 
 				# Find SpikePostSyn if exists
 				#spikeCollection = M.spikes
 				spikeCollection = M.it
+				print 'spikeCollection',spikeCollection
 				#print 'spikeCollection', spikeCollection
 				NumberOfSpikes = len(spikeCollection[0])
 				for i in range(NumberOfSpikes):
 					#CurrentSpikeNueron = spikeCollection[i][0]
 					#CurrentSpikeTime = spikeCollection[i][1]*1000
 					CurrentSpikeNueron = spikeCollection[0][i]
-					CurrentSpikeTime = spikeCollection[1][i]*1000
+					#CurrentSpikeTime = spikeCollection[1][i]*1000
+					CurrentSpikeTime = spikeCollection[1][i]*10
+					print 'CurrentSpikeNueron',CurrentSpikeNueron,'CurrentSpikeTime',CurrentSpikeTime,'self.t*second',self.t*second
 
 					# exit loop once values below current time elapsed have all been checked
 					# Disabled due to spikeCollection not being sorted and causing break too early
@@ -376,7 +395,8 @@ class gupta_paper:
 					# (self.t*second-.1*second) is to check if in relevant time window below.
 					# Note: that may not be a good cut off and I should check it
 					# * Important difference: CurrentSpikeNueron is compared to self.neuronIndex and not inputNeuronIndex here
-					if CurrentSpikeNueron == self.neuronIndex and CurrentSpikeTime >= (self.t*second-.1*second) and CurrentSpikeTime <= (self.t*second):
+					# added (.1+.008)
+					if CurrentSpikeNueron == self.neuronIndex and CurrentSpikeTime >= (self.t*second-(.1+.008)*second) and CurrentSpikeTime <= (self.t*second):
 						SpikePostSyn = CurrentSpikeTime	
 						postSynSpikeFound = True	
 
@@ -398,6 +418,7 @@ class gupta_paper:
 
 				#SpikePreSyn = 500*ms
 				#SpikePostSyn = 700*ms
+				print 'neuronIndex', self.neuronIndex, 'inputNeuronIndex',inputNeuronIndex,'self.t', self.t, 'preSynSpikeFound',preSynSpikeFound,'postSynSpikeFound',postSynSpikeFound,'SpikePostSyn', SpikePostSyn, 'SpikePreSyn', SpikePreSyn
 
 				# Find DeltaW
 				DeltaW = returnDeltaW(SpikePreSyn, SpikePostSyn)  
@@ -411,7 +432,9 @@ class gupta_paper:
 			DeltaSpikeTime = SpikePreSyn - SpikePostSyn
 			# TODO: figure out if DeltaW = 0 is really fine for init value
 			DeltaW = 0
-			if DeltaSpikeTime < 0:
+			# changed below line from that content in the article for a workaround/temp fix
+			#if DeltaSpikeTime < 0:
+			if DeltaSpikeTime <= 0:
 				DeltaW = APlus * (e ** (DeltaSpikeTime / (TauPlus*ms)))
 				# for testing
 				DeltaW = 1
@@ -421,11 +444,11 @@ class gupta_paper:
 				DeltaW = -1
 
 			# testing
-			'''print '(t*ms)',(t*ms),'SpikePreSyn',SpikePreSyn,'SpikePostSyn',SpikePostSyn,'DeltaSpikeTime',DeltaSpikeTime,'DeltaW',DeltaW
-			if 	(t*ms) - SpikePreSyn > (1*ms):
-				DeltaW = .5
-			else:
-				DeltaW = -.5	'''			
+			print 'self.t',self.t,'SpikePreSyn',SpikePreSyn,'SpikePostSyn',SpikePostSyn,'DeltaSpikeTime',DeltaSpikeTime,'DeltaW',DeltaW
+			#if 	(t*ms) - SpikePreSyn > (1*ms):
+			#	DeltaW = .5
+			#else:
+			#	DeltaW = -.5				
 
 			return DeltaW
 
@@ -533,7 +556,9 @@ class gupta_paper:
 			#t = t + 0.0002
 			# changed time step time for testing
 			#timeStepInterval = 0.01
-			timeStepInterval = 0.002
+			#timeStepInterval = 0.002
+			timeStepInterval = 0.001
+			#timeStepInterval = 0.0002
 			t = t + timeStepInterval
 			self.timing.append(t)
 			refractoryPointCounter = refractoryPointCounter + timeStepInterval
@@ -544,7 +569,8 @@ class gupta_paper:
 			# less than the set refractory period.  I am just using it for the time being for testing.
 			refractoryPointSwitch = False
 			if refractoryPointCounter >= spikeIntervalUnformatted:
-				refractoryPointCounter = 0.001
+				#refractoryPointCounter = 0.009
+				refractoryPointCounter = 0.000
 				refractoryPointSwitch = True
 				self.lastSpikeInterval = self.t
 				WeightChangeCalculation()
@@ -558,7 +584,8 @@ class gupta_paper:
 
 			neuronIndexSwitch = False
 			if neuronIndexCounter >= (spikeIntervalUnformatted*3):
-				neuronIndexCounter = 0.001
+				#neuronIndexCounter = 0.009
+				neuronIndexCounter = 0.0000
 				neuronIndexSwitch = True
 				# add epoch every epoch ms duration.  Occurs when a full series of input charactors has
 				# occured and a new one starts.  self.neuronIndex == 3 really means it will roll back to
@@ -584,14 +611,26 @@ class gupta_paper:
 		# The Um output is saved directly to the ADDS V (voltage) records for use with Brian's code.
 		@network_operation
 		def myoperation():
-			#print 'neuronIndex', self.neuronIndex, 'self.t', self.t, 'ADDS.v[0]', ADDS.v
-			#print 'neuronIndex', self.neuronIndex, 'self.t', self.t, 'ADDS.IdVZ[0]', ADDS.IdVZ
+			print 'neuronIndex', self.neuronIndex, 'self.t', self.t, 'ADDS.t', ADDS.t, 'ADDS.v[0]', ADDS.v
+			print 'neuronIndex', self.neuronIndex, 'self.t', self.t, 'ADDS.t', ADDS.t, 'ADDS.IdVZ[0]', ADDS.IdVZ
+			#ADDS.IdVZ[0] = 10*mV;ADDS.IdVZ[1] = 10*mV;ADDS.IdVZ[2] = 10*mV;ADDS.IdVZ[3] = 10*mV;
+
+			#print 'neuronIndex', self.neuronIndex, 'self.t', self.t, 'UmM.t',UmM.t
 			# Record voltage for whichever neuron is being trained at the time. i.e. neuron 1 for first 300ms.
 			# Note: below lline moved to higher code line
 			#ADDS[self.neuronIndex][0].V = returnUm(self)
 			#ADDS.V[self.neuronIndex] = returnUm(self)
 			returnUm(self)
 			spikeIntervalCounter = (floor(self.t/spikeIntervalUnformatted) * spikeIntervalUnformatted)*10
+
+			#if refractoryGraphingSwitch == True:
+			#ADDS.v2 = 
+			#for vCheck in ADDS.v:
+			#	if vCheck == -.002*mV:
+			#		refractoryGraphingSwitch = True
+			for vCheck in range(len(ADDS.v2)):
+				if ADDS.v2[vCheck] == 10*mV:
+					ADDS.v2[vCheck] = 0*mV
 
 			#ADDS.tNorm[self.neuronIndex] = (self.t - (floor(self.t/spikeIntervalUnformatted) * spikeIntervalUnformatted))*1000*ms
 			#print 'clock', myclock.t
@@ -653,12 +692,16 @@ class gupta_paper:
 			ADDS.dendriV13[self.neuronIndex] = Id[self.neuronIndex][13]*volt
 			ADDS.dendriV14[self.neuronIndex] = Id[self.neuronIndex][14]*volt
 
+			#myclock.tick()
+			#defaultclock.tick()
+
 		M = SpikeMonitor(ADDS)
 		Mv = StateMonitor(ADDS, 'V', record=True)
 		MDendI = StateMonitor(ADDS, 'DendI', record=True)
 		MSynI = StateMonitor(ADDS, 'SynI', record=True)
 		UmM = StateMonitor(ADDS, 'v', record=True)
 		UmM2 = StateMonitor(ADDS, variables=True, record=True)
+		UmM3 = StateMonitor(ADDS, 'v2', record=True)
 		MdendriV1 = StateMonitor(ADDS, 'dendriV1', record=True)
 		MdendriV2 = StateMonitor(ADDS, 'dendriV2', record=True)
 		MdendriV3 = StateMonitor(ADDS, 'dendriV3', record=True)
@@ -680,11 +723,13 @@ class gupta_paper:
 		#run(totalRunTime*ms,threads=2, report='text')
 		#run(200*ms,threads=2, report='text')
 		#run(300*ms,report='text')
+		#run(200*ms,report='text')
+		run(2000*ms,report='text')
 		'''run(10*ms,threads=2, report='text')
 		run(10*ms,threads=2, report='text')
 		run(10*ms,threads=2, report='text')		'''
 
-		store()
+		'''store()
 		run(100*ms,report='text')
 		#myclock.reinit()
 		#restore()
@@ -704,7 +749,7 @@ class gupta_paper:
 		ADDS.IdVZ[0] = 0*volt;ADDS.IdVZ[1] = 0*volt;ADDS.IdVZ[2] = 0*volt;ADDS.IdVZ[3] = 0*volt		
 		print 'defaultclock.t',defaultclock.t
 		run(100*ms,report='text')
-		#myclock.reinit()
+		#myclock.reinit()'''
 
 		# Present results and logging
 		if presentResults == True:
@@ -770,7 +815,9 @@ class gupta_paper:
 		#plot(UmM.t, UmM.v.T[1])
 		#plot(UmM.t, UmM.v.T[2])
 		#plot(UmM.t, UmM.v.T[3])
-		plot(UmM2.t, UmM2.v.T)
+		
+		#plot(UmM.t, UmM.v.T/mV)
+		plot(UmM3.t, UmM3.v2.T/mV)
 
 		xlabel('Time (ms)')
 		ylabel('Membrane Potential (mV)')
