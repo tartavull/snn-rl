@@ -55,6 +55,11 @@ class gupta_paper:
 	correctSpikes[2][0:6] = 0
 	correctSpikes[2][9:12] = 0
 	correctSpikes[3][0:9] = 0
+    
+	M = None
+	testM = None
+	UmM3 = None
+	testUmM3 = None
 
 	print 'initial Weights\n',W
 
@@ -73,6 +78,16 @@ class gupta_paper:
 	        v2 : volt			
 		    ''')			
 
+		directToSomaEqs = Equations('''
+			dv/dt = (-v+summedWandIDirac)/(tauMZ) : volt (unless refractory)
+			tauMZ = 30*ms : second
+			IdVZ : volt
+	        V : volt
+	        DendI : volt
+	        SynI : volt
+	        v2 : volt
+			''')
+
 		testEqs = Equations('''
 			dvTest/dt = (-vTest+((RmTest/volt)*(IdVTest)))/(tauMTest) : volt (unless refractory)
 			RmTest = 80*mV : volt
@@ -84,6 +99,8 @@ class gupta_paper:
 	        v2Test : volt
 	        testUmSpikeFired : boolean		
 		    ''')			
+
+
 
 		myclock=Clock(dt=1*ms)
 		testMyclock=Clock(dt=1*ms)
@@ -612,13 +629,17 @@ class gupta_paper:
 						#self.testSpikesFiredInInterval[neuronIndex][spikeIntervalCounter] = False
 						print 'self.t',self.t,'neuronIndex',neuronIndex,'Spike results: TP:\t',self.truePositiveSpikeResults,'\tFP:\t',self.falsePositiveSpikeResults,'\tTN:\t',self.trueNegativeSpikeResults,'\tFN:\t',self.falseNegativeSpikeResults
 
-		#M = SpikeMonitor(ADDS)
-		M = SpikeMonitor(testADDS)
+		M = SpikeMonitor(ADDS)
+		self.M = M # for ipython compatibility
+		testM = SpikeMonitor(testADDS)
+		self.testM = testM
 		Mv = StateMonitor(ADDS, 'V', record=True)
 		MDendI = StateMonitor(ADDS, 'DendI', record=True)
 		MSynI = StateMonitor(ADDS, 'SynI', record=True)
-		#UmM3 = StateMonitor(ADDS, 'v2', record=True)
-		UmM3 = StateMonitor(testADDS, 'v2Test', record=True)
+		UmM3 = StateMonitor(ADDS, 'v2', record=True)
+		self.UmM3 = UmM3 # for ipython compatibility
+		testUmM3 = StateMonitor(testADDS, 'v2Test', record=True)
+		self.testUmM3 = testUmM3
 
 		#totalRunTime = 21
 		#run(totalRunTime*ms,threads=2, report='text')
@@ -652,9 +673,16 @@ class gupta_paper:
 		neuronToPlot = 1
 		subplot(211)
 		plot(M.t/ms, M.i, '.')
+		subplot(221)
+		plot(testM.t/ms, testM.i, '.')
 		subplot(223)
 		#plot(UmM3.t, UmM3.v2.T/mV)
-		plot(UmM3.t, UmM3.v2Test.T/mV)
+		plot(UmM3.t, UmM3.v2.T/mV)
+		xlabel('Time (ms)')
+		ylabel('Membrane Potential (mV)')
+		subplot(224)
+		#plot(UmM3.t, UmM3.v2.T/mV)
+		plot(testUmM3.t, testUmM3.v2Test.T/mV)
 		xlabel('Time (ms)')
 		ylabel('Membrane Potential (mV)')
 		show()
