@@ -643,8 +643,8 @@ class gupta_paper:
 
 		#totalRunTime = 21
 		#run(totalRunTime*ms,threads=2, report='text')
-		run(119*ms,report='text') # Run with enough time for scoring evaluation
-		#run(2000*ms,report='text')
+		#run(119*ms,report='text') # Run with enough time for scoring evaluation
+		run(2000*ms,report='text')
 
 		# Present results and logging
 		if presentResults == True:
