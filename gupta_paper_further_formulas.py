@@ -25,6 +25,7 @@ class gupta_paper:
 	testR = testR
 	tauM = tauM
 	lastSpikeInterval = -0.001#0.0
+	testLastSpikeInterval = -0.001#0.0
 	currentEpoch = 0
 	timeStepInterval = 0.001
 	refractoryPointCounter = 0.0
@@ -67,12 +68,15 @@ class gupta_paper:
 	UmM3 = None
 	testUmM3 = None
 
+	#self.ADDSNeuronModel2 = self.
+
 	print 'initial Weights\n',W
 
 	def run_model(self):
 		neuralnet = self.neuralnet
 		dictionary = self.dictionary
 		spiketimes = self.spiketimes
+		#self.ADDSNeuronModel2 = self.ADDSNeuronModel
 		#dv/dt = (-v+((RmZ/volt)*(IdVZ)))/(tauMZ) : volt (unless refractory)
 		#dv/dt = (-v+((RmZ/volt)*(IdVZ)))/(tauMZ) : volt (unless refractory)
 		eqs = Equations('''
@@ -122,6 +126,7 @@ class gupta_paper:
 		class ADDSNeuronModel(NeuronGroup, gupta_paper): 
 			neuronIndex = self.neuronIndex
 			refractoryPointCounter = self.refractoryPointCounter
+			calcDirac2 = None
 			def __init__(self, params): 
 				myclock=Clock(dt=1*ms)
 				NeuronGroup.__init__(self, N=4, model=eqs,threshold='v>10*mV', reset='v=-0.002 * mV; dv=0; IdVZ = 0*mV;v2=10*mV',refractory=10*ms,clock=myclock)
@@ -373,10 +378,11 @@ class gupta_paper:
 
 					def mainSimulationCalcs():
 						# dirac
-						dend[neuronIndex].dirac = self.diracCalc(dend, False)
-						print 'dend.dirac',dend[0].dirac,dend[1].dirac,dend[2].dirac,dend[3].dirac
+						#dend[neuronIndex].dirac = self.diracCalc(dend, False)#super(gupta_paper, run_model).diracCalc(dend, False)
+						dend[neuronIndex].dirac = self.diracCalc(dend, False, self.time, math.e, self.neuronIndex, spiketimes,self.lastSpikeInterval)
+						'''print 'dend.dirac',dend[0].dirac,dend[1].dirac,dend[2].dirac,dend[3].dirac
 						print 'dend.v',dend[0].v,dend[1].v,dend[2].v,dend[3].v
-						print 'sum(dend[neuronIndex].v[:])',sum(dend[neuronIndex].v[:])
+						print 'sum(dend[neuronIndex].v[:])',sum(dend[neuronIndex].v[:])'''
 						'''for i in range(4):
 							if i != neuronIndex:
 								dend[i].dirac = [0*volt]*15'''
@@ -409,11 +415,13 @@ class gupta_paper:
 
 				self.contained_objects.append(additionToNetwork)	
 
-			def diracCalc(self, IDend, evaluationActive):
+			def diracCalc(self, IDend, evaluationActive, time, e, neuronIndex, spiketimes,lastSpikeInterval):
 				# This method only calculates dirac
-				time = self.time
+				'''time = self.time
 				e = math.e
-				neuronIndex = self.neuronIndex
+				neuronIndex = self.neuronIndex'''
+
+
 				#print ':::range(len(IDend[neuronIndex][:])\t','self.time\t',self.time,'\tneuronIndex\t',neuronIndex,'\t',IDend,'\t',IDend[neuronIndex]
 
 				# normalize t to count just time within spike interval.  Formula from article just uses t in a way
@@ -422,7 +430,7 @@ class gupta_paper:
 
 				dendGroup = [None]*len(dend[neuronIndex][:])
 				for IdIndex in range(len(dend[neuronIndex][:])):
-					tauDen = tauD[neuronIndex][IdIndex]
+					#tauDen = tauD[neuronIndex][IdIndex]
 					#r = R[neuronIndex][IdIndex]
 					#w = W[neuronIndex][IdIndex]
 
@@ -432,11 +440,12 @@ class gupta_paper:
 					for presynInd in range(shape(spiketimes)[0]):
 						comparedSpikeTime = spiketimes[presynInd][1]
 
+						#print '+++===self.time',self.time,'neuronIndex',neuronIndex,'spiketimes[presynInd][0]',spiketimes[presynInd][0],'comparedSpikeTime',comparedSpikeTime,'IdIndex',IdIndex,'lastSpikeInterval',lastSpikeInterval,'spikeIntervalUnformatted',spikeIntervalUnformatted#,'self.lastSpikeInterval',self.lastSpikeInterval,'spikeIntervalUnformatted',spikeIntervalUnformatted,'IdIndex',IdIndex,'spiketimes[presynInd][0]',spiketimes[presynInd][0]
 						# this is true? -> commented out logic below due to spiketimes perhaps not being in sorted order, a relevant entry could occur after an irrelevant one
 						#if (comparedSpikeTime-spikeIntervalUnformatted) > t:
 						# spike times are in order of earliest to latest times grouped with input pixel number.  therefore the below cutoff in the loop is fine.
 						#if comparedSpikeTime > self.lastSpikeInterval:
-						if comparedSpikeTime > (self.lastSpikeInterval + spikeIntervalUnformatted):
+						if comparedSpikeTime > (lastSpikeInterval + spikeIntervalUnformatted):
 							break
 
 						#print ':::',comparedSpikeTime,self.lastSpikeInterval,spikeIntervalUnformatted
@@ -447,10 +456,9 @@ class gupta_paper:
 						if spiketimes[presynInd][0] == IdIndex and (comparedSpikeTime-spikeIntervalUnformatted) < t:'''
 						# checking prior interval for a spike.  This looks for a spike in the prior spike time interval 
 						#if spiketimes[presynInd][0] == IdIndex and comparedSpikeTime > (self.lastSpikeInterval - spikeIntervalUnformatted):
-						#print 'self.time',self.time,'neuronIndex',neuronIndex,'spiketimes[presynInd][0]',spiketimes[presynInd][0],'comparedSpikeTime',comparedSpikeTime#,'self.lastSpikeInterval',self.lastSpikeInterval,'spikeIntervalUnformatted',spikeIntervalUnformatted,'IdIndex',IdIndex,'spiketimes[presynInd][0]',spiketimes[presynInd][0]
 						#if spiketimes[presynInd][0] == IdIndex and comparedSpikeTime > (self.lastSpikeInterval - (spikeIntervalUnformatted*2)) and comparedSpikeTime <= (self.lastSpikeInterval - spikeIntervalUnformatted):
 						#if spiketimes[presynInd][0] == IdIndex and comparedSpikeTime > (self.lastSpikeInterval - spikeIntervalUnformatted) and comparedSpikeTime <= self.lastSpikeInterval:
-						if spiketimes[presynInd][0] == IdIndex and comparedSpikeTime > self.lastSpikeInterval and comparedSpikeTime <= (self.lastSpikeInterval + spikeIntervalUnformatted):
+						if spiketimes[presynInd][0] == IdIndex and comparedSpikeTime > lastSpikeInterval and comparedSpikeTime <= (lastSpikeInterval + spikeIntervalUnformatted):
 							## adding below if statement to avoid constant input stimulus in evaluation, that seem more accurate to how the article did it's evaulation.
 							#print 'tNorm',tNorm
 							tNorm2 = time - (floor((time/.001)*.01) * .1)
@@ -462,6 +470,7 @@ class gupta_paper:
 					#Id2 = IDend[neuronIndex].v[IdIndex]
 					#Dt = time - tPreSyn
 					Dt = Decimal(format(time, '.8f')) - Decimal(format(tPreSyn, '.8f'))
+					#print '++++++++Dt++++++++',Dt,'Decimal(format(time, .8f))',Decimal(format(time, '.8f')),'Decimal(format(tPreSyn, .8f))',Decimal(format(tPreSyn, '.8f'))
 					# self.time == lines below are a workaround for initialization values
 					if self.time == 0.121 or self.time == 0.421 or self.time == 0.721 or self.time == 1.021:
 						Dt = 1.0
@@ -486,7 +495,7 @@ class gupta_paper:
 					#print '***ni:\t',neuronIndex,'\tIdIndex\t',IdIndex,'\t***w:\t',w
 
 					# correct for scaling
-					tauDen = tauDen * .001
+					#tauDen = tauDen * .001
 					
 					#if -Dt/2<(tNorm or t?)<Dt/2:
 					#if Dt <= 0.0:
@@ -508,7 +517,7 @@ class gupta_paper:
 						DiracFun = 0
 						#SpikeModCoeff = (SpikeModCoeff*DiracFun)															
 						#IDend[neuronIndex][IdIndex] = -(SpikeModCoeff - Id2) * (e ** (-tNorm/tauDen)) + SpikeModCoeff
-						dendGroup[IdIndex] = float(DiracFun)*volt						
+						dendGroup[IdIndex] = float(DiracFun)*volt*.001						
 
 					#print 'neuronIndex',neuronIndex,'IdIndex',IdIndex,'dirac\t',DiracFun
 				return dendGroup				
@@ -544,17 +553,23 @@ class gupta_paper:
 				#NeuronGroup.__init__(self, N=15, model=dendriteEqs,threshold='v>.002*mV', reset='v=-0.002 * mV',refractory=0.3*ms) 
 				@network_operation 
 				def additionToNetwork(): 
+					testSpikeIntervalCounter = (floor(self.testTime/spikeIntervalUnformatted) * spikeIntervalUnformatted)*10
+					timeAndRefractoryCalcs(testSpikeIntervalCounter)
+
 					mainTestSimulationCalcs()			
-
+					print '*******time********',ADDS.time					
 					# classifier performance test
-					evaluateClassifier()
-
-					self.testTime = self.testTime + self.timeStepInterval
+					evaluateClassifier(testSpikeIntervalCounter)				
 
 				def mainTestSimulationCalcs():
 					# for each charactor input below test the classfication results
+					test1 = [None]*4
 					for neuronIndex in range(dictionaryLongitude):
-						testDend[neuronIndex].dirac = ADDS.diracCalc(testDend, False)
+						#testDend[neuronIndex].dirac = ADDS.diracCalc(testDend, False)
+						test1[neuronIndex] = ADDS.diracCalc(testDend, True, self.testTime, math.e, neuronIndex, spiketimes,self.testLastSpikeInterval)
+						print 'test1[neuronIndex]',test1[neuronIndex]
+						testDend[neuronIndex].dirac = test1[neuronIndex]
+						print '^^^diracCalc^^^',False, self.testTime, math.e, neuronIndex, self.testLastSpikeInterval
 
 						for indexOfDend in range(dictionaryLongitude):
 							testADDS.IdVZ[indexOfDend] = sum(testDend[indexOfDend].v[:])
@@ -563,47 +578,51 @@ class gupta_paper:
 						if self.v2[vCheck] == 10*mV:
 							self.v2[vCheck] = 0*mV	
 
-					print 'testDend.dirac',testDend[0].dirac,testDend[1].dirac,testDend[2].dirac,testDend[3].dirac
+					'''print 'testDend.dirac',testDend[0].dirac,testDend[1].dirac,testDend[2].dirac,testDend[3].dirac
 					print 'testDend.v',testDend[0].v,testDend[1].v,testDend[2].v,testDend[3].v
-					print 'sum(testDend[neuronIndex].v[:])',sum(testDend[neuronIndex].v[:])							
+					print 'sum(testDend[neuronIndex].v[:])',sum(testDend[neuronIndex].v[:])		'''					
 
-				def evaluateClassifier():
-					spikeIntervalCounter = (floor(self.testTime/spikeIntervalUnformatted) * spikeIntervalUnformatted)*10
-					print 'spikeIntervalCounterspikeIntervalCounter=',spikeIntervalCounter,'self.testTime',self.testTime,'spikeIntervalUnformatted',spikeIntervalUnformatted
+				def timeAndRefractoryCalcs(testSpikeIntervalCounter):
+					self.testRefractoryPointCounter = self.testRefractoryPointCounter + self.timeStepInterval	
 
-					self.testRefractoryPointCounter = self.testRefractoryPointCounter + self.timeStepInterval
+					print 'testSpikeIntervalCountertestSpikeIntervalCounter=',testSpikeIntervalCounter,'self.testTime',self.testTime,'spikeIntervalUnformatted',spikeIntervalUnformatted
 
 					self.testRefractoryPointSwitch = False
+					print 'testRefractoryPointCountertestRefractoryPointCounter=',self.testRefractoryPointCounter
 					if self.testRefractoryPointCounter >= spikeIntervalUnformatted:
 						self.testRefractoryPointCounter = 0.000
 						self.testRefractoryPointSwitch = True
+						self.testLastSpikeInterval = self.testTime
 
+					self.testTime = self.testTime + self.timeStepInterval
+
+				def evaluateClassifier(testSpikeIntervalCounter):
 					# Only evaluate results for enough epochs to test each char in input (3 spike interv per char * 4 char = 12 spike intervals total)
 					# the +1 in (self.timeotalSpikeIntervals+1) is to allow a last refractoryPointSwitch triggered negative spike evaluation to occur.
-					if spikeIntervalCounter < (self.totalSpikeIntervals+1):
+					if testSpikeIntervalCounter < (self.totalSpikeIntervals+1):
 						for neuronIndex in range(dictionaryLongitude):				
 							# Negative results below are only set to be measured after a full spike interval has passed and had the opportunity to have created a spike
-							# (spikeIntervalCounter-1) is to correct for refractoryPointSwitch occuring after spikeInterval it addresses.
+							# (testSpikeIntervalCounter-1) is to correct for refractoryPointSwitch occuring after spikeInterval it addresses.
 							#print 'refractoryPointSwitch = ', self.refractoryPointSwitch
 							print 'refractoryPointSwitch =', self.testRefractoryPointSwitch
-							#if self.refractoryPointSwitch == true and (spikeIntervalCounter > 0):
-							if self.testRefractoryPointSwitch == True and (spikeIntervalCounter > 0):
-								#if self.testSpikesFiredInInterval[neuronIndex][spikeIntervalCounter-1] == False:
+							#if self.refractoryPointSwitch == true and (testSpikeIntervalCounter > 0):
+							if self.testRefractoryPointSwitch == True and (testSpikeIntervalCounter > 0):
+								#if self.testSpikesFiredInInterval[neuronIndex][testSpikeIntervalCounter-1] == False:
 
 
-								if (testADDS.testUmSpikeFired[neuronIndex] == 1*mV) and (spikeIntervalCounter < self.totalSpikeIntervals):
-									if (self.correctSpikes[neuronIndex][spikeIntervalCounter] == 1):
+								if (testADDS.testUmSpikeFired[neuronIndex] == 1*mV) and (testSpikeIntervalCounter < self.totalSpikeIntervals):
+									if (self.correctSpikes[neuronIndex][testSpikeIntervalCounter] == 1):
 										self.truePositiveSpikeResults = self.truePositiveSpikeResults + 1	
 									else:
 										self.falsePositiveSpikeResults = self.falsePositiveSpikeResults + 1	
-									#self.testSpikesFiredInInterval[neuronIndex][spikeIntervalCounter] = True	
-								elif (testADDS.testUmSpikeFired[neuronIndex] == 0*mV) and (spikeIntervalCounter < self.totalSpikeIntervals):
-									if (self.correctSpikes[neuronIndex][(spikeIntervalCounter-1)] == 1):
+									#self.testSpikesFiredInInterval[neuronIndex][testSpikeIntervalCounter] = True	
+								elif (testADDS.testUmSpikeFired[neuronIndex] == 0*mV) and (testSpikeIntervalCounter < self.totalSpikeIntervals):
+									if (self.correctSpikes[neuronIndex][(testSpikeIntervalCounter-1)] == 1):
 										self.falseNegativeSpikeResults = self.falseNegativeSpikeResults + 1		
 									else:
 										self.trueNegativeSpikeResults = self.trueNegativeSpikeResults + 1	
 								testADDS.testUmSpikeFired[neuronIndex] = 0*mV	
-
+						print 'results',self.truePositiveSpikeResults,self.falsePositiveSpikeResults,self.trueNegativeSpikeResults,self.falseNegativeSpikeResults
 				self.contained_objects.append(additionToNetwork)
 
 			def intitializeParameters():
