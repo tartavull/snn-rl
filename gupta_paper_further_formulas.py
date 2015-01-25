@@ -5,7 +5,6 @@ class gupta_paper:
 	dictionary = dictionary()
 	spiketimes = dictionary.spikeTimes(dictionaryLongitude, spikeInterval, spikesPerChar, epochs)
 	testSpiketimes = spiketimes
-	print 'st',spiketimes[0:100]
 	LIK = SpikeGeneratorGroup(N=15, indices=spiketimes[:,0], times=spiketimes[:,1]*ms)
 	neuronIndex = 0
 	time = 0.0000
@@ -34,7 +33,7 @@ class gupta_paper:
 	testRefractoryPointSwitch = False
 	neuronIndexCounter = 0.0
 	neuronIndexSwitch = False
-	timing = []
+	#timing = []
 	truePositiveSpikeResults = 0
 	falsePositiveSpikeResults = 0
 	trueNegativeSpikeResults = 0
@@ -67,8 +66,7 @@ class gupta_paper:
 	testM = None
 	UmM3 = None
 	testUmM3 = None
-
-	#self.ADDSNeuronModel2 = self.
+	testSpikeIntervalCounter = 0.0
 
 	print 'initial Weights\n',W
 
@@ -135,9 +133,9 @@ class gupta_paper:
 				def additionToNetwork(): 
 					neuronIndex = self.neuronIndex
 					spikeIntervalCounter = (floor(self.time/spikeIntervalUnformatted) * spikeIntervalUnformatted)*10
-					print 'neuronIndex', self.neuronIndex, 'self.time', self.time,'ADDS.t', ADDS.t, 'ADDS.v', ADDS.v[neuronIndex]
+					#print 'neuronIndex', self.neuronIndex, 'self.time', self.time,'ADDS.t', ADDS.t, 'ADDS.v', ADDS.v[neuronIndex]
 					#print 'neuronIndex', neuronIndex, 'self.time', self.time, 'refractoryPointCounter',self.refractoryPointCounter,'ADDS.t', ADDS.t, 'testADDS.vTest', testADDS.vTest
-					print 'neuronIndex', self.neuronIndex, 'self.time', self.time, 'ADDS.t', ADDS.t, 'ADDS.IdVZ', ADDS.IdVZ[neuronIndex]
+					#print 'neuronIndex', self.neuronIndex, 'self.time', self.time, 'ADDS.t', ADDS.t, 'ADDS.IdVZ', ADDS.IdVZ[neuronIndex]
 					#print 'neuronIndex', neuronIndex, 'self.time', self.time, 'ADDS.t', ADDS.t, 'testADDS.IdVTest', testADDS.IdVTest
 
 					#returnUm(self)
@@ -151,23 +149,24 @@ class gupta_paper:
 						time = self.time
 
 						time = time + self.timeStepInterval
-						self.timing.append(time)
+						#self.timing.append(time)
 						refractoryPointCounter = refractoryPointCounter + self.timeStepInterval
 						# if statement below corrects for offset of spiketimes starting at .1 sec.
 						if time >= .1:
 							neuronIndexCounter = neuronIndexCounter + self.timeStepInterval
 
+						#print '===+++__','time',time,'refractoryPointCounter',refractoryPointCounter
+
 						# At the end of each spike time interval refractory period is turned off and weight changes
 						# are calculated.  Refractory turning off here * is not correct * because it can occur for
 						# less than the set refractory period.  I am just using it for the time being for testing.
 						self.refractoryPointSwitch = False
-						ADDS.refractoryPointSwitch = False
 						if refractoryPointCounter >= spikeIntervalUnformatted:
 							#refractoryPointCounter = 0.009
 							refractoryPointCounter = 0.000
 							self.refractoryPointSwitch = True
-							ADDS.refractoryPointSwitch = True
-							self.lastSpikeInterval = self.time
+							self.lastSpikeInterval = time-self.timeStepInterval
+							#self.lastSpikeInterval = self.time
 							WeightChangeCalculation()
 							# Report weights at different times
 							#if self.time == 1.081 or self.time == 2.081 or self.time == 4.081 or self.time == 8.081 or self.time == 12.081:
@@ -380,9 +379,22 @@ class gupta_paper:
 						# dirac
 						#dend[neuronIndex].dirac = self.diracCalc(dend, False)#super(gupta_paper, run_model).diracCalc(dend, False)
 						dend[neuronIndex].dirac = self.diracCalc(dend, False, self.time, math.e, self.neuronIndex, spiketimes,self.lastSpikeInterval)
-						'''print 'dend.dirac',dend[0].dirac,dend[1].dirac,dend[2].dirac,dend[3].dirac
+						'''print 'neuronIndex',self.neuronIndex,'time',self.time
+						print 'dend.dirac',dend[0].dirac,dend[1].dirac,dend[2].dirac,dend[3].dirac
 						print 'dend.v',dend[0].v,dend[1].v,dend[2].v,dend[3].v
-						print 'sum(dend[neuronIndex].v[:])',sum(dend[neuronIndex].v[:])'''
+						print 'sum(dend[neuronIndex].v[:])',sum(dend[neuronIndex].v[:])
+						print 'Prelim Weights\n0',dend[0].w[:]
+						print '1',dend[1].w[:]
+						print '2',dend[2].w[:]
+						print '3',dend[3].w[:]
+						print 'Prelim Tau\n0',dend[0].tau[:]
+						print '1',dend[1].tau[:]
+						print '2',dend[2].tau[:]
+						print '3',dend[3].tau[:]					
+						print 'Prelim Res\n0',dend[0].r[:]
+						print '1',dend[1].r[:]
+						print '2',dend[2].r[:]
+						print '3',dend[3].r[:]'''
 						'''for i in range(4):
 							if i != neuronIndex:
 								dend[i].dirac = [0*volt]*15'''
@@ -391,13 +403,13 @@ class gupta_paper:
 						tauD = self.tauD
 						tauD = tauDCalc(neuronIndex, dend, W)
 						#self.tauD = tauD # this line is just for resutls reporting and can be removed later
-						print 'tauD',tauD
+						#print 'tauD',tauD
 
 						# Calculate resistance
 						R = self.R
 						R = resistanceCalc(neuronIndex, dend, R)
 						#self.R = R # this line is just for resutls reporting and can be removed later
-						print 'R',R
+						#print 'R',R
 
 						# Record sum of dend voltage
 						#ADDS.IdVZ[neuronIndex] = sum(dend[neuronIndex].v[:])#0.0375*mV 
@@ -406,8 +418,8 @@ class gupta_paper:
 						'''for i in range(4):
 							if i != neuronIndex:
 								ADDS.IdVZ[i] = 0*volt'''
-						print '::ADDS.IdVZ::\t', ADDS.IdVZ
-						print 'ADDS.v2',ADDS.v2
+						#print '::ADDS.IdVZ::\t', ADDS.IdVZ
+						#print 'ADDS.v2',ADDS.v2
 
 						timePeriodAndRefractoryCalcs()
 
@@ -462,10 +474,11 @@ class gupta_paper:
 							## adding below if statement to avoid constant input stimulus in evaluation, that seem more accurate to how the article did it's evaulation.
 							#print 'tNorm',tNorm
 							tNorm2 = time - (floor((time/.001)*.01) * .1)
-							print 'tNorm2',tNorm2
-							if tNorm2 < .02 or evaluationActive == False:
+							#print 'tNorm2',tNorm2
+							#if tNorm2 < .02 or evaluationActive == False:
+							if True:
 								tPreSyn = comparedSpikeTime
-								print '++++++++++'
+								#print '++++++++++'
 
 					#Id2 = IDend[neuronIndex].v[IdIndex]
 					#Dt = time - tPreSyn
@@ -553,23 +566,20 @@ class gupta_paper:
 				#NeuronGroup.__init__(self, N=15, model=dendriteEqs,threshold='v>.002*mV', reset='v=-0.002 * mV',refractory=0.3*ms) 
 				@network_operation 
 				def additionToNetwork(): 
-					testSpikeIntervalCounter = (floor(self.testTime/spikeIntervalUnformatted) * spikeIntervalUnformatted)*10
-					timeAndRefractoryCalcs(testSpikeIntervalCounter)
+					timeAndRefractoryCalcs()
 
 					mainTestSimulationCalcs()			
-					print '*******time********',ADDS.time					
+					#print '*******time********',ADDS.time					
 					# classifier performance test
-					evaluateClassifier(testSpikeIntervalCounter)				
+					evaluateClassifier()				
 
 				def mainTestSimulationCalcs():
 					# for each charactor input below test the classfication results
 					test1 = [None]*4
 					for neuronIndex in range(dictionaryLongitude):
 						#testDend[neuronIndex].dirac = ADDS.diracCalc(testDend, False)
-						test1[neuronIndex] = ADDS.diracCalc(testDend, True, self.testTime, math.e, neuronIndex, spiketimes,self.testLastSpikeInterval)
-						print 'test1[neuronIndex]',test1[neuronIndex]
-						testDend[neuronIndex].dirac = test1[neuronIndex]
-						print '^^^diracCalc^^^',False, self.testTime, math.e, neuronIndex, self.testLastSpikeInterval
+						testDend[neuronIndex].dirac = ADDS.diracCalc(testDend, True, self.testTime, math.e, neuronIndex, spiketimes,self.testLastSpikeInterval)
+						#print '^^^diracCalc^^^',False, self.testTime, math.e, neuronIndex, self.testLastSpikeInterval
 
 						for indexOfDend in range(dictionaryLongitude):
 							testADDS.IdVZ[indexOfDend] = sum(testDend[indexOfDend].v[:])
@@ -580,49 +590,63 @@ class gupta_paper:
 
 					'''print 'testDend.dirac',testDend[0].dirac,testDend[1].dirac,testDend[2].dirac,testDend[3].dirac
 					print 'testDend.v',testDend[0].v,testDend[1].v,testDend[2].v,testDend[3].v
-					print 'sum(testDend[neuronIndex].v[:])',sum(testDend[neuronIndex].v[:])		'''					
+					print 'sum(testDend[neuronIndex].v[:])',sum(testDend[neuronIndex].v[:])							
+					print 'Prelim Weights\n0',testDend[0].w[:]
+					print '1',testDend[1].w[:]
+					print '2',testDend[2].w[:]
+					print '3',testDend[3].w[:]
+					print 'Prelim Tau\n0',testDend[0].tau[:]
+					print '1',testDend[1].tau[:]
+					print '2',testDend[2].tau[:]
+					print '3',testDend[3].tau[:]					
+					print 'Prelim Res\n0',testDend[0].r[:]
+					print '1',testDend[1].r[:]
+					print '2',testDend[2].r[:]
+					print '3',testDend[3].r[:]	'''				
 
-				def timeAndRefractoryCalcs(testSpikeIntervalCounter):
+				def timeAndRefractoryCalcs():
+					self.testTime = self.testTime + self.timeStepInterval
 					self.testRefractoryPointCounter = self.testRefractoryPointCounter + self.timeStepInterval	
+					self.testSpikeIntervalCounter = (floor(self.testTime/spikeIntervalUnformatted) * spikeIntervalUnformatted)*10
 
-					print 'testSpikeIntervalCountertestSpikeIntervalCounter=',testSpikeIntervalCounter,'self.testTime',self.testTime,'spikeIntervalUnformatted',spikeIntervalUnformatted
+					#print 'self.testSpikeIntervalCounterself.testSpikeIntervalCounter=',self.testSpikeIntervalCounter,'self.testTime',self.testTime,'spikeIntervalUnformatted',spikeIntervalUnformatted
 
 					self.testRefractoryPointSwitch = False
-					print 'testRefractoryPointCountertestRefractoryPointCounter=',self.testRefractoryPointCounter
+					#print 'testRefractoryPointCountertestRefractoryPointCounter=',self.testRefractoryPointCounter
 					if self.testRefractoryPointCounter >= spikeIntervalUnformatted:
 						self.testRefractoryPointCounter = 0.000
 						self.testRefractoryPointSwitch = True
-						self.testLastSpikeInterval = self.testTime
+						self.testLastSpikeInterval = self.testTime-self.timeStepInterval	
 
-					self.testTime = self.testTime + self.timeStepInterval
+					#print '__+++===','time',self.testTime,'refractoryPointCounter',self.testRefractoryPointCounter
 
-				def evaluateClassifier(testSpikeIntervalCounter):
+				def evaluateClassifier():
 					# Only evaluate results for enough epochs to test each char in input (3 spike interv per char * 4 char = 12 spike intervals total)
 					# the +1 in (self.timeotalSpikeIntervals+1) is to allow a last refractoryPointSwitch triggered negative spike evaluation to occur.
-					if testSpikeIntervalCounter < (self.totalSpikeIntervals+1):
+					if self.testSpikeIntervalCounter < (self.totalSpikeIntervals+1):
 						for neuronIndex in range(dictionaryLongitude):				
 							# Negative results below are only set to be measured after a full spike interval has passed and had the opportunity to have created a spike
-							# (testSpikeIntervalCounter-1) is to correct for refractoryPointSwitch occuring after spikeInterval it addresses.
+							# (self.testSpikeIntervalCounter-1) is to correct for refractoryPointSwitch occuring after spikeInterval it addresses.
 							#print 'refractoryPointSwitch = ', self.refractoryPointSwitch
-							print 'refractoryPointSwitch =', self.testRefractoryPointSwitch
-							#if self.refractoryPointSwitch == true and (testSpikeIntervalCounter > 0):
-							if self.testRefractoryPointSwitch == True and (testSpikeIntervalCounter > 0):
-								#if self.testSpikesFiredInInterval[neuronIndex][testSpikeIntervalCounter-1] == False:
+							#print 'refractoryPointSwitch =', self.testRefractoryPointSwitch
+							#if self.refractoryPointSwitch == true and (self.testSpikeIntervalCounter > 0):
+							if self.testRefractoryPointSwitch == True and (self.testSpikeIntervalCounter > 0):
+								#if self.testSpikesFiredInInterval[neuronIndex][self.testSpikeIntervalCounter-1] == False:
 
 
-								if (testADDS.testUmSpikeFired[neuronIndex] == 1*mV) and (testSpikeIntervalCounter < self.totalSpikeIntervals):
-									if (self.correctSpikes[neuronIndex][testSpikeIntervalCounter] == 1):
+								if (testADDS.testUmSpikeFired[neuronIndex] == 1*mV) and (self.testSpikeIntervalCounter < self.totalSpikeIntervals):
+									if (self.correctSpikes[neuronIndex][self.testSpikeIntervalCounter] == 1):
 										self.truePositiveSpikeResults = self.truePositiveSpikeResults + 1	
 									else:
 										self.falsePositiveSpikeResults = self.falsePositiveSpikeResults + 1	
-									#self.testSpikesFiredInInterval[neuronIndex][testSpikeIntervalCounter] = True	
-								elif (testADDS.testUmSpikeFired[neuronIndex] == 0*mV) and (testSpikeIntervalCounter < self.totalSpikeIntervals):
-									if (self.correctSpikes[neuronIndex][(testSpikeIntervalCounter-1)] == 1):
+									#self.testSpikesFiredInInterval[neuronIndex][self.testSpikeIntervalCounter] = True	
+								elif (testADDS.testUmSpikeFired[neuronIndex] == 0*mV) and (self.testSpikeIntervalCounter < self.totalSpikeIntervals):
+									if (self.correctSpikes[neuronIndex][(self.testSpikeIntervalCounter-1)] == 1):
 										self.falseNegativeSpikeResults = self.falseNegativeSpikeResults + 1		
 									else:
 										self.trueNegativeSpikeResults = self.trueNegativeSpikeResults + 1	
 								testADDS.testUmSpikeFired[neuronIndex] = 0*mV	
-						print 'results',self.truePositiveSpikeResults,self.falsePositiveSpikeResults,self.trueNegativeSpikeResults,self.falseNegativeSpikeResults
+						#print 'results',self.truePositiveSpikeResults,self.falsePositiveSpikeResults,self.trueNegativeSpikeResults,self.falseNegativeSpikeResults
 				self.contained_objects.append(additionToNetwork)
 
 			def intitializeParameters():
@@ -633,10 +657,10 @@ class gupta_paper:
 				[0, 0, 1,0, 1, 0,0, 0, 1,0, 1, 0,0, 0, 1],
 				[0, 0, 0,0, 1, 1,0, 1, 1,0, 1, 1,0, 0, 0],
 				[0, 0, 1,0, 1, 0,0, 1, 0,0, 1, 0,0, 0, 1]]'''
-				testW = [[0.70080412, 0.00324985, 0.70223351, 0.00421194, 0.70073588, 0.00253654, 0.00241304, 0.00386221, 0.00446284, 0.0045989, 0.70021551, 0.00332156, 0.00453394, 0.70026736, 0.00364166],
-				[0.00312473, 0.00303151, 0.70134693, 0.00250971, 0.70082969, 0.00264048, 0.00426394, 0.00245731, 0.70103305, 0.00272881, 0.70223473, 0.00287218, 0.00364664, 0.00237047, 0.70049339],
-				[0.00337244, 0.00489955, 0.00332976, 0.00476442, 0.66939278, 0.66919182, 0.00383946, 0.66793638, 0.6669667, 0.00301663, 0.6670524, 0.66844534, 0.00401786, 0.00284326, 0.00354638],
-				[0.00381406, 0.00498837, 0.701597, 0.00521621, 0.70256855, 0.00533906, 0.00412508, 0.7023335, 0.00631239, 0.0043698, 0.70042287, 0.00589082, 0.00326269, 0.00518741, 0.70275034]]
+				testW = [[0.7004951, 0.00299856, 0.70085791, 0.00369599, 0.70079641, 0.00245995, 0.00433145, 0.00302166, 0.00261059, 0.00338837, 0.70107221, 0.00382794, 0.00391812, 0.7002158, 0.00261986],
+				[0.00355271, 0.00352117, 0.70031808, 0.00371104, 0.70217063, 0.00440704, 0.00331328, 0.00297992, 0.70041271, 0.00235294, 0.70154393, 0.00271551, 0.00442378, 0.00403136, 0.70143686],
+				[0.00401543, 0.00265892, 0.00361079, 0.00434494, 0.66817783, 0.66848986, 0.00432942, 0.66698178, 0.66919802, 0.00411504, 0.66889164, 0.66714679, 0.00295245, 0.00363973, 0.00374949],
+				[0.00527166, 0.00558407, 0.70225087, 0.00466969, 0.70021103, 0.00467829, 0.00430914, 0.69986055, 0.00358859, 0.00480534, 0.70199339, 0.00578071, 0.00583865, 0.00618692, 0.70014918]]
 
 				self.testW = testW
 
@@ -659,10 +683,10 @@ class gupta_paper:
 				[0.01016803758319553, 0.010171374818041036, 0.0083665317732988555, 0.01017281704840039, 0.0048279096384584727, 0.0071335782968518762, 0.010173903373815114, 0.0071306637775638056, 0.0048108924488047102, 0.010175980702300289, 0.0048274813185357644, 0.0071408747375879501, 0.010177025843651875, 0.010178177167130422, 0.0083748475057425463],
 				[0.01016803758319553, 0.010171374818041036, 0.0083665317732988555, 0.01017281704840039, 0.0048279096384584727, 0.0071335782968518762, 0.010173903373815114, 0.0071306637775638056, 0.0048108924488047102, 0.010175980702300289, 0.0048274813185357644, 0.0071408747375879501, 0.010177025843651875, 0.010178177167130422, 0.0083748475057425463],
 				[0.01016803758319553, 0.010171374818041036, 0.0083665317732988555, 0.01017281704840039, 0.0048279096384584727, 0.0071335782968518762, 0.010173903373815114, 0.0071306637775638056, 0.0048108924488047102, 0.010175980702300289, 0.0048274813185357644, 0.0071408747375879501, 0.010177025843651875, 0.010178177167130422, 0.0083748475057425463]]'''
-				testR = [[0.70080412, 0.00324985, 0.70223351, 0.00421194, 0.70073588, 0.00253654, 0.00241304, 0.00386221, 0.00446284, 0.0045989, 0.70021551, 0.00332156, 0.00453394, 0.70026736, 0.00364166],
-				[0.00312473, 0.00303151, 0.70134693, 0.00250971, 0.70082969, 0.00264048, 0.00426394, 0.00245731, 0.70103305, 0.00272881, 0.70223473, 0.00287218, 0.00364664, 0.00237047, 0.70049339],
-				[0.00337244, 0.00489955, 0.00332976, 0.00476442, 0.66939278, 0.66919182, 0.00383946, 0.66793638, 0.6669667, 0.00301663, 0.6670524, 0.66844534, 0.00401786, 0.00284326, 0.00354638],
-				[0.00381406, 0.00498837, 0.701597, 0.00521621, 0.70256855, 0.00533906, 0.00412508, 0.7023335, 0.00631239, 0.0043698, 0.70042287, 0.00589082, 0.00326269, 0.00518741, 0.70275034]]
+				testR = [[0.0065761, 0.01017929, 0.00657398, 0.01017597, 0.00657434, 0.01018185, 0.01017295, 0.01017918, 0.01018114, 0.01017743, 0.00657273, 0.01017534, 0.01017491, 0.00657773, 0.01018109],
+				[0.01017665, 0.0101768, 0.00657714, 0.0101759, 0.00656631, 0.01017259, 0.01017779, 0.01017938, 0.00657658, 0.01018236, 0.00656997, 0.01018064, 0.01017251, 0.01017437, 0.0065706],
+				[0.01017233, 0.0101795, 0.01017447, 0.01017058, 0.00697279, 0.00697084, 0.01017066, 0.00698027, 0.0069664, 0.0101718, 0.00696832, 0.00697924, 0.01017795, 0.01017431, 0.01017373],
+				[0.01016847, 0.01016698, 0.00656584, 0.01017134, 0.00657776, 0.01017129, 0.01017305, 0.00657981, 0.01017648, 0.01017069, 0.00656734, 0.01016605, 0.01016577, 0.01016411, 0.00657812]]
 				#print 't:',self.time,'neuronIndex',neuronIndex,'main calc resistanceCalc()', testR
 
 				self.testR = testR
@@ -672,7 +696,7 @@ class gupta_paper:
 				for indexOfDend in range(dictionaryLongitude):
 					# TODO see if some of these do not need to be recomputed every time
 					testDend[indexOfDend].w = testW[indexOfDend]*volt
-					testDend[indexOfDend].tau = testTauD[indexOfDend]*second
+					testDend[indexOfDend].tau = testTauD[indexOfDend]*ms
 					testDend[indexOfDend].r = testR[indexOfDend]*volt	
 
 			def OutputEvaluationResults(self):
@@ -747,11 +771,12 @@ class gupta_paper:
 		testADDS.OutputEvaluationResults()
 
 		neuronToPlot = 1
-		subplot(111)
-		#plot(M.t/ms, M.i, '.')
-		#plot(dendSpikeM[0].t/ms, dendSpikeM[0].i, '.')
 		subplot(221)
 		plot(M.t/ms, M.i, '.')
+		#plot(M.t/ms, M.i, '.')
+		#plot(dendSpikeM[0].t/ms, dendSpikeM[0].i, '.')
+		subplot(222)
+		plot(testM.t/ms, testM.i, '.')
 		#plot(testM.t/ms, testM.i, '.')
 		#plot(dendSpikeM[0].t/ms, dendSpikeM[0].i, '.')
 		subplot(223)
