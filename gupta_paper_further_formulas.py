@@ -55,11 +55,11 @@ class gupta_paper:
 
 	correctSpikes = np.array([[1]*(totalSpikeIntervals+1)]*dictionaryLongitude);#[[1] * totalSpikeIntervals]*dictionaryLongitude
 	correctSpikes[0][0] = 0
-	correctSpikes[0][4:12] = 0
+	correctSpikes[0][4:13] = 0
 	correctSpikes[1][0:4] = 0
-	correctSpikes[1][7:12] = 0
+	correctSpikes[1][7:13] = 0
 	correctSpikes[2][0:7] = 0
-	correctSpikes[2][10:12] = 0
+	correctSpikes[2][10:13] = 0
 	correctSpikes[3][0:10] = 0
     
 	M = None
@@ -69,8 +69,17 @@ class gupta_paper:
 	testSpikeIntervalCounter = 0.0
 	testRelRefracTimeActivated = [False]*dictionaryLongitude	
 	testAbsRefracTimeActivated = [False]*dictionaryLongitude
+	# Parameters for tuning
 	relRefracTimeDuration = 0.03#.1#.01		
 	absRefracTimeDuration = 0.02#.02#.002	
+	#dendCalcScaling = 0.16#.32#1.0
+	dendCalcScaling = 1.0
+	#somaDirectScaling = .0005#.0005#.001#.0005#.001#0.002285#0.002857
+	somaDirectScaling = 1.0
+	diracScaling = 0.1#0.5#1.0#0.1#1.0#0.0007#0.0007#0.0825#0.0325#0.0825
+	#diracScaling = 1.0
+	#uMScaling = 1.0#.32
+	lateralInhibitScaling = -18*mV#18*mV#-13*mV#17*mV#12.5*mV#25*mV#8.0*mV
 
 	print 'initial Weights\n',W
 
@@ -81,7 +90,7 @@ class gupta_paper:
 
 		#dv/dt = (-v+((Rm/mV)*(SynI+DendI)))/(tauM) : volt (unless refractory)
 		eqs = Equations('''
-			dv/dt = (-v+((Rm/mV)*(SynI+DendI*0.5)))/(tauM) : volt
+			dv/dt = (-v+((Rm/mV)*(SynI+DendI*1.0)))/(tauM) : volt
 			Rm = 80*mV : volt
 			tauM = 20*ms : second
 	        V : volt
@@ -91,6 +100,7 @@ class gupta_paper:
 			UmSpikeFired : volt	
 			lateralInhibActive : boolean
 			beginRefrac : volt
+			uMScaling : volt
 		    ''')			
 
 		dendriteEqs = Equations('''
@@ -104,11 +114,12 @@ class gupta_paper:
 			''')
 
 		directToSomaEqs = Equations('''
-			dv/dt = (-v+summedWandDirac)/(tauS) : volt (unless refractory)
+			dv/dt = (-v+(summedWandDirac))/(tauS) : volt
 			tauS = 2*ms : second
 			V : volt
 			summedWandDirac : volt
 			v2 : volt
+			spikeFired : boolean
 			''')		
 
 		class ADDSNeuronModel(NeuronGroup, gupta_paper): 
@@ -411,7 +422,7 @@ class gupta_paper:
 				# somaDirect calcs
 				# Reuse existing dendtrite values below instead of recalculating
 				dotProductWandDirac =  sum(w*d for w,d in zip(dendObject[neuronIndex].w[:], dendObject[neuronIndex].dirac[:]))
-				somaDirectObject.summedWandDirac[neuronIndex] = (dotProductWandDirac/volt)
+				somaDirectObject.summedWandDirac[neuronIndex] = (dotProductWandDirac/volt)*self.somaDirectScaling
 
 				for neuronNumber in range(dictionaryLongitude):
 					ADDSObject.SynI[neuronNumber] = somaDirectObject.v[neuronNumber]				
@@ -459,17 +470,25 @@ class gupta_paper:
 					
 					# simplify dirac until later.  TODO: try more comple dirac
 					#if (t > -(Dt/2) and t < (Dt/2)):
+					# Seems to me what is looked for here is that the post synapse (output neurons) is after the pre synapse (input neurons)
 					if Dt >= 0.0:
 						if self.time == 0.121 or self.time == 0.421 or self.time == 0.721 or self.time == 1.021:
 							DiracFun = 1.00
 						if Dt != 0: 
+							# A closer post to pre synapse creates a larger dirac signal for greater weight I'd suppose than
+							# a further distance below in DiracFun
+							#Dt = Dt*1000
 							DiracFun = 1/Dt
 						else:
-							DiracFun = 1000
-						dendGroup[IdIndex] = float(DiracFun)*volt*.001 #add .001 as scaling factor
+							DiracFun = 1#1000
+						#DiracFun = 1
+						dendGroup[IdIndex] = float(DiracFun)*volt*.001*self.diracScaling #add .001 as scaling factor.  
+						# Scaling factor of .001 could account for 1ms being present instead of .001 as it is computed, difference of
+						# 1/1 compared to 1/.001
+						#dendGroup[IdIndex] = float(DiracFun)*volt*self.diracScaling
 					else:
 						DiracFun = 0
-						dendGroup[IdIndex] = float(DiracFun)*volt*.001						
+						dendGroup[IdIndex] = float(DiracFun)*volt*.001*self.diracScaling						
 
 				return dendGroup				
 
@@ -492,10 +511,14 @@ class gupta_paper:
 		class SomaDirectNeuronModel(NeuronGroup): 
 			def __init__(self, params): 
 				somaDirectClock=Clock(dt=1*ms)
-				NeuronGroup.__init__(self, N=4, model=directToSomaEqs,threshold='v>10*mV', reset='v=-0.002*mV; dv=0; v2=10*mV',refractory=10*ms,clock=somaDirectClock) 
+				NeuronGroup.__init__(self, N=4, model=directToSomaEqs,threshold='v>10*mV', reset='v=-0.002*mV; dv=0; v2=10*mV;spikeFired=True',refractory=10*ms,clock=somaDirectClock) 
 				@network_operation 
 				def additionToNetwork(): 
-					placeHolderForLaterContent = True
+					for neuronIndex in range(dictionaryLongitude):
+						if self.spikeFired[neuronIndex] == True:
+							self.spikeFired[neuronIndex] = False
+							self.v[neuronIndex] = -.002*mV
+						#print 'DtSoma','testTime',self.t,'\tneuronIndex',neuronIndex,'\tself.v[neuronIndex]',self.v[neuronIndex],'\tsummedWandDirac',self.summedWandDirac
 				self.contained_objects.append(additionToNetwork)				
 
 		dend = [None]*dictionaryLongitude
@@ -536,15 +559,15 @@ class gupta_paper:
 					for neuronIndex in range(dictionaryLongitude):
 						# dend calcs
 						for indexOfDend in range(dictionaryLongitude):
-							testADDS.DendI[indexOfDend] = sum(testDend[indexOfDend].v[:])
+							testADDS.DendI[indexOfDend] = sum(testDend[indexOfDend].v[:])*self.dendCalcScaling
 						# somaDirect calcs
-						#ADDS.somaDirectCalcs(neuronIndex, testADDS, testSomaDirect, testDend)
+						ADDS.somaDirectCalcs(neuronIndex, testADDS, testSomaDirect, testDend)
 
 						#print 'testSomaDirect results\t',neuronIndex,'time',self.testTime,'v',testSomaDirect.v2[neuronIndex]
 
 						#checkForResets(neuronIndex)
 
-					#printEvalOutputForTesting()
+					printEvalOutputForTesting()
 
 				def checkForResets(neuronIndex):
 					if self.v2[neuronIndex] == 10*mV:
@@ -590,6 +613,8 @@ class gupta_paper:
 					print 'testDend.dirac','time',self.testTime,'\t',testDend[0].dirac,testDend[1].dirac,testDend[2].dirac,testDend[3].dirac
 					print 'testDend.v',testDend[0].v,testDend[1].v,testDend[2].v,testDend[3].v
 					print 'sum(testDend[neuronIndex])',sum(testDend[0].v[:]),sum(testDend[1].v[:]),sum(testDend[2].v[:]),sum(testDend[3].v[:])							
+					print 'testSomaDirect.v',testSomaDirect.v[0],testSomaDirect.v[1],testSomaDirect.v[2],testSomaDirect.v[3]
+					print 'sum(testSomaDirect[neuronIndex])',sum(testSomaDirect.v[0]),sum(testSomaDirect.v[1]),sum(testSomaDirect.v[2]),sum(testSomaDirect.v[3])							
 					print 'testADDS.v',testADDS.v[0],testADDS.v[1],testADDS.v[2],testADDS.v[3]
 					#print 'Prelim Weights\n0',testDend[0].w[:]
 					#print '1',testDend[1].w[:]
@@ -714,7 +739,7 @@ class gupta_paper:
 		#S.connect('i != j') # all-to-all but no self-connections
 		S=Synapses(testADDS,testADDS,model='w:volt',pre='v+=w')
 		S.connect('i != j')
-		S.w[:]=-24*mV#8.0*mV
+		S.w[:]=self.lateralInhibitScaling
 
 		M = SpikeMonitor(ADDS)
 		self.M = M # for ipython compatibility
