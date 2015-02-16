@@ -19,16 +19,10 @@ def timePeriodAndRefractoryCalcs(timeAndRefrac):
 
 	return timeAndRefrac
 
-	#print '__+++===','time',self.testTime,'refractoryPointCounter',self.testRefractoryPointCounter
-
 def checkForResets(neuronIndex, ADDSObj, dendObj, somaDirectObj, timeAndRefrac):
 	if ADDSObj.v2[neuronIndex] == 10*mV:
-		ADDSObj.v2[neuronIndex] = 0*mV	
-		'''dendObj[neuronIndex].dirac = [0*volt]*len(dendObj[neuronIndex][:])
-		dendObj[neuronIndex].v = [0*volt]*len(dendObj[neuronIndex][:])	'''						
-		# Activate lateral inhibition upon a spike to inhibit other neurons from spiking.  As brian's 
-		# Inhibition inhibits before dend input can increase the signal to balance things out.
-		#ADDS.lateralInhibition()
+		ADDSObj.v2[neuronIndex] = 0*mV						
+
 	elif ADDSObj.v[neuronIndex] != -0.002 * mV:
 		ADDSObj.v2[neuronIndex] = ADDSObj.v[neuronIndex]
 
@@ -43,22 +37,11 @@ def checkForResets(neuronIndex, ADDSObj, dendObj, somaDirectObj, timeAndRefrac):
 		timeAndRefrac.relRefracTimeActivated[neuronIndex] = True
 	# Absolute refrac
 	if timeAndRefrac.absRefracTimeActivated[neuronIndex] == True:
-		'''testADDS.v[neuronIndex] = -0.002*mV
-		testADDS.DendI[neuronIndex] = -0.002*mV
-		testADDS.SynI[neuronIndex] = -0.002*mV
-		testDend[neuronIndex].dirac = [0*volt]*len(dend[neuronIndex][:])'''
 		if timeAndRefrac.time >= (timeAndRefrac.absRefracTime[neuronIndex] + timeAndRefrac.absRefracTimeDuration):
 			timeAndRefrac.absRefracTimeActivated[neuronIndex] = False
-	#print 'neuronIndex', neuronIndex, 'abs',timeAndRefrac.testAbsRefracTimeActivated[neuronIndex],'timeAndRefrac.testTime',timeAndRefrac.testTime,'timeAndRefrac.beginRefrac[neuronIndex]',timeAndRefrac.beginRefrac[neuronIndex],'timeAndRefrac.relRefracTimeDuration/ms',(timeAndRefrac.absRefracTimeDuration/ms),'timeAndRefrac.testAbsRefracTime[neuronIndex] + timeAndRefrac.absRefracTimeDuration',(timeAndRefrac.testAbsRefracTime[neuronIndex] + timeAndRefrac.absRefracTimeDuration)
 	# Relative refrac
 	if timeAndRefrac.relRefracTimeActivated[neuronIndex] == True:
-		'''if testADDS.v[neuronIndex] > -0.002 * mV:
-			testADDS.v[neuronIndex] = -0.002*mV
-			testADDS.DendI[neuronIndex] = -0.002*mV
-			testADDS.SynI[neuronIndex] = -0.002*mV
-			testDend[neuronIndex].dirac = [0*volt]*len(dend[neuronIndex][:])'''
 		if timeAndRefrac.time >= (timeAndRefrac.relRefracTime[neuronIndex] + timeAndRefrac.relRefracTimeDuration):
 			timeAndRefrac.relRefracTimeActivated[neuronIndex] = False
-	#print 'neuronIndex', neuronIndex, 'rel',timeAndRefrac.testRelRefracTimeActivated[neuronIndex],'timeAndRefrac.testTime',timeAndRefrac.testTime,'timeAndRefrac.testRelRefracTime[neuronIndex]',timeAndRefrac.testRelRefracTime[neuronIndex],'timeAndRefrac.relRefracTimeDuration/ms',(timeAndRefrac.relRefracTimeDuration/ms),'timeAndRefrac.testRelRefracTime[neuronIndex] + timeAndRefrac.relRefracTimeDuration',(timeAndRefrac.testRelRefracTime[neuronIndex] + timeAndRefrac.relRefracTimeDuration)			
 
 	return ADDSObj.v2, somaDirectObj.v2, timeAndRefrac

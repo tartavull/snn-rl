@@ -16,7 +16,6 @@ def intitializeTrainedModelParameters(dendObj):
 	[6.36534465, 6.93170042, 6.35646422, 5.69956225, 5.51481581, 5.13093667, 6.47016506, 4.99283791, 5.70442879, 5.94150634, 6.51938451, 5.10472189, 4.95819508, 5.31264187, 4.67271447],
 	[7.44412582, 7.32882233, 4.76605631, 6.58661617, 4.96321112, 7.34606257, 6.31640753, 5.1810014, 4.95338848, 5.97297472, 6.67245869, 5.8974608, 6.46720377, 4.89962516, 6.53007485],
 	[7.68646215, 5.11581952, 4.57335711, 6.33589406, 5.38732016, 7.25180984, 7.2498024, 5.92156072, 5.55171007, 5.89916649, 6.07367171, 6.84386832, 5.58276752, 6.51163569, 7.58550996]]
-	#print 't:',timeAndRefrac.time,'neuronIndex',neuronIndex,'main calc resistanceCalc()', testR
 
 	for indexOfDend in range(dictionaryLongitude):
 		# TODO see if some of these do not need to be recomputed every time
@@ -26,39 +25,26 @@ def intitializeTrainedModelParameters(dendObj):
 
 def evaluateClassifierPerf(ADDSObj, testRun):
 	# Negative results below are only set to be measured after a full spike interval has passed and had the opportunity to have created a spike
-	# (self.testSpikeIntervalCounter-1) is to correct for refractoryPointSwitch occuring after spikeInterval it addresses.
-	#print 'refractoryPointSwitch = ', timeAndRefrac.refractoryPointSwitch
-	#print 'refractoryPointSwitch =', self.testRefractoryPointSwitch
-	#if timeAndRefrac.refractoryPointSwitch == true and (self.testSpikeIntervalCounter > 0):
-	if timeAndRefrac.refractoryPointSwitch == True:# and (self.testSpikeIntervalCounter > 0):
-		'''print 'self.testTime',self.testTime,'refrac on'
-		tT = (Decimal(format(self.testTime, '.1f')))
-		sIU = (Decimal(format(spikeIntervalUnformatted, '.1f')))
-		timeDiff = tT/sIU
-		print 'recalc testT',(floor(self.testTime/spikeIntervalUnformatted) * spikeIntervalUnformatted)*10,'floor(self.testTime/spikeIntervalUnformatted)',floor(self.testTime/spikeIntervalUnformatted),'floor with decimal',int(timeDiff)'''
-		#if self.testSpikesFiredInInterval[neuronIndex][self.testSpikeIntervalCounter-1] == False:
-		# Only evaluate results for enough epochs to test each char in input (3 spike interv per char * 4 char = 12 spike intervals total)
-		# the +1 in (timeAndRefrac.timeotalSpikeIntervals+1) is to allow a last refractoryPointSwitch triggered negative spike evaluation to occur.
-		# * A change was made to the scoring to not count the 0.0-0.1 second period because the input spike generator does not start until .1
-		# seconds and the first occurences of output spikes should be monitored looking at .2 seconds to see if any occured in seconds .1-.2 .
+	# Only evaluate results for enough epochs to test each char in input (3 spike interv per char * 4 char = 12 spike intervals total)
+	# the +1 in (totalSpikeIntervals+1) is to allow a last refractoryPointSwitch triggered negative spike evaluation to occur.
+	# * A change was made to the scoring to not count the 0.0-0.1 second period because the input spike generator does not start until .1
+	# seconds and the first occurences of output spikes should be monitored looking at .2 seconds to see if any occured in seconds .1-.2 .	
+	if timeAndRefrac.refractoryPointSwitch == True:
 		if (timeAndRefrac.spikeIntervalCounter >= 2) and (timeAndRefrac.spikeIntervalCounter <= (totalSpikeIntervals+1)):
 			for neuronIndex in range(dictionaryLongitude):				
-				#print 'eval','self.testSpikeIntervalCounter\t',self.testSpikeIntervalCounter
-				if (ADDSObj.UmSpikeFired[neuronIndex] == 1*mV):# and (self.testSpikeIntervalCounter < self.totalSpikeIntervals):
+				if (ADDSObj.UmSpikeFired[neuronIndex] == 1*mV):
 					if (testRun.correctSpikes[neuronIndex][(timeAndRefrac.spikeIntervalCounter-1)] == 1):
 						testRun.truePositiveSpikeResults = testRun.truePositiveSpikeResults + 1	
 						print 'TP found\t','self.testSpikeIntervalCounter-1\t',timeAndRefrac.spikeIntervalCounter-1,'neuronIndex\t',neuronIndex
 					else:
 						testRun.falsePositiveSpikeResults = testRun.falsePositiveSpikeResults + 1	
-					#self.testSpikesFiredInInterval[neuronIndex][self.testSpikeIntervalCounter] = True	
-				elif (ADDSObj.UmSpikeFired[neuronIndex] == 0*mV):# and (self.testSpikeIntervalCounter < self.totalSpikeIntervals):
+				elif (ADDSObj.UmSpikeFired[neuronIndex] == 0*mV):
 					if (testRun.correctSpikes[neuronIndex][(timeAndRefrac.spikeIntervalCounter-1)] == 1):
 						testRun.falseNegativeSpikeResults = testRun.falseNegativeSpikeResults + 1		
 					else:
 						testRun.trueNegativeSpikeResults = testRun.trueNegativeSpikeResults + 1	
 		for neuronIndex in range(dictionaryLongitude):											
 			ADDSObj.UmSpikeFired[neuronIndex] = 0*mV
-				#print 'results',testRun.truePositiveSpikeResults,testRun.falsePositiveSpikeResults,testRun.trueNegativeSpikeResults,testRun.falseNegativeSpikeResults
 
 	return ADDSObj.UmSpikeFired, testRun
 
