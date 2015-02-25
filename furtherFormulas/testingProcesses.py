@@ -1,7 +1,8 @@
 from architecture_further_formulas import *
+from processHDF5Data import *
 
 def intitializeTrainedModelParameters(dendObj):
-	# Below values that have been created through prior training are used for w, tau, and r
+	'''# Below values that have been created through prior training are used for w, tau, and r
 	testW = [[0.90433194, 0.6139531, 0.50387484, 0.55220372, 0.51213536, 0.85443374, 0.99955922, 0.5039825, 0.73091913, 0.9780236, 0.5241028, 0.71571812, 0.93782861, 0.51210244, 0.73074697],
 	[0., 0., 0.03412608, 0., 0.90455366, 0.78683668, 0., 0.95912629, 0.7282637, 0., 0.78548583, 0.78935491, 0.03193823, 0.00609877, 0.17287094],
 	[0.4474444, 0., 0.98135641, 0., 0.96315942, 0., 0., 0., 0.15930208, 0., 0.77299245, 0., 0., 0.71739497, 0.02804206],
@@ -15,13 +16,42 @@ def intitializeTrainedModelParameters(dendObj):
 	testR = [[5.28618924, 7.07014396, 7.67118426, 7.41054119, 7.62696131, 5.62546396, 4.55408732, 7.67060873, 6.39667963, 4.73398033, 7.56265998, 6.48674751, 5.04468982, 7.62713777, 6.39770456],
 	[6.36534465, 6.93170042, 6.35646422, 5.69956225, 5.51481581, 5.13093667, 6.47016506, 4.99283791, 5.70442879, 5.94150634, 6.51938451, 5.10472189, 4.95819508, 5.31264187, 4.67271447],
 	[7.44412582, 7.32882233, 4.76605631, 6.58661617, 4.96321112, 7.34606257, 6.31640753, 5.1810014, 4.95338848, 5.97297472, 6.67245869, 5.8974608, 6.46720377, 4.89962516, 6.53007485],
-	[7.68646215, 5.11581952, 4.57335711, 6.33589406, 5.38732016, 7.25180984, 7.2498024, 5.92156072, 5.55171007, 5.89916649, 6.07367171, 6.84386832, 5.58276752, 6.51163569, 7.58550996]]
+	[7.68646215, 5.11581952, 4.57335711, 6.33589406, 5.38732016, 7.25180984, 7.2498024, 5.92156072, 5.55171007, 5.89916649, 6.07367171, 6.84386832, 5.58276752, 6.51163569, 7.58550996]]'''
+
+	hdf5Data = processHDF5Data('simulation.hdf5',permision = "r")
+	start = .001 #seconds
+	end = 500.0#.5#.13
+	weightCollection = np.array([None]*dictionaryLongitude)
+	names = [None]*dictionaryLongitude
+	for weightIndex in range(dictionaryLongitude): names[weightIndex] = 'weights'+str(weightIndex)
+	totalWeightCollection = hdf5Data.incorperateData(weightCollection,names,start,end)
+	#print 'len(totalWeightCollection)',len(totalWeightCollection[0]),'shape(totalWeightCollection)',shape(totalWeightCollection[0])
+	lastIndex = (len(totalWeightCollection[0])-1)
+	testW = []
+	for finalWeightIndex in range(dictionaryLongitude):
+		testW.extend([totalWeightCollection[finalWeightIndex][lastIndex]])
+	testW = np.array(testW)
+	testTauD = np.array(tauMax - abs(testW) * (tauMax - tauMin))
+	tauMScaled = tauM * 1000 # scaling to make the scale match tau
+	#testTauD = ((tauMax - abs(testW)*(tauMax-tauMin)) * ms)/ms# .001 is scaling factor found in dirac method
+	testR =  np.array(((testTauD * neuronFiringThreshold) / Rm) * ((tauMScaled / testTauD) ** (tauM / (tauMScaled - testTauD))))
+	#dendObj[neuronIndex].r[RIndex] = (((((dendObj[neuronIndex].tau[RIndex]*.001)/ms)*neuronFiringThreshold) / Rm) * ((tauM / ((dendObj[neuronIndex].tau[RIndex]/ms)*.001) ) ** (tauM / (tauM - ((dendObj[neuronIndex].tau[RIndex]/ms)*.001) ))))*volt
+	del(totalWeightCollection)
 
 	for indexOfDend in range(dictionaryLongitude):
 		# TODO see if some of these do not need to be recomputed every time
-		dendObj[indexOfDend].w = testW[indexOfDend]*volt*weightScaling
+		dendObj[indexOfDend].w = testW[indexOfDend]*volt*weightScaling # NOTE: weightScaling only included in testing code now, don't be confused with it being in training code!
 		dendObj[indexOfDend].tau = testTauD[indexOfDend]*ms # unclear if dividing by tau in ms is e.x. /.02 or /20 but it is assumed to be 20, therefore no ms conversion here
 		dendObj[indexOfDend].r = testR[indexOfDend]*mV	# volt unit is cancelled out in the equation anyhow, doesn't matter if it is volt or mV due to being cancelled.  Having mv could cause *.001 that is now wanted
+	
+	'''print 'Model\'s values\n'
+	print 'testW\t',testW
+	print 'testTauD\t',testTauD
+	print 'testR\r',testR'''
+
+#print 'test start'
+#intitializeTrainedModelParameters(None)
+#print 'test end'
 
 def evaluateClassifierPerf(ADDSObj, testRun):
 	# Negative results below are only set to be measured after a full spike interval has passed and had the opportunity to have created a spike
@@ -48,21 +78,120 @@ def evaluateClassifierPerf(ADDSObj, testRun):
 
 	return ADDSObj.UmSpikeFired, testRun
 
+def evaluateClassifierPerf2(ADDSObj, testRun):
+	# Negative results below are only set to be measured after a full spike interval has passed and had the opportunity to have created a spike
+	# Only evaluate results for enough epochs to test each char in input (3 spike interv per char * 4 char = 12 spike intervals total)
+	# the +1 in (totalSpikeIntervals+1) is to allow a last refractoryPointSwitch triggered negative spike evaluation to occur.
+	# * A change was made to the scoring to not count the 0.0-0.1 second period because the input spike generator does not start until .1
+	# seconds and the first occurences of output spikes should be monitored looking at .2 seconds to see if any occured in seconds .1-.2 .	
+
+	# Only assign neuron to first window it fires in
+	# multiple neurons firing in the same window is not accounted for
+
+	currentSpikeIntervalTime = timeAndRefrac.spikeIntervalCounter
+	neuronsWithoutSpikes = 0
+	currentWindow = math.floor(Decimal(format((currentSpikeIntervalTime-2), '.1f'))/Decimal(format(testingSpikesPerChar, '.1f')))
+
+	if timeAndRefrac.refractoryPointSwitch == True:
+		if (currentSpikeIntervalTime >= 2) and (currentSpikeIntervalTime <= (totalSpikeIntervals+1)):
+			for neuronIndex in range(dictionaryLongitude):				
+				if (ADDSObj.UmSpikeFired[neuronIndex] == 1*mV):
+					if (testRun.firedSpikes[currentSpikeIntervalTime]) == None:
+						testRun.firedSpikes[currentSpikeIntervalTime] = np.array([neuronIndex])
+					else:
+						'''firedSpikes2 = np.array([])
+						for elemIndex in range(len(testRun.firedSpikes)): 
+							if elemIndex == currentSpikeIntervalTime: firedSpikes2 = np.append(firedSpikes2, np.append(testRun.firedSpikes[elemIndex], np.array([neuronIndex])))
+							else: firedSpikes2 = np.append(firedSpikes2, testRun.firedSpikes[elemIndex])
+						firedSpikes = firedSpikes2'''
+
+						firedSpikes2 = []
+						for elemIndex in range(len(testRun.firedSpikes)): 
+							if elemIndex == currentSpikeIntervalTime: 
+								newElem = testRun.firedSpikes[elemIndex].tolist()
+								newElem.append([neuronIndex])
+								firedSpikes2.append(np.array(newElem))
+							else: 
+								firedSpikes2.append(testRun.firedSpikes[elemIndex])
+						testRun.firedSpikes = np.array(firedSpikes2)
+
+						#newElements = np.append(np.append(testRun.firedSpikes[currentSpikeIntervalTime], neuronIndex),testRun.firedSpikes[(neuronIndex+1):])
+						#testRun.firedSpikes[currentSpikeIntervalTime] = np.append(testRun.firedSpikes[:neuronIndex], newElements)
+
+					'''neuronAssignedToWindow = False
+					for indiciesInWindow in testRun.testingSpikeWindows[currentWindow]:
+						for windowIndex in indiciesInWindow:
+							if len(testRun.assignedSpikeWindows[windowIndex]) > 1 or testRun.assignedSpikeWindows[windowIndex] != [None]:
+								neuronAssignedToWindow = True'''
+
+					neuronAssignedToWindow = False
+					for neuronWindowAssignment in testRun.assignedSpikeWindows:
+						if neuronWindowAssignment == currentWindow:
+							neuronAssignedToWindow = True
+
+					if neuronAssignedToWindow == False:# and testRun.assignedSpikeWindows[neuronIndex] == None:
+						testRun.assignedSpikeWindows[neuronIndex] = currentWindow
+
+					if testRun.assignedSpikeWindows[neuronIndex] == currentWindow:
+						testRun.truePositiveSpikeResults = testRun.truePositiveSpikeResults + 1	
+						print 'TP found\t','self.testSpikeIntervalCounter-1\t',timeAndRefrac.spikeIntervalCounter-1,'neuronIndex\t',neuronIndex
+					else:
+						testRun.falsePositiveSpikeResults = testRun.falsePositiveSpikeResults + 1
+
+					'''for spikesFired in testRun.firedSpikes
+						for neuronWithPriorSpike in spikesFired:
+							if neuronIndex == neuronWithPriorSpike:
+								duplicate'''
+
+					'''if (testRun.correctSpikes[neuronIndex][(timeAndRefrac.spikeIntervalCounter-1)] == 1):
+						testRun.truePositiveSpikeResults = testRun.truePositiveSpikeResults + 1	
+						print 'TP found\t','self.testSpikeIntervalCounter-1\t',timeAndRefrac.spikeIntervalCounter-1,'neuronIndex\t',neuronIndex
+					else:
+						testRun.falsePositiveSpikeResults = testRun.falsePositiveSpikeResults + 1	'''
+				elif (ADDSObj.UmSpikeFired[neuronIndex] == 0*mV):
+					testRun.trueNegativeSpikeResults = testRun.trueNegativeSpikeResults + 1
+					neuronsWithoutSpikes += 1
+
+				if neuronsWithoutSpikes == dictionaryLongitude:
+					testRun.trueNegativeSpikeResults = testRun.trueNegativeSpikeResults - 1
+					#testRun.falseNegativeSpikeResults = testRun.falseNegativeSpikeResults + 1
+				'''elif (ADDSObj.UmSpikeFired[neuronIndex] == 0*mV):
+					if (testRun.correctSpikes[neuronIndex][(timeAndRefrac.spikeIntervalCounter-1)] == 1):
+						testRun.falseNegativeSpikeResults = testRun.falseNegativeSpikeResults + 1		
+					else:
+						testRun.trueNegativeSpikeResults = testRun.trueNegativeSpikeResults + 1	'''
+			correctNeuronFound = False
+			print 'ADDSObj.t',ADDSObj.t,'testRun.firedSpikes', testRun.firedSpikes
+			for spikedNeurons in testRun.firedSpikes:
+				if len(spikedNeurons) > 1 or spikedNeurons != [None]:
+					for spikedNeuronNumber in spikedNeurons:
+						if spikedNeuronNumber != None and currentWindow == testRun.assignedSpikeWindows[spikedNeuronNumber]:
+							correctNeuronFound = True
+			if correctNeuronFound == False:
+				testRun.falseNegativeSpikeResults = testRun.falseNegativeSpikeResults + 1
+			'''correctNeuronFound = False
+			for windowAssigned in testRun.assignedSpikeWindows:
+				if currentWindow = windowAssigned:'''				
+		for neuronIndex in range(dictionaryLongitude):											
+			ADDSObj.UmSpikeFired[neuronIndex] = 0*mV
+
+	return ADDSObj.UmSpikeFired, testRun	
+
 def OutputEvaluationResults(dendObj, testRun):
-	print 'Final Weights\n',dendObj[0].w[:]/volt
-	print dendObj[1].w[:]/volt
-	print dendObj[2].w[:]/volt
-	print dendObj[3].w[:]/volt
-	print 'Final Tau\n',dendObj[0].tau[:]/ms
-	print dendObj[1].tau[:]/ms
-	print dendObj[2].tau[:]/ms
-	print dendObj[3].tau[:]/ms
-	print 'Final Res\n',dendObj[0].r[:]/mV
-	print dendObj[1].r[:]/mV
-	print dendObj[2].r[:]/mV
-	print dendObj[3].r[:]/mV		
+	print 'Final Weights\n'
+	for printIndex in range(dictionaryLongitude):
+		print dendObj[printIndex].w[:]/volt
+	print 'Final Tau\n'
+	for printIndex in range(dictionaryLongitude):
+		print dendObj[printIndex].tau[:]/ms
+	print 'Final Res\n'
+	for printIndex in range(dictionaryLongitude):
+		print dendObj[printIndex].r[:]/mV		
 	print '\n'
 	print '+++ Results +++'
+	print 'testRun.firedSpikes\t',testRun.firedSpikes
+	print 'testRun.assignedSpikeWindows\t',testRun.assignedSpikeWindows
+	#print 'testRun.testingSpikeWindows\t',testRun.testingSpikeWindows
 	print 'Spike results: TP:\t',testRun.truePositiveSpikeResults,'\tFP:\t',testRun.falsePositiveSpikeResults,'\tTN:\t',testRun.trueNegativeSpikeResults,'\tFN:\t',testRun.falseNegativeSpikeResults
 	print 'totalSpikeIntervalsTested:\t',totalSpikeIntervals,'\ttotalCharsPresented:\t',dictionaryLongitude
 	print 'True positives correct percentage (TP/totalSpikeIntervalsTested):\t',Decimal(format(testRun.truePositiveSpikeResults, '.1f'))/Decimal(format(totalSpikeIntervals, '.1f')),'\t(this is the percentage of all true positves that were found)'

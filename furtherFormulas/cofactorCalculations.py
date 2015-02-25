@@ -91,15 +91,16 @@ def returnNewW(WOld, DeltaW, DeltaSpikeTime, negativeWeightReinforcement, positi
 	return WNew;
 	##	
 
-def tauDCalc(neuronIndex, dendObj, W):
+def tauDCalc(neuronIndex, dendObj):
 	# Weight loop
-	for WIndex in range(len(W[0][:])):
-		if abs(W[neuronIndex][WIndex]) <= 1:
-			dendObj[neuronIndex].tau[WIndex] = (tauMax - abs(W[neuronIndex][WIndex])*(tauMax-tauMin)) * ms# .001 is scaling factor found in dirac method
+	for WIndex in range(numberOfPixels):
+		weight = ((dendObj[neuronIndex].w[WIndex])/volt)
+		if abs(weight) <= 1:
+			dendObj[neuronIndex].tau[WIndex] = (tauMax - (abs(weight)*(tauMax-tauMin))) * ms# .001 is scaling factor found in dirac method
 
-def resistanceCalc(neuronIndex, dendObj, R, tauM):
+def resistanceCalc(neuronIndex, dendObj, tauM):
 	#Resistance loop
-	for RIndex in range(len(R[0][:])):				
+	for RIndex in range(numberOfPixels):				
 		if (dendObj[neuronIndex].tau[RIndex]*.001 == tauM*second):
 			# avoid a division by 0 issue
 			tauM = tauM - .000001

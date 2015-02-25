@@ -26,8 +26,8 @@ def checkForResets(neuronIndex, ADDSObj, dendObj, somaDirectObj, timeAndRefrac):
 	elif ADDSObj.v[neuronIndex] != -0.002 * mV:
 		ADDSObj.v2[neuronIndex] = ADDSObj.v[neuronIndex]
 
-	if somaDirectObj.v2[neuronIndex] == 10*mV:
-		somaDirectObj.v2[neuronIndex] = 0*mV	
+	#if somaDirectObj.v2[neuronIndex] == 10*mV:
+	#	somaDirectObj.v2[neuronIndex] = 0*mV	
 
 	if (timeAndRefrac.beginRefrac[neuronIndex] == 1*mV) and (timeAndRefrac.relRefracTimeActivated[neuronIndex] == False):
 		timeAndRefrac.beginRefrac[neuronIndex] = 0*mV

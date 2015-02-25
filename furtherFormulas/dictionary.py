@@ -1,4 +1,4 @@
-from brian import *
+from brian2 import *
 
 #In the matlab implementation the fisrt layer consited of 15 leaky integrate and fire in which 
 #the input was a constant current in case the pixel was "on" or a null current in case the pixel 
@@ -59,7 +59,7 @@ class dictionary():
 						
 							spike = array([indexPixel, time])
 							spikeArray = vstack([spikeArray,spike])
-
+		
 		return spikeArray 
 
 

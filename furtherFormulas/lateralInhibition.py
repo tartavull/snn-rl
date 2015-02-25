@@ -29,9 +29,14 @@ def lateralInhibition(ADDSObj, timeAndRefrac, latInhibSettings):
 			latInhibSettings.voltageForInhibition = 70*mV#(70*mV/latInhibSettings.inhibitionReduction)
 			if latInhibSettings.inhibitionReduction < 150: latInhibSettings.inhibitionReduction += 0.01
 
+	#print 't\t',ADDSObj.t,'preliminaryV\t',preliminaryV,'ADDSObj.prelimV\t',ADDSObj.prelimV
+
 	for neuronIndex in range(dictionaryLongitude):		
 		if neuronIndex != neuronNumberAboutToFire and neuronIndex != neuronNumberFired:
 			preliminaryV[neuronIndex] -= abs(latInhibSettings.voltageForInhibition)
 			ADDSObj.v[neuronIndex] = preliminaryV[neuronIndex]
+
+	#print 'latInhibSettings.voltageForInhibition\t',latInhibSettings.voltageForInhibition
+	#print 'ADDSObj.v\t',ADDSObj.v
 
 	return ADDSObj.v, latInhibSettings
