@@ -1,6 +1,6 @@
 Reinforcement Learning for Spiking Neural Networks
 ======
-Check out some of the latest results <a href='http://nbviewer.ipython.org/github/tartavull/snn-rl/blob/master/FFSSN.ipynb'>at this link</a> .
+Check out some of the latest results [at this link](http://nbviewer.ipython.org/github/tartavull/snn-rl/blob/master/FFSSN.ipynb) .
 
 from wikipedia: "Spiking neural networks (SNNs) fall into the third generation of neural network models,
 increasing the level of realism in a neural simulation. 
