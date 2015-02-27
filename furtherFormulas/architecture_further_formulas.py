@@ -5,10 +5,12 @@ import math # used for natural log
 from decimal import Decimal # Used for results reporting calculations
 from brian2 import *
 
-epochs = 100 
+testingEpochs = 100 
+trainingEpochs = 300
 spikeMiliseconds = 100
 dictionaryLongitude = 26
 testingSpikesPerChar=3
+trainingSpikesPerChar=1
 spikeInterval = spikeMiliseconds * ms
 totalTestingTime = testingSpikesPerChar * dictionaryLongitude
 epochsToPrint = [0,1,2,25,50,75]
@@ -27,7 +29,7 @@ tauMax = 30
 tauMin = 2
 tauM = .03 # removed ms for compatibility
 SimulationDuration = 10000
-epochMsDuration = (SimulationDuration / epochs) * 10 # Times 10 is to adjust to Ms scale
+epochMsDuration = (SimulationDuration / testingEpochs) * 10 # Times 10 is to adjust to Ms scale
 numberOfPixels = 15
 neuronFiringThreshold = 10 # removed mV for compatibility
 W = np.random.uniform(0.5,1.0,[dictionaryLongitude,15]) # Initial weights
@@ -63,6 +65,7 @@ IdRefractoryPeriod = np.array([[False]*numberOfPixels]*dictionaryLongitude);
 IsRefractoryPeriod = np.array([False]*dictionaryLongitude); 
 UmRefractoryPeriod = np.array([False]*dictionaryLongitude); 
 refractoryGraphingSwitch = False
+printWeights = 0
 M = None
 UmM = None
 weightMonitors = [None]*dictionaryLongitude
@@ -77,8 +80,9 @@ generalClockDt = 1.0*ms#0.1*ms
 positiveWeightReinforcement = 1.0#2.0#2.0#7.0#1.0#7.0#20.0#5.0#10.0#1.0#2.0
 negativeWeightReinforcement = 2.0#5.0#3.5#7.5#30.0#30#2.0#30#7.5#15.0#30.0#8.0#6.0#1.0#50.0#10.0#50.0#10.0#3.0#0.5
 LearningRate = 0.2#0.1#1.0#0.7
-evaluateClassifier = True
-accelerateTraining = False
+evaluateClassifier = True#True
+accelerateTraining = False#False
+loadHD5ForTesting = False
 runTimeScaling = 10
 runTime = 810*ms#80*ms#810*ms#20*ms#3000*ms
 #runTime = 10*ms+(10*ms*totalTestingTime) # For testing runs
@@ -109,9 +113,6 @@ class testRun():
 	trueNegativeSpikeResults = 0
 	falseNegativeSpikeResults = 0
 	firedSpikes = np.array([np.array([None])]*(totalTestingTime+3));
-	'''testingSpikeWindows = np.array([None,None])
-	for w in range(dictionaryLongitude+1):
-		testingSpikeWindows = np.append(testingSpikeWindows, (np.array([2,3,4])+(w*3)))'''
 	assignedSpikeWindows = np.array([None]*dictionaryLongitude)
 	def __init__(self):
 		initalize = True		

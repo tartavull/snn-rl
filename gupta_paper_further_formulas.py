@@ -11,8 +11,8 @@ class gupta_paper:
 
 	neuralnet = Network()
 	dictionary = dictionary()
-	spiketimes = dictionary.spikeTimes(dictionaryLongitude, spikeInterval, testingSpikesPerChar, epochs)
-	trainingSpikeTimes = dictionary.spikeTimes(dictionaryLongitude, spikeInterval, 1, 300)
+	spiketimes = dictionary.spikeTimes(dictionaryLongitude, spikeInterval, testingSpikesPerChar, testingEpochs)
+	trainingSpikeTimes = dictionary.spikeTimes(dictionaryLongitude, spikeInterval, trainingSpikesPerChar, trainingEpochs)
 	LIK = SpikeGeneratorGroup(N=15, indices=spiketimes[:,0], times=spiketimes[:,1]*ms)
 	# W = W and other lines below are to avoid an odd 'reference before assignment' error
 	W = W
@@ -126,8 +126,8 @@ class gupta_paper:
 						
 						self.timeAndRefrac = timePeriodAndRefractoryCalcs(self.timeAndRefrac)
 
-						if (evaluationActive==True) and timeAndRefrac.time == 0.000 or timeAndRefrac.time == 0.001:
-							intitializeTrainedModelParameters(dendObj)
+						if (evaluationActive==True) and (timeAndRefrac.time == 0.000 or timeAndRefrac.time == 0.001):
+							initializeTrainedModelParameters(dendObj)
 
 						# Option to accelerate computations for training
 						if self.accelerateTraining == False or (evaluationActive == False and (tNorm <= .005 or tNorm >= .096)):													
@@ -157,6 +157,10 @@ class gupta_paper:
 								ADDSObj.v2, somaDirectObj.v2, self.timeAndRefrac = checkForResets(neuronIndex, ADDSObj, dendObj, somaDirectObj, self.timeAndRefrac)
 
 							ADDSObj.UmSpikeFired, self.testRun = evaluateClassifierPerf2(ADDSObj, self.testRun)
+
+						'''roundedSecondsTime = math.floor(Decimal(format((ADDSObj.t), '.1f'))/Decimal(format((1.0*second), '.1f')))
+						if printWeights < roundedSecondsTime:
+							self.printWeights = roundedSecondsTime; printWeights(dendObj);'''
 					if self.evaluateClassifier == False:
 						mainSimulationCalcs(ADDS, dend, somaDirect, self.trainingSpikeTimes, False)
 					else:

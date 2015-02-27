@@ -26,7 +26,7 @@ for fileName in inputDirectory:
 
 		for line in lines:
 			match = re.match(r'.*def (.*)\(.*:.*', line)
-			if match != None and fileName != '3dAnimScatterPlotHdf5.py':
+			if match != None and fileName != '3dAnimScatterPlotHdf5.py' and fileName != '3dBarWTauRAnim.py' and fileName != '3dBarChartAnim.py':
 				outputText += '\r\n# <markdowncell>\r\n<a id=\''+match.group(1)+'\'></a>'+\
 				'<div style=\'font-size:1.7em;text-decoration:underline;font-weight:bold\'>'+match.group(1)+\
 				'</div>\r\n# <codecell>\r\n'

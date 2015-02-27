@@ -13,57 +13,30 @@ from brian2 import *
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
-import h5py
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import pylab as pylab
 from decimal import Decimal
+from gupta_paper_further_formulas_brianversion19 import *
+from processHDF5Data import *
+
+plottingTimeRange = 300# ms to show at a time
 
 class Anim3dBarChart:
-    plottingTimeRange = 300# ms to show at a time
-    def openHdf5(self, hdf5name , permision = "w"):
-        self.hdf = h5py.File(hdf5name, permision)
-
-    def closeHdf5(self):
-        self.hdf.close()
-
-    def getData(self, group,  level ):
-
-        return self.hdf['/'+group+'/'+str(level)]
-
-    def getDownsampleData(self, group, start, end , screenSize = 1024):
-        bestLevel = 1
-        data = self.getData(group,bestLevel)
-        print group + " has been downsampled "+ str(bestLevel) + " times"
-        start = int(start/bestLevel)
-        end = int(end/bestLevel)
-        if (end > data.shape[0]):
-            print data.shape
-            print "WARNING: you requested end = "+str(float(end))+" seconds but data length is "+str(float(data.shape[0] *bestLevel/10000))+" seconds"
-            end=data.shape[0] -1
-
-        return data[start:end]
-
-    def incorperateData(self, group, start, end):
-        #because timestep is 0.1 mseconds, and start and end is expressed in seconds.
-        start = int(start * 10000)
-        end = int(end * 10000)
-
-        weights0 = self.getDownsampleData('weights0', start, end)
-        weights1 = self.getDownsampleData('weights1', start, end)
-        weights2 = self.getDownsampleData('weights2', start, end)
-        weights3 = self.getDownsampleData('weights3', start, end)
-
-        return weights0, weights1, weights2, weights3
+    plottingTimeRange = self.plottingTimeRange
 
     def create3dBarChart(self):
         plottingTimeRange = self.plottingTimeRange
-        self.openHdf5('../simulation.hdf5',permision = "r")
+        hdf5Data = processHDF5Data('../simulation.hdf5',permision = "r")
         start = .001 #seconds
         end = 5.0#.5#.13
-        weights0, weights1, weights2, weights3 = self.incorperateData('weights0',start,end)
-        times = np.array(range(0,len(weights0)))*.001
+        weightMonitors = [None]*dictionaryLongitude
+        names = [None]*dictionaryLongitude
+        for weightIndex in dictionaryLongitude:
+            names[weightIndex] = 'weights'+str(weightIndex)
+        weightMonitor = hdf5Data.incorperateData(weightMonitors,names,start,end)
+        times = np.array(range(0,len(weightMonitor)))*.001
 
         fig = plt.figure()
         ax1 = fig.add_subplot(111, projection='3d')
@@ -120,9 +93,10 @@ class Anim3dBarChart:
 
         plt.show()
 
+        del(hdf5Data)
+
     def __init__(self):
         self.create3dBarChart()
-        self.closeHdf5
 
 def main():
     run3dAnim = Anim3dBarChart()
