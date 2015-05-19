@@ -80,11 +80,11 @@ generalClockDt = 1.0*ms#0.1*ms
 positiveWeightReinforcement = 1.0#2.0#2.0#7.0#1.0#7.0#20.0#5.0#10.0#1.0#2.0
 negativeWeightReinforcement = 2.0#5.0#3.5#7.5#30.0#30#2.0#30#7.5#15.0#30.0#8.0#6.0#1.0#50.0#10.0#50.0#10.0#3.0#0.5
 LearningRate = 0.2#0.1#1.0#0.7
-evaluateClassifier = True#True
-accelerateTraining = False#False
+evaluateClassifier = False#True#True
+accelerateTraining = True
 loadHD5ForTesting = False
 runTimeScaling = 10
-runTime = 810*ms#80*ms#810*ms#20*ms#3000*ms
+runTime = 410*ms#810*ms#80*ms#810*ms#20*ms#3000*ms
 #runTime = 10*ms+(10*ms*totalTestingTime) # For testing runs
 
 class timeAndRefrac(): 	
