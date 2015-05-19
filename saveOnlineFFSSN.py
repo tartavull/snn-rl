@@ -13,7 +13,7 @@ fileName='OfflineFFSSN.ipynb'
 outputFile='FFSSN.ipynb'
 
 outputText = '';
-f = open(currentDirectory+'\\'+fileName,"r")
+f = open(currentDirectory+'/'+fileName,"r")
 lines = f.readlines()
 f.close()
 
@@ -24,7 +24,10 @@ for line in lines:
 	else:
 		outputText += line
 
-nb = nbf.reads(outputText, 'ipynb')
-nbf.write(nb, open(outputFile, 'w'), 'ipynb')
+#nb = nbf.reads(outputText, 'ipynb')
+#nbf.write(nb, open(outputFile, 'w'), 'ipynb')
+f = open(currentDirectory+'/'+outputFile,"w")
+f.write(outputText)
+f.close()
 
 print 'done'
