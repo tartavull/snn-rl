@@ -2,6 +2,8 @@ Reinforcement Learning for Spiking Neural Networks
 ======
 Check out some of the latest results [at this link](http://nbviewer.ipython.org/github/tartavull/snn-rl/blob/master/FFSSN.ipynb) .
 
+See the bottom of this document for file descriptions and organization of the project.
+
 from wikipedia: "Spiking neural networks (SNNs) fall into the third generation of neural network models,
 increasing the level of realism in a neural simulation. 
 In addition to neuronal and synaptic state, SNNs also incorporate the concept of time into their operating model.
@@ -41,3 +43,14 @@ Getting Started
 2. simulation.ipynb and gupta_paper_further_formulas.py are where the actual simulation is performed. We are using a clock-driven simulator for spiking neural networks called [brian](https://github.com/brian-team/brian).
 
 3. analysis.ipynb is what we run after the simulation is finished, it helps us to analyse the performance of the network.
+
+======
+File descriptions and organization
+/gupta_paper_further_formulas.py main file for project
+/FFSSN.ipynb ipython notebook overviewing work
+/experimentalComponents code exploring new functionality for possible use in the project
+/furtherFormulas modules used in the main file
+/img images
+/notebooks notebooks to describe the project
+/originalVersion initial version of the work, the new version is in gupta_paper_further_formulas.py 
+/utilities programs used for processing files to prepare them for use in the project
