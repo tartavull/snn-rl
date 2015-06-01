@@ -46,11 +46,19 @@ Getting Started
 
 ======
 File descriptions and organization
+
 /gupta_paper_further_formulas.py main file for project
+
 /FFSSN.ipynb ipython notebook overviewing work
+
 /experimentalComponents code exploring new functionality for possible use in the project
+
 /furtherFormulas modules used in the main file
+
 /img images
+
 /notebooks notebooks to describe the project
+
 /originalVersion initial version of the work, the new version is in gupta_paper_further_formulas.py 
+
 /utilities programs used for processing files to prepare them for use in the project
