@@ -143,8 +143,7 @@ def OutputEvaluationResults(dendObj, testRun):
 	weightsFile = open('./furtherFormulas/savedWeights.txt', 'a')
 	np.set_printoptions(threshold=np.inf, linewidth=np.inf)  # turn off summarization, line-wrapping
 
-	weightsFile.write("[")
-	outputWeightDesc = ""
+	outputWeightDesc = "["
 	print 'Final Weights\n'
 	for printIndex in range(dictionaryLongitude):
 		print dendObj[printIndex].w[:]/volt
@@ -169,6 +168,10 @@ def OutputEvaluationResults(dendObj, testRun):
 		else:
 			outputWeightDesc += "]\n"
 			outputWeightDesc = outputWeightDesc.replace("],]", "]]")
+			# Remove all brackets because numpy.fromstring used
+			outputWeightDesc = outputWeightDesc.replace("[", "")
+			outputWeightDesc = outputWeightDesc.replace("],", "")
+			outputWeightDesc = outputWeightDesc.replace("]", "")
 		#weightsFile.write(np.array2string((dendObj[printIndex].w[:]/volt), separator=', ', precision=8))
 		#if printIndex < (dictionaryLongitude-1): weightsFile.write("\n")
 	#x = np.arange(1,10).reshape(3,3)
