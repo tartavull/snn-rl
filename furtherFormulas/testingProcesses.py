@@ -1,6 +1,7 @@
 from architecture_further_formulas import *
 from processHDF5Data import *
 from savedWeights import *
+import re
 
 def initializeTrainedModelParameters(dendObj):
 	# Below values that have been created through prior training are used for w, tau, and r.  Those values are imported
@@ -135,9 +136,49 @@ def evaluateClassifierPerf2(ADDSObj, testRun):
 	return ADDSObj.UmSpikeFired, testRun	
 
 def OutputEvaluationResults(dendObj, testRun):
+	# From http://stackoverflow.com/questions/22821460/numpy-save-2d-array-to-text-file
+	# this could use code for validating weight files created but that is not writen so far
+	weightsFile = open('./furtherFormulas/savedWeights.txt', 'w')
+	weightsFile.close()
+	weightsFile = open('./furtherFormulas/savedWeights.txt', 'a')
+	np.set_printoptions(threshold=np.inf, linewidth=np.inf)  # turn off summarization, line-wrapping
+
+	weightsFile.write("[")
+	outputWeightDesc = ""
 	print 'Final Weights\n'
 	for printIndex in range(dictionaryLongitude):
 		print dendObj[printIndex].w[:]/volt
+
+		# Formatting rules
+		outputWeightDescTemp = ""
+		outputWeightDescTemp += np.array2string((dendObj[printIndex].w[:]/volt), separator=', ')
+		outputWeightDescTemp = outputWeightDescTemp.replace("0.        ", "0.0")
+		outputWeightDescTemp = outputWeightDescTemp.replace("0.]", "0.0]")
+		outputWeightDescTemp = outputWeightDescTemp.replace(",  ", ", ")
+		#outputWeightDesc = outputWeightDesc.replace("[]+,", ",")
+		#outputWeightDesc = outputWeightDesc.replace("\[ ", "\[")
+		#outputWeightDesc = outputWeightDesc.replace("[0-9]+\]", "\],")
+		outputWeightDescTemp = re.sub(r"0\.\]\,", "0.0]", outputWeightDescTemp)
+		outputWeightDescTemp = re.sub(r"[ ]+\]", "]", outputWeightDescTemp)
+		outputWeightDescTemp = re.sub(r"[ ]+,", ",", outputWeightDescTemp)
+		outputWeightDescTemp = re.sub(r"\[ ", "[", outputWeightDescTemp)
+		outputWeightDescTemp = re.sub(r"([0-9]+)\]", r"\1],", outputWeightDescTemp)
+		outputWeightDesc += outputWeightDescTemp
+		if printIndex < (dictionaryLongitude-1): 
+			outputWeightDesc += "\n"
+		else:
+			outputWeightDesc += "]\n"
+			outputWeightDesc = outputWeightDesc.replace("],]", "]]")
+		#weightsFile.write(np.array2string((dendObj[printIndex].w[:]/volt), separator=', ', precision=8))
+		#if printIndex < (dictionaryLongitude-1): weightsFile.write("\n")
+	#x = np.arange(1,10).reshape(3,3)
+	#np.set_printoptions(threshold=np.inf, linewidth=np.inf)  # turn off summarization, line-wrapping
+	#with open(path, 'w') as f:
+    #	f.write(np.array2string((dendObj[printIndex].w[:]/volt), separator=', '))
+	#	weightsFile.write(dendObj[printIndex].w[:]/volt)
+	#	weightsFile.write("\n")
+	weightsFile.write(outputWeightDesc)
+	weightsFile.close()
 	print 'Final Tau\n'
 	for printIndex in range(dictionaryLongitude):
 		print dendObj[printIndex].tau[:]/ms
