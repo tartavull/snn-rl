@@ -7,19 +7,15 @@ from furtherFormulas.lateralInhibition import *
 
 timeAndRefrac = timeAndRefrac	
 
-if len(sys.argv) > 1:
-	print "Parameters found"
-else:
-	print "Parameters that can be used when running the program are: \n\
-	<trainOrTest>: if training or testing should be run\n\
-	<randomization>: the amount of randomization to initialize weights for\n\
-	training with.  E.x. (.5-1.0)\n\
-	<posReinf>: strength of positive reinforcement.  E.x. ...\n\
-	<negReinf>: strength of negative reinforcement.  E.x. ...\n\
-	"
+print "Parameters that can be used when running the program are: \n\
+		<trainOrTest>: if training or testing should be run\n\
+		<randomization>: the amount of randomization to initialize weights for\n\
+		training with.  E.x. (.5-1.0)\n\
+		<posReinf>: strength of positive reinforcement.  E.x. ...\n\
+		<negReinf>: strength of negative reinforcement.  E.x. ...\n\
+		"
 
 class gupta_paper:
-
 	neuralnet = Network()
 	dictionary = dictionary()
 	spiketimes = dictionary.spikeTimes(dictionaryLongitude, spikeInterval, testingSpikesPerChar, testingEpochs)
@@ -47,6 +43,7 @@ class gupta_paper:
 	def run_model(self):
 		neuralnet = self.neuralnet
 		dictionary = self.dictionary
+
 		eqs = Equations('''
 			dv/dt = v/(1*second): volt
 			dprelimV/dt = (-prelimV+((Rm/mV)*(SynI+DendI*1.0)))/(tauM) : volt (unless refractory)
@@ -82,7 +79,42 @@ class gupta_paper:
 		class ADDSNeuronModel(NeuronGroup, gupta_paper): 
 			neuronIndex = self.neuronIndex
 			generalClockDt = self.generalClockDt
-			def __init__(self, params):
+
+			def __init__(self, params, *args, **kwargs):
+
+				'''self.evaluateClassifier = True
+				self.accelerateTraining = False'''
+
+				#self.evaluateClassifier = kwargs["evaluateClassifier"]#evaluateClassifier
+				#self.accelerateTraining = kwargs["accelerateTraining"]#accelerateTraining
+
+				for key in kwargs:
+					print "another keyword arg: %s: %s" % (key, kwargs[key])
+				print "showing args"
+				for kwarg in sys.argv:
+					keyAndVal = str(kwarg).split('=')
+					if (len(keyAndVal) > 1):
+						currentKWArgName = str(kwarg).split('=')[0].strip()
+						currentKWArgValue = str(kwarg).split('=')[1].strip()
+						if currentKWArgValue == 'True':
+							currentKWArgValue = True
+						elif currentKWArgValue == 'False':
+							currentKWArgValue = False
+						
+						if currentKWArgName == "evaluateClassifier":
+							self.evaluateClassifier = currentKWArgValue
+							# By default accelerate
+							if currentKWArgValue == False: self.accelerateTraining = True
+						elif currentKWArgName == "accelerateTraining":
+							self.accelerateTraining = accelerateTraining
+
+					'''b = str(kwarg).split('=')
+					print len(b)
+					print b[1]
+					print str(kwarg).split('=')
+					print str(kwarg).split('=')[0]
+					#print str(kwarg).split('=')[1]'''
+
 				NeuronGroup.__init__(self, N=dictionaryLongitude, model=eqs,threshold='v>10*mV', reset='v=-0.002 * mV; dv=0; v2=10*mV;UmSpikeFired=1*mV;beginRefrac=1*mV;inhibitionVoltage=prelimV',refractory=8*ms,clock=Clock(dt=self.generalClockDt))
 				@network_operation(dt=self.generalClockDt)
 				def additionToNetwork(): 
@@ -206,7 +238,7 @@ class gupta_paper:
 			neuralnet.add(weightMonitors[firstLayerIndex])
 		somaDirect = SomaDirectNeuronModel(dictionaryLongitude)
 		neuralnet.add(somaDirect)
-		ADDS = ADDSNeuronModel(self)			
+		ADDS = ADDSNeuronModel(self, sys.argv)			
 		M = SpikeMonitor(ADDS)
 		Mv = StateMonitor(ADDS, 'V', record=True)
 		UmM = StateMonitor(ADDS, 'v2', record=True)
@@ -234,10 +266,75 @@ class gupta_paper:
 		ylabel('Membrane Potential (mV)')
 		show()	
 
-	def __init__(self):
+	def __init__(self, *args, **kwargs):
+		'''self.neuralnet = Network()
+		self.dictionary = dictionary()
+		self.spiketimes = dictionary.spikeTimes(self.dictionary, dictionaryLongitude, spikeInterval, testingSpikesPerChar, testingEpochs)
+		self.trainingSpikeTimes = dictionary.spikeTimes(self.dictionary, dictionaryLongitude, spikeInterval, trainingSpikesPerChar, trainingEpochs)
+		self.LIK = SpikeGeneratorGroup(N=15, indices=self.spiketimes[:,0], times=self.spiketimes[:,1]*ms)
+		# W = W and other lines below are to avoid an odd 'reference before assignment' error
+		self.W = W
+		self.tauM = tauM
+		self.neuronIndex = neuronIndex
+		self.generalClockDt = generalClockDt
+		self.runTime = runTime
+		self.runTimeScaling = runTimeScaling
+		self.evaluateClassifier = evaluateClassifier
+		self.accelerateTraining = accelerateTraining
+		self.diracScaling = diracScaling
+		self.somaDirectScaling = somaDirectScaling
+		self.negativeWeightReinforcement = negativeWeightReinforcement
+		self.positiveWeightReinforcement = positiveWeightReinforcement
+		self.timeAndRefrac = timeAndRefrac	
+		self.testRun = testRun
+		self.latInhibSettings = latInhibSettings'''
+
+		'''neuralnet = Network()
+		dictionary = self.dictionary()
+		spiketimes = dictionary.spikeTimes(self.dictionary, dictionaryLongitude, spikeInterval, testingSpikesPerChar, testingEpochs)
+		trainingSpikeTimes = dictionary.spikeTimes(self.dictionary, dictionaryLongitude, spikeInterval, trainingSpikesPerChar, trainingEpochs)
+		LIK = SpikeGeneratorGroup(N=15, indices=self.spiketimes[:,0], times=self.spiketimes[:,1]*ms)
+		# W = W and other lines below are to avoid an odd 'reference before assignment' error
+		W = W
+		tauM = tauM
+		neuronIndex = neuronIndex
+		generalClockDt = generalClockDt
+		runTime = runTime
+		runTimeScaling = runTimeScaling
+		evaluateClassifier = evaluateClassifier
+		accelerateTraining = accelerateTraining
+		diracScaling = diracScaling
+		somaDirectScaling = somaDirectScaling
+		negativeWeightReinforcement = negativeWeightReinforcement
+		positiveWeightReinforcement = positiveWeightReinforcement
+		timeAndRefrac = timeAndRefrac	
+		testRun = testRun
+		latInhibSettings = latInhibSettings'''
+
 		self.run_model()
 
-def main():
-	run_gupta_paper = gupta_paper()
+def main(*args, **kwargs):
 
-if  __name__ =='__main__':main()
+	if len(sys.argv) > 1:
+		print "Parameters found"
+		for key in kwargs:
+			print "another keyword arg22: %s: %s" % (key, kwargs[key])
+		print "Number of arguments111: ", len(kwargs.items())
+	else:
+		print "Parameters that can be used when running the program are: \n\
+		<trainOrTest>: if training or testing should be run\n\
+		<randomization>: the amount of randomization to initialize weights for\n\
+		training with.  E.x. (.5-1.0)\n\
+		<posReinf>: strength of positive reinforcement.  E.x. ...\n\
+		<negReinf>: strength of negative reinforcement.  E.x. ...\n\
+		"
+
+	print "This is the name of the script: ", sys.argv[0]
+	print "Number of arguments: ", len(sys.argv)
+	print "The arguments are: " , str(sys.argv[1]).split('=', 1)[0]
+	print "The arguments are: " , str(sys.argv[2]).split('=', 1)[0]
+
+	run_gupta_paper = gupta_paper(sys.argv)
+
+#if  __name__ =='__main__':main(evaluateClassifier = evaluateClassifier, negativeWeightReinforcement = negativeWeightReinforcement, positiveWeightReinforcement = positiveWeightReinforcement)
+if  __name__ =='__main__':main(sys.argv)
