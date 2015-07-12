@@ -7,6 +7,17 @@ from furtherFormulas.lateralInhibition import *
 
 timeAndRefrac = timeAndRefrac	
 
+if len(sys.argv) > 1:
+	print "Parameters found"
+else:
+	print "Parameters that can be used when running the program are: \n\
+	<trainOrTest>: if training or testing should be run\n\
+	<randomization>: the amount of randomization to initialize weights for\n\
+	training with.  E.x. (.5-1.0)\n\
+	<posReinf>: strength of positive reinforcement.  E.x. ...\n\
+	<negReinf>: strength of negative reinforcement.  E.x. ...\n\
+	"
+
 class gupta_paper:
 
 	neuralnet = Network()

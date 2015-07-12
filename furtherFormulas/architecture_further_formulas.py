@@ -4,6 +4,7 @@ from sympy import * # used for differentiation
 import math # used for natural log
 from decimal import Decimal # Used for results reporting calculations
 from brian2 import *
+import sys
 
 testingEpochs = 100 
 trainingEpochs = 300
