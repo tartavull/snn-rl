@@ -199,8 +199,9 @@ def OutputEvaluationResults(dendObj, testRun):
 	print '+++++++++++++++'	
 
 	if (evaluateClassifier == True):
+		print ">>>>>>>>>TrueEvalClass<<<<<<<<<<<"
 		latestResultsFile = open('./furtherFormulas/latestResults.txt', 'w')
-		latestResultsFile.write(totalCorrectPercentage)
+		latestResultsFile.write(str(totalCorrectPercentage))
 		latestResultsFile.close()
 
 def printWeights(dendObj):

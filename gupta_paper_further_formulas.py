@@ -10,9 +10,9 @@ timeAndRefrac = timeAndRefrac
 print "Parameters that can be used when running the program are: \n\
 		<trainOrTest>: if training or testing should be run\n\
 		<randomization>: the amount of randomization to initialize weights for\n\
-		training with.  E.x. (.5-1.0)\n\
-		<posReinf>: strength of positive reinforcement.  E.x. ...\n\
-		<negReinf>: strength of negative reinforcement.  E.x. ...\n\
+		training with.  Default value: \"randomization = 0.75-1.00\".\n\
+		<posReinf>: strength of positive reinforcement.  Default value: \"1.0\"\n\
+		<negReinf>: strength of negative reinforcement.  Default value: \"2.0\"\n\
 		"
 
 class gupta_paper:
