@@ -36,10 +36,10 @@ def initializeTrainedModelParameters(dendObj):
 		dendObj[indexOfDend].tau = testTauD[indexOfDend]*ms # unclear if dividing by tau in ms is e.x. /.02 or /20 but it is assumed to be 20, therefore no ms conversion here
 		dendObj[indexOfDend].r = testR[indexOfDend]*mV	# volt unit is cancelled out in the equation anyhow, doesn't matter if it is volt or mV due to being cancelled.  Having mv could cause *.001 that is now wanted
 	
-	print 'Model\'s values\n'
+	'''print 'Model\'s values\n'
 	print 'testW\t',testW
 	print 'testTauD\t',testTauD
-	print 'testR\r',testR
+	print 'testR\r',testR'''
 
 #print 'test start'
 #initializeTrainedModelParameters(None)
@@ -135,6 +135,10 @@ def evaluateClassifierPerf2(ADDSObj, testRun):
 
 	return ADDSObj.UmSpikeFired, testRun	
 
+def totalCorrectPercentage():
+	totalCorrectPercentage = (Decimal(format(testRun.truePositiveSpikeResults, '.1f'))+Decimal(format(testRun.trueNegativeSpikeResults, '.1f')))/(Decimal(format(totalSpikeIntervals, '.1f'))*Decimal(format(dictionaryLongitude, '.1f')))
+	return totalCorrectPercentage
+
 def OutputEvaluationResults(dendObj, testRun):
 	'''
 	If training is performed weights produced are saved to a text file.  The file
@@ -190,11 +194,11 @@ def OutputEvaluationResults(dendObj, testRun):
 	print 'testRun.firedSpikes\t',testRun.firedSpikes
 	print 'testRun.assignedSpikeWindows\t',testRun.assignedSpikeWindows
 	print '\n'	
+	totalCorrectPercentage = (Decimal(format(testRun.truePositiveSpikeResults, '.1f'))+Decimal(format(testRun.trueNegativeSpikeResults, '.1f')))/(Decimal(format(totalSpikeIntervals, '.1f'))*Decimal(format(dictionaryLongitude, '.1f')))
 	print '+++ Results +++'
 	print 'Spike results: TP:\t',testRun.truePositiveSpikeResults,'\tFP:\t',testRun.falsePositiveSpikeResults,'\tTN:\t',testRun.trueNegativeSpikeResults,'\tFN:\t',testRun.falseNegativeSpikeResults
 	print 'totalSpikeIntervalsTested:\t',totalSpikeIntervals,'\ttotalCharsPresented:\t',dictionaryLongitude
 	print 'True positives correct percentage (TP/totalSpikeIntervalsTested):\t',Decimal(format(testRun.truePositiveSpikeResults, '.1f'))/Decimal(format(totalSpikeIntervals, '.1f')),'\t(this is the percentage of all true positves that were found)'
-	totalCorrectPercentage = (Decimal(format(testRun.truePositiveSpikeResults, '.1f'))+Decimal(format(testRun.trueNegativeSpikeResults, '.1f')))/(Decimal(format(totalSpikeIntervals, '.1f'))*Decimal(format(dictionaryLongitude, '.1f')))
 	print 'Total correct percentage (TP+TN/(totalSpikeIntervals*totalCharsPresented)):\t',totalCorrectPercentage
 	print '+++++++++++++++'	
 

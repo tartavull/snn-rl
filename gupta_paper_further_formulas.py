@@ -10,7 +10,7 @@ timeAndRefrac = timeAndRefrac
 print "Parameters that can be used when running the program are: \n\
 		<trainOrTest>: if training or testing should be run\n\
 		<randomization>: the amount of randomization to initialize weights for\n\
-		training with.  Default value: \"randomization = 0.75-1.00\".\n\
+		training with.  Default value: \"randomization = 0.50-1.00\"\n\
 		<posReinf>: strength of positive reinforcement.  Default value: \"1.0\"\n\
 		<negReinf>: strength of negative reinforcement.  Default value: \"2.0\"\n\
 		"
@@ -38,7 +38,7 @@ class gupta_paper:
 	testRun = testRun
 	latInhibSettings = latInhibSettings
 
-	print 'initial Weights\n',W
+	#print 'initial Weights\n',W
 
 	def run_model(self):
 		neuralnet = self.neuralnet
@@ -81,31 +81,42 @@ class gupta_paper:
 			generalClockDt = self.generalClockDt
 
 			def __init__(self, params):
+				'''
+				The join(re.findall... one liner regex command was from:
+				http://stackoverflow.com/questions/23366848/getting-captured-group-in-one-line
+				It parses text from within single quotes that exists in the kwargs
+
+				'''
 				# process command line args
-				for kwarg in sys.argv:
-					keyAndVal = str(kwarg).split('=')
-					# check for kwarg not arg
-					if (len(keyAndVal) > 1):
-						currentKWArgName = keyAndVal[0].strip()
-						currentKWArgValue = keyAndVal[1].strip()
-						if currentKWArgValue == 'True': currentKWArgValue = True
-						elif currentKWArgValue == 'False': currentKWArgValue = False
-						
-						if currentKWArgName == "evaluateClassifier":
-							self.evaluateClassifier = currentKWArgValue
-							# By default accelerate
-							if currentKWArgValue == False: self.accelerateTraining = True
-						elif currentKWArgName == "accelerateTraining":
-							self.accelerateTraining = currentKWArgValue
-						elif currentKWArgName == "randomization":
-							minRand = Decimal(currentKWArgValue.split("-")[0], '.1f')
-							maxRand = Decimal(currentKWArgValue.split("-")[1], '.1f')
-							self.W = np.random.uniform(minRand,maxRand,[dictionaryLongitude,15]) # Initial weights
-							W = self.W
-						elif currentKWArgName == "posReinf":
-							self.positiveWeightReinforcement = Decimal(currentKWArgValue, '.1f')
-						elif currentKWArgName == "negReinf":
-							self.negativeWeightReinforcement = Decimal(currentKWArgValue, '.1f')			
+				for allArgs in sys.argv:
+					argsGroup = str(allArgs).split(',')
+					for args in argsGroup:
+						keyAndVal = args.split(':')
+						# check for kwarg not arg
+						if (len(keyAndVal) > 1):
+							currentKWArgName = ''.join(re.findall(r'\'(.*)\'', keyAndVal[0]))
+							currentKWArgValue = ''.join(re.findall(r'\'(.*)\'', keyAndVal[1]))
+							if currentKWArgValue == '': currentKWArgValue = keyAndVal[1]
+							if currentKWArgValue == 'True': currentKWArgValue = True
+							elif currentKWArgValue == 'False': currentKWArgValue = False
+							print "\n1:  ",currentKWArgName," 2:  ",keyAndVal[1]," & ",currentKWArgValue,"\n"							
+							if currentKWArgName == "evaluateClassifier":
+								self.evaluateClassifier = currentKWArgValue
+								# By default accelerate
+								if currentKWArgValue == False: self.accelerateTraining = True
+							elif currentKWArgName == "accelerateTraining":
+								self.accelerateTraining = currentKWArgValue
+							elif currentKWArgName == "randomization":
+								minRand = Decimal(currentKWArgValue.split("-")[0], '.1f')
+								maxRand = Decimal(currentKWArgValue.split("-")[1], '.1f')
+								self.W = np.random.uniform(minRand,maxRand,[dictionaryLongitude,15]) # Initial weights
+								W = self.W
+							elif currentKWArgName == "posReinf":
+								self.positiveWeightReinforcement = Decimal(currentKWArgValue, '.1f')
+							elif currentKWArgName == "negReinf":
+								self.negativeWeightReinforcement = Decimal(currentKWArgValue, '.1f')			
+							elif currentKWArgName == "showPlot":
+								self.showPlot = currentKWArgValue							
 
 				NeuronGroup.__init__(self, N=dictionaryLongitude, model=eqs,threshold='v>10*mV', reset='v=-0.002 * mV; dv=0; v2=10*mV;UmSpikeFired=1*mV;beginRefrac=1*mV;inhibitionVoltage=prelimV',refractory=8*ms,clock=Clock(dt=self.generalClockDt))
 				@network_operation(dt=self.generalClockDt)
@@ -244,7 +255,8 @@ class gupta_paper:
 		self.runTime *= self.runTimeScaling # scaling factor
 		neuralnet.run(self.runTime,report='text')
 
-		OutputEvaluationResults(dend, self.testRun)
+		#OutputEvaluationResults(dend, self.testRun)
+		accuracyPerc = totalCorrectPercentage()
 
 		neuronToPlot = 1
 		colors = ['r']*1+['g']*1+['b']*1+['y']*1
@@ -256,12 +268,33 @@ class gupta_paper:
 		plot(UmM.t, UmM.v2.T/mV)	
 		xlabel('Time (ms)')
 		ylabel('Membrane Potential (mV)')
-		show()	
+		if (showPlot==True):
+			show()	
 
-	def __init__(self):
-		self.run_model()
+		return accuracyPerc
+
+	#def __init__(self):
+	#	self.run_model()
+
+#def reportAccuracy(**kwargs):
+	'''
+	Parameters for running this sim can be passed in with this
+	method and override any parameters that would be passed in
+	as command line args.
+	'''
+	'''sys.argv = ['snn-rl.py']
+	for modelArg in kwargs:
+		sys.argv += modelArg'''
+	
+	'''print "argv:\t", sys.argv, "\n"
+	accuracyPerc = gupta_paper().run_model()
+	print "\n:Aper:\t",accuracyPerc,"\n"
+	return accuracyPerc'''
 
 def main():
 	run_gupta_paper = gupta_paper()
+	accuracyPerc = run_gupta_paper.run_model()
+	#print "\n:Aper:\t",accuracyPerc,"\n"
+	return accuracyPerc
 
 if  __name__ =='__main__':main()

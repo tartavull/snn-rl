@@ -44,8 +44,8 @@ def retreiveTestW():
 
 	weightsFile.close()
 
-	print "NEW WEIGHTS::\n"
+	'''print "NEW WEIGHTS::\n"
 	print testW
-	print "\n____________________\n\n"
+	print "\n____________________\n\n"'''
 
 	return testW
