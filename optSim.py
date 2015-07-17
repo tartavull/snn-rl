@@ -12,7 +12,7 @@ def objective(args):
     randVal = str(minRand)+'-'+str(maxRand)
     snnrlWithParams(evaluateClassifier=False, randomization=randVal, posReinf=posReinfVal, negReinf=negReinfVal)
     # test
-    accuracyPerc = 1 - (snnrlWithParams(evaluateClassifier=True))
+    accuracyPerc = 1 - (snnrlWithParams(evaluateClassifier=True, posReinf=posReinfVal, negReinf=negReinfVal))
     print "\naccPer:\t",accuracyPerc
 
     return {'loss': accuracyPerc}
