@@ -97,6 +97,8 @@ class gupta_paper:
 							currentKWArgName = ''.join(re.findall(r'\'(.*)\'', keyAndVal[0]))
 							currentKWArgValue = ''.join(re.findall(r'\'(.*)\'', keyAndVal[1]))
 							if currentKWArgValue == '': currentKWArgValue = keyAndVal[1]
+							currentKWArgValue = currentKWArgValue.replace("}", "")
+							currentKWArgValue = currentKWArgValue.replace("{", "")
 							if currentKWArgValue == 'True': currentKWArgValue = True
 							elif currentKWArgValue == 'False': currentKWArgValue = False
 							print "\n1:  ",currentKWArgName," 2:  ",keyAndVal[1]," & ",currentKWArgValue,"\n"							

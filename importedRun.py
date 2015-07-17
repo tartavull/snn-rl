@@ -6,12 +6,13 @@ import sys
 #snnrl.main()
 
 def snnrlWithParams(*args, **kwargs):
-	#sys.argv = ['snnrl.py', args, kwargs]
+	sys.argv = ['snnrl.py', args, kwargs]
 	#print "\n\nargv:\t",sys.argv[0],sys.argv[1],sys.argv[2],"\n\n"
 	return snnrl.main()
 
 #accuracyPerc = snnrlWithParams(["snnrl.py", "evaluateClassifier = True", "accelerateTraining = False", "randomization = 0.75-1.00"])#3#reportAccuracy({'showPlot':'True'})
-#accuracyPerc = snnrlWithParams(showPlot=True,randomization='0.75-1.00',reportAccuracy=True)#3#reportAccuracy({'showPlot':'True'})
-accuracyPerc = snnrlWithParams()#3#reportAccuracy({'showPlot':'True'})
+accuracyPerc = snnrlWithParams(showPlot=True,randomization='0.75-1.00',reportAccuracy=True)#3#reportAccuracy({'showPlot':'True'})
+#accuracyPerc = snnrlWithParams()#3#reportAccuracy({'showPlot':'True'})
+#accuracyPerc = snnrl(randomization='0.75-1.00',reportAccuracy=True)
 
 print accuracyPerc

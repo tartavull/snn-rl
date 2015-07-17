@@ -85,8 +85,8 @@ LearningRate = 0.2#0.1#1.0#0.7
 evaluateClassifier = True#False#True
 accelerateTraining = False#False#True
 loadHD5ForTesting = False
-runTimeScaling = 10
-runTime = 11*ms#41*ms#410*ms#810*ms#80*ms#810*ms#20*ms#3000*ms
+runTimeScaling = 1
+runTime = 110*ms#41*ms#410*ms#810*ms#80*ms#810*ms#20*ms#3000*ms
 #runTime = 10*ms+(10*ms*totalTestingTime) # For testing runs
 showPlot = False
 
