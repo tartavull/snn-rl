@@ -14,6 +14,7 @@ def parseArgs(self, systemArgs, dictionaryLongitude):
 	It parses text from within single quotes that exists in the kwargs
 
 	'''
+
 	#print '\n', systemArgs, '\n'
 	# process command line args
 	for allArgs in systemArgs:
@@ -43,9 +44,10 @@ def parseArgs(self, systemArgs, dictionaryLongitude):
 				elif currentKWArgName == "accelerateTraining":
 					self.accelerateTraining = currentKWArgValue
 				elif currentKWArgName == "randomization":
-					minRand = Decimal(currentKWArgValue.split("-")[0], '.1f')
-					maxRand = Decimal(currentKWArgValue.split("-")[1], '.1f')
-					self.W = np.random.uniform(minRand,maxRand,[dictionaryLongitude,15]) # Initial weights
+					self.minWeightsRand = Decimal(currentKWArgValue.split("-")[0], '.1f')
+					self.maxWeightsRand = Decimal(currentKWArgValue.split("-")[1], '.1f')
+					#print("\n+++rand found+++\t"+str(self.minWeightsRand)+"\t"+str(self.maxWeightsRand)+"\n")
+					self.W = np.random.uniform(self.minWeightsRand,self.maxWeightsRand,[dictionaryLongitude,15]) # Initial weights
 					W = self.W
 				elif currentKWArgName == "posReinf":
 					self.positiveWeightReinforcement = float(currentKWArgValue)#Decimal(currentKWArgValue, '.1f')
@@ -58,7 +60,10 @@ def parseArgs(self, systemArgs, dictionaryLongitude):
 					if currentKWArgName == "runTime":
 						self.runTime = int(currentKWArgValue)*ms
 					else:
-						self.testingRunTime = int(currentKWArgValue)*ms					
+						# TODO: testingRunTime argument passing is not working and it can be fixed later
+						self.testingRunTime = int(currentKWArgValue)*ms		
+				elif currentKWArgName == "optResultsFile":
+					self.optResultsFile = currentKWArgValue
 
 				if self.verbosePrint == True:
 					print("\n1:  ",keyAndVal[0]," & ",currentKWArgName," 2:  ",keyAndVal[1]," & ",currentKWArgValue,"\n")
@@ -80,4 +85,4 @@ def parseArgs(self, systemArgs, dictionaryLongitude):
 	#if (self.standardPrint == False and self.verbosePrint == False):
 	#	print("Starting sim run for total time: "+str(self.runTime * self.runTimeScaling), file=sys.stderr)
 
-	return self		
+	return self	

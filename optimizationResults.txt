@@ -1,0 +1,14 @@
+Parameters used in run:
+trainingRunTime:	110
+testingRunTime:		790	Note: testingRunTime parameter passing not currently working
+['minRand', 0.6, 0.7]
+['maxRand', 0.9, 0.9]
+['posReinfVal', 1.0, 5.0]
+['negReinfVal', 1.0, 5.0]
+
+self.minWeightsRand	0.622685145356	self.maxWeightsRand	0.9	self.positiveWeightReinforcement	3.78587674239	self.negativeWeightReinforcement	2.1445573398
+accuracyPerc	0E+1
+self.minWeightsRand	0.657231353663	self.maxWeightsRand	0.9	self.positiveWeightReinforcement	1.42425962382	self.negativeWeightReinforcement	3.98188593954
+accuracyPerc	0E+1
+self.minWeightsRand	0.662757998579	self.maxWeightsRand	0.9	self.positiveWeightReinforcement	3.026904046	self.negativeWeightReinforcement	1.23012278067
+accuracyPerc	0E+1

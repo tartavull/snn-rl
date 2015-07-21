@@ -33,6 +33,9 @@ class gupta_paper:
 	standardPrint = standardPrint
 	verbosePrint = verbosePrint
 	testingRunTime = testingRunTime
+	optResultsFile = optResultsFile
+	minWeightsRand = minWeightsRand
+	maxWeightsRand = maxWeightsRand
 
 	def run_model(self):
 		neuralnet = self.neuralnet
@@ -75,7 +78,7 @@ class gupta_paper:
 			generalClockDt = self.generalClockDt
 
 			def __init__(self, params):
-				self = parseArgs(self, sys.argv, dictionaryLongitude)					
+				self = parseArgs(self, sys.argv, dictionaryLongitude)		
 
 				NeuronGroup.__init__(self, N=dictionaryLongitude, model=eqs,threshold='v>10*mV', reset='v=-0.002 * mV; dv=0; v2=10*mV;UmSpikeFired=1*mV;beginRefrac=1*mV;inhibitionVoltage=prelimV',refractory=8*ms,clock=Clock(dt=self.generalClockDt))
 				@network_operation(dt=self.generalClockDt)
@@ -213,13 +216,12 @@ class gupta_paper:
 		neuralnet.add(UmM)
 		if (ADDS.evaluateClassifier==True): ADDS.runTime = ADDS.testingRunTime
 		ADDS.runTime *= ADDS.runTimeScaling # scaling factor
-		if ADDS.standardPrint: 
-			neuralnet.run(ADDS.runTime,report='text')
-		else: 
-			neuralnet.run(ADDS.runTime,report='stderr')
+		if ADDS.standardPrint: neuralnet.run(ADDS.runTime,report='text')
+		else: neuralnet.run(ADDS.runTime,report='stderr')
 
 		OutputEvaluationResults(dend, self.testRun, ADDS.verbosePrint, ADDS.evaluateClassifier)
 		accuracyPerc = totalCorrectPercentage()
+		writeOptimizationResults(ADDS, accuracyPerc)
 
 		neuronToPlot = 1
 		colors = ['r']*1+['g']*1+['b']*1+['y']*1

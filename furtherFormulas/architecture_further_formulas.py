@@ -33,7 +33,9 @@ SimulationDuration = 10000
 epochMsDuration = (SimulationDuration / testingEpochs) * 10 # Times 10 is to adjust to Ms scale
 numberOfPixels = 15
 neuronFiringThreshold = 10 # removed mV for compatibility
-W = np.random.uniform(0.5,1.0,[dictionaryLongitude,15]) # Initial weights
+minWeightsRand = 0.5
+maxWeightsRand = 1.0
+W = np.random.uniform(minWeightsRand,maxWeightsRand,[dictionaryLongitude,15]) # Initial weights
 # none to 1 below
 numberOfNeurons = dictionaryLongitude
 ## Added 0 init below but I don't really know what the right init value is
@@ -84,12 +86,13 @@ LearningRate = 0.2#0.1#1.0#0.7
 evaluateClassifier = True#False#True
 accelerateTraining = False#False#True
 loadHD5ForTesting = False
-runTimeScaling = 1
-runTime = 110*ms#110*ms#41*ms#410*ms#810*ms#80*ms#810*ms#20*ms#3000*ms
-testingRunTime = 10*ms+(10*ms*totalTestingTime) # For testing runs
 showPlot = False
 standardPrint = True
 verbosePrint = False
+optResultsFile = ""
+runTimeScaling = 1
+runTime = 110*ms#110*ms#41*ms#410*ms#810*ms#80*ms#810*ms#20*ms#3000*ms
+testingRunTime = 11*ms#10*ms+(10*ms*totalTestingTime) # For testing runs
 
 class timeAndRefrac(): 	
 	timeStepInterval = 0.001	

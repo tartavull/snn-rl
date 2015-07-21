@@ -213,3 +213,11 @@ def printWeights(dendObj):
 	print 'Current Weights\n'
 	for printIndex in range(dictionaryLongitude):
 		print dendObj[printIndex].w[:]/volt	
+
+def writeOptimizationResults(self, accuracyPerc):
+	if (self.optResultsFile != ""):
+		optResults = open(self.optResultsFile, 'a')
+		optResults.write("\nself.minWeightsRand\t"+str(self.minWeightsRand)+"\tself.maxWeightsRand\t"+str(self.maxWeightsRand)+\
+			"\tself.positiveWeightReinforcement\t"+str(self.positiveWeightReinforcement)+"\tself.negativeWeightReinforcement\t"+str(self.negativeWeightReinforcement))
+		optResults.write("\naccuracyPerc\t"+str(accuracyPerc))
+		optResults.close()
