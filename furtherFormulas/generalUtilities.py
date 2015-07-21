@@ -1,6 +1,8 @@
+#from __future__ import print_function
 import numpy as np
 from decimal import Decimal
 import re
+#import sys
 
 def parseArgs(self, systemArgs, dictionaryLongitude):
 	'''
@@ -46,17 +48,23 @@ def parseArgs(self, systemArgs, dictionaryLongitude):
 					self.W = np.random.uniform(minRand,maxRand,[dictionaryLongitude,15]) # Initial weights
 					W = self.W
 				elif currentKWArgName == "posReinf":
-					self.positiveWeightReinforcement = Decimal(currentKWArgValue, '.1f')
+					self.positiveWeightReinforcement = float(currentKWArgValue)#Decimal(currentKWArgValue, '.1f')
 				elif currentKWArgName == "negReinf":
-					self.negativeWeightReinforcement = Decimal(currentKWArgValue, '.1f')			
+					self.negativeWeightReinforcement = float(currentKWArgValue)#Decimal(currentKWArgValue, '.1f')			
 				elif currentKWArgName == "showPlot":
 					self.showPlot = currentKWArgValue
+				elif currentKWArgName == "runTime" or currentKWArgName == "testingRunTime":
+					from brian2 import ms
+					if currentKWArgName == "runTime":
+						self.runTime = int(currentKWArgValue)*ms
+					else:
+						self.testingRunTime = int(currentKWArgValue)*ms					
 
 				if self.verbosePrint == True:
-					print "\n1:  ",keyAndVal[0]," & ",currentKWArgName," 2:  ",keyAndVal[1]," & ",currentKWArgValue,"\n"
+					print("\n1:  ",keyAndVal[0]," & ",currentKWArgName," 2:  ",keyAndVal[1]," & ",currentKWArgValue,"\n")
 
 	if self.standardPrint == True:
-		print "\n\nParameters that can be used when running the program are: \n\
+		print("\n\nParameters that can be used when running the program are: \n\
 				<trainOrTest>: if training or testing should be run\n\
 				<randomization>: the amount of randomization to initialize weights for\n\
 				training with.  Default value: \"randomization = 0.50-1.00\"\n\
@@ -64,9 +72,12 @@ def parseArgs(self, systemArgs, dictionaryLongitude):
 				<negReinf>: strength of negative reinforcement.  Default value: \"2.0\"\n\
 				<standardPrint>: print regular output.  Note: accuracy printed irregardless\n\
 				<verbosePrint>: print extra details\n\
-				"
+				")
 
 	if self.verbosePrint == True:
-		print 'initial Weights\n',self.W
+		print('initial Weights\n',self.W)
+
+	#if (self.standardPrint == False and self.verbosePrint == False):
+	#	print("Starting sim run for total time: "+str(self.runTime * self.runTimeScaling), file=sys.stderr)
 
 	return self		

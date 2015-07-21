@@ -32,6 +32,7 @@ class gupta_paper:
 	latInhibSettings = latInhibSettings
 	standardPrint = standardPrint
 	verbosePrint = verbosePrint
+	testingRunTime = testingRunTime
 
 	def run_model(self):
 		neuralnet = self.neuralnet
@@ -210,11 +211,14 @@ class gupta_paper:
 		neuralnet.add(ADDS)
 		neuralnet.add(M)
 		neuralnet.add(UmM)
-		self.runTime *= self.runTimeScaling # scaling factor
-		if ADDS.standardPrint: neuralnet.run(self.runTime,report='text')
-		else: neuralnet.run(self.runTime,report=None)
+		if (ADDS.evaluateClassifier==True): ADDS.runTime = ADDS.testingRunTime
+		ADDS.runTime *= ADDS.runTimeScaling # scaling factor
+		if ADDS.standardPrint: 
+			neuralnet.run(ADDS.runTime,report='text')
+		else: 
+			neuralnet.run(ADDS.runTime,report='stderr')
 
-		if ADDS.verbosePrint: OutputEvaluationResults(dend, self.testRun)
+		OutputEvaluationResults(dend, self.testRun, ADDS.verbosePrint, ADDS.evaluateClassifier)
 		accuracyPerc = totalCorrectPercentage()
 
 		neuronToPlot = 1
@@ -235,7 +239,7 @@ class gupta_paper:
 def main():
 	run_gupta_paper = gupta_paper()
 	evaluateClassifier, accuracyPerc = run_gupta_paper.run_model()
-	if evaluateClassifier: print 2;#accuracyPerc
+	if evaluateClassifier: print accuracyPerc#2;#accuracyPerc
 	return accuracyPerc
 
 if  __name__ =='__main__':main()

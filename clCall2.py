@@ -19,7 +19,7 @@ from decimal import Decimal
 #output = subprocess.call(["python", "/home/nmsutton/Documents/Software/SNNRL/snn-rl/gupta_paper_further_formulas.py", "evaluateClassifier=True", "standardPrint = False", shell=True)
 #output = subprocess.call("exit 1", shell=True)
 #output = subprocess.call(["python", "/home/nmsutton/Documents/Software/SNNRL/snn-rl/gupta_paper_further_formulas.py", "evaluateClassifier=True", "standardPrint=False", "verbosePrint=False"])
-testRun = Popen(["python", "/home/nmsutton/Documents/Software/SNNRL/snn-rl/gupta_paper_further_formulas.py", "evaluateClassifier=True", "standardPrint=False", "verbosePrint=False"], stdout=PIPE)
+testRun = Popen(["python", "gupta_paper_further_formulas.py", "evaluateClassifier=True", "standardPrint=False", "verbosePrint=False"], stdout=PIPE)
 #testRun = Popen(["ls", "-l"], stdout=PIPE)
 #p = Popen(["/bin/ls", "-l"], stdout=PIPE)
 #(child_stdin, child_stdout) = (p.stdin, p.stdout)
