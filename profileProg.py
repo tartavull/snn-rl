@@ -1,6 +1,8 @@
 '''
 Profiling sim to find ways to quicken run time
-reference: https://zapier.com/engineering/profiling-python-boss/
+references: 
+https://zapier.com/engineering/profiling-python-boss/
+http://java2s.com/Code/Python/Class/Classdestructordel.htm
 '''
 from hyperopt import fmin, tpe, hp
 import gupta_paper_further_formulas as snnrl
@@ -21,17 +23,24 @@ def do_cprofile(func):
 
 def snnrlWithParams(*args, **kwargs):
     sys.argv = ['snnrl.py', args, kwargs]
-    return snnrl.main() 
+    '''gupta_paper()
+    accuracyPerc = run_gupta_paper.run_model()'''
+    return snnrl.gupta_paper() 
 
 @do_cprofile
 def objective(args):
     minRand, maxRand, posReinfVal, negReinfVal = args
     # train
     randVal = str(minRand)+'-'+str(maxRand)
-    snnrlWithParams(evaluateClassifier=False, randomization=randVal, posReinf=posReinfVal, negReinf=negReinfVal)
+    trainModel = snnrlWithParams(evaluateClassifier=False, randomization=randVal, posReinf=posReinfVal, negReinf=negReinfVal)
+    trainModel.run_model()
+    del trainModel
     # test
-    accuracyPerc = 1 - (snnrlWithParams(evaluateClassifier=True, posReinf=posReinfVal, negReinf=negReinfVal))
+    testModel = snnrlWithParams(evaluateClassifier=True, posReinf=posReinfVal, negReinf=negReinfVal)
+    origAccPerc = testModel.run_model()
+    accuracyPerc = 1 - (origAccPerc)
     print "\naccPer:\t",accuracyPerc
+    del testModel
 
     return {'loss': accuracyPerc}
 

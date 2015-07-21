@@ -5,7 +5,6 @@ import math # used for natural log
 from decimal import Decimal # Used for results reporting calculations
 from brian2 import *
 import sys
-import re
 
 testingEpochs = 100 
 trainingEpochs = 300
@@ -86,9 +85,11 @@ evaluateClassifier = True#False#True
 accelerateTraining = False#False#True
 loadHD5ForTesting = False
 runTimeScaling = 1
-runTime = 110*ms#41*ms#410*ms#810*ms#80*ms#810*ms#20*ms#3000*ms
+runTime = 11*ms#110*ms#41*ms#410*ms#810*ms#80*ms#810*ms#20*ms#3000*ms
 #runTime = 10*ms+(10*ms*totalTestingTime) # For testing runs
 showPlot = False
+standardPrint = True
+verbosePrint = False
 
 class timeAndRefrac(): 	
 	timeStepInterval = 0.001	
