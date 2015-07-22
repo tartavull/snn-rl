@@ -1,14 +1,38 @@
 Parameters used in run:
-trainingRunTime:	110
+trainingRunTime:	3300
 testingRunTime:		790	Note: testingRunTime parameter passing not currently working
-['minRand', 0.6, 0.7]
-['maxRand', 0.9, 0.9]
+['minRand', 0.5, 0.75]
+['maxRand', 0.76, 1.0]
 ['posReinfVal', 1.0, 5.0]
 ['negReinfVal', 1.0, 5.0]
 
-self.minWeightsRand	0.622685145356	self.maxWeightsRand	0.9	self.positiveWeightReinforcement	3.78587674239	self.negativeWeightReinforcement	2.1445573398
-accuracyPerc	0E+1
-self.minWeightsRand	0.657231353663	self.maxWeightsRand	0.9	self.positiveWeightReinforcement	1.42425962382	self.negativeWeightReinforcement	3.98188593954
-accuracyPerc	0E+1
-self.minWeightsRand	0.662757998579	self.maxWeightsRand	0.9	self.positiveWeightReinforcement	3.026904046	self.negativeWeightReinforcement	1.23012278067
-accuracyPerc	0E+1
+self.minWeightsRand	0.556712863391	self.maxWeightsRand	0.89231554458	self.positiveWeightReinforcement	3.78587674239	self.negativeWeightReinforcement	2.1445573398
+PrecisionPerc	0.07692307692307692307692307692	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.07692307692307692307692307692
+self.minWeightsRand	0.643078384158	self.maxWeightsRand	0.869977884103	self.positiveWeightReinforcement	1.42425962382	self.negativeWeightReinforcement	3.98188593954
+PrecisionPerc	0.07692307692307692307692307692	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.07692307692307692307692307692
+self.minWeightsRand	0.656894996448	self.maxWeightsRand	0.791812606528	self.positiveWeightReinforcement	3.026904046	self.negativeWeightReinforcement	1.23012278067
+PrecisionPerc	0.06410256410256410256410256410	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.07593688362919132149901380671
+self.minWeightsRand	0.521851577115	self.maxWeightsRand	0.787714855041	self.positiveWeightReinforcement	1.42068850887	self.negativeWeightReinforcement	1.51257628814
+PrecisionPerc	0.06410256410256410256410256410	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.07642998027613412228796844181
+self.minWeightsRand	0.54649132805	self.maxWeightsRand	0.945469755509	self.positiveWeightReinforcement	3.09533327982	self.negativeWeightReinforcement	1.1598518966
+PrecisionPerc	0.02564102564102564102564102564	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.07445759368836291913214990138
+self.minWeightsRand	0.532852119543	self.maxWeightsRand	0.769982426499	self.positiveWeightReinforcement	4.4665481714	self.negativeWeightReinforcement	2.05257939839
+PrecisionPerc	0.07692307692307692307692307692	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.07692307692307692307692307692
+self.minWeightsRand	0.651323809406	self.maxWeightsRand	0.780365530627	self.positiveWeightReinforcement	3.28212650058	self.negativeWeightReinforcement	2.07303910326
+PrecisionPerc	0.06410256410256410256410256410	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.07642998027613412228796844181
+self.minWeightsRand	0.638698072891	self.maxWeightsRand	0.790194740466	self.positiveWeightReinforcement	1.56652107631	self.negativeWeightReinforcement	2.24617744451
+PrecisionPerc	0.07692307692307692307692307692	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.07692307692307692307692307692
+self.minWeightsRand	0.597007221696	self.maxWeightsRand	0.913911077955	self.positiveWeightReinforcement	3.60061442189	self.negativeWeightReinforcement	4.79243666336
+PrecisionPerc	0.07692307692307692307692307692	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.07692307692307692307692307692
+self.minWeightsRand	0.707159410427	self.maxWeightsRand	0.94760387001	self.positiveWeightReinforcement	4.12361559517	self.negativeWeightReinforcement	2.52457816728
+PrecisionPerc	0.07692307692307692307692307692	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.07692307692307692307692307692

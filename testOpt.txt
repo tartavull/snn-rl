@@ -1,0 +1,7 @@
+
+self.minWeightsRand	0.5	self.maxWeightsRand	1.0	self.positiveWeightReinforcement	1.0	self.negativeWeightReinforcement	2.0
+PrecisionPerc	0	0/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0E+1	TP:	0	FP:	0	TN:	0	FN:	0
+self.minWeightsRand	0.5	self.maxWeightsRand	1.0	self.positiveWeightReinforcement	1.0	self.negativeWeightReinforcement	2.0
+PrecisionPerc	0.03846153846153846153846153846	3/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.07544378698224852071005917160	TP:	3	FP:	3	TN:	150	FN:	3

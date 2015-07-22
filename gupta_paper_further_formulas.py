@@ -36,6 +36,7 @@ class gupta_paper:
 	optResultsFile = optResultsFile
 	minWeightsRand = minWeightsRand
 	maxWeightsRand = maxWeightsRand
+	totalSpikeIntervals = totalSpikeIntervals
 
 	def run_model(self):
 		neuralnet = self.neuralnet
@@ -221,7 +222,7 @@ class gupta_paper:
 
 		OutputEvaluationResults(dend, self.testRun, ADDS.verbosePrint, ADDS.evaluateClassifier)
 		accuracyPerc = totalCorrectPercentage()
-		writeOptimizationResults(ADDS, accuracyPerc)
+		writeOptimizationResults(ADDS, self.testRun, accuracyPerc)
 
 		neuronToPlot = 1
 		colors = ['r']*1+['g']*1+['b']*1+['y']*1

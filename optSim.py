@@ -6,14 +6,15 @@ from decimal import Decimal
 
 simFile = "gupta_paper_further_formulas.py"
 optResultsFile = "optimizationResults.txt"
-trainingRunTime = 110#1100
-testingRunTime = 790
-minRandVals = ['minRand', 0.6, 0.7]
-maxRandVals = ['maxRand', 0.9, 0.9]
+trainingRunTime = 33000#1100#1100
+testingRunTime = 7800
+minRandVals = ['minRand', 0.5, 0.75]
+maxRandVals = ['maxRand', 0.76, 1.0]
 posReinfVals = ['posReinfVal', 1.0, 5.0]
 negReinfVals = ['negReinfVal', 1.0, 5.0]
 space = [hp.uniform(minRandVals[0],minRandVals[1],minRandVals[2]), hp.uniform(maxRandVals[0],maxRandVals[1],maxRandVals[2]), \
          hp.uniform(posReinfVals[0],posReinfVals[1],posReinfVals[2]), hp.uniform(negReinfVals[0],negReinfVals[1],negReinfVals[2])]
+evaluationRuns = 10;
 
 # Clear and open output file
 optResults = open(optResultsFile, 'w')
@@ -51,6 +52,6 @@ def objective(args):
 best = fmin(objective,
     space,
     algo=tpe.suggest,
-    max_evals=3)#100
+    max_evals=evaluationRuns)#100
 
 print best
