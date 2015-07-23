@@ -92,7 +92,7 @@ verbosePrint = False
 optResultsFile = ""
 runTimeScaling = 1
 runTime = 110*ms#110*ms#41*ms#410*ms#810*ms#80*ms#810*ms#20*ms#3000*ms
-testingRunTime = 10*ms+(10*ms*totalTestingTime)*10 # For testing runs.  The * 10 is for the 10x scaling factor # 11*ms#790*ms#
+testingRunTime = 16*ms#10*ms+(10*ms*totalTestingTime)*10 # For testing runs.  The * 10 is for the 10x scaling factor # 11*ms#790*ms#
 
 class timeAndRefrac(): 	
 	timeStepInterval = 0.001	

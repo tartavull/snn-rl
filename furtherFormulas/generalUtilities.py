@@ -85,4 +85,10 @@ def parseArgs(self, systemArgs, dictionaryLongitude):
 	#if (self.standardPrint == False and self.verbosePrint == False):
 	#	print("Starting sim run for total time: "+str(self.runTime * self.runTimeScaling), file=sys.stderr)
 
+	if self.evaluateClassifier == True: 
+		if (self.optResultsFile != ""):
+			optResults = open(self.optResultsFile, 'a')
+			optResults.write("\nTestTime: "+str(self.runTime))
+			optResults.close()
+
 	return self	

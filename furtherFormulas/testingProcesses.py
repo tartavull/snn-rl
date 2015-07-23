@@ -219,8 +219,8 @@ def printWeights(dendObj):
 def writeOptimizationResults(self, testRun, accuracyPerc):
 	if (self.optResultsFile != ""):
 		optResults = open(self.optResultsFile, 'a')
-		optResults.write("\nself.minWeightsRand\t"+str(self.minWeightsRand)+"\tself.maxWeightsRand\t"+str(self.maxWeightsRand)+\
-			"\tself.positiveWeightReinforcement\t"+str(self.positiveWeightReinforcement)+"\tself.negativeWeightReinforcement\t"+str(self.negativeWeightReinforcement))
+		optResults.write("\tminWeightsRand\t"+str(self.minWeightsRand)+"\tmaxWeightsRand\t"+str(self.maxWeightsRand)+\
+			"\tpositiveWeightReinforcement\t"+str(self.positiveWeightReinforcement)+"\tnegativeWeightReinforcement\t"+str(self.negativeWeightReinforcement))
 		optResults.write("\nPrecisionPerc\t"+str(Decimal(format(testRun.truePositiveSpikeResults, '.1f'))/Decimal(format(self.totalSpikeIntervals, '.1f')))+"\t"+str(testRun.truePositiveSpikeResults)+"/"+str(self.totalSpikeIntervals)+"\t(this is the percentage of all true positves that were found)")
 		optResults.write('\nAccuracyPerc\t'+str(accuracyPerc)+'\tTP:\t'+str(testRun.truePositiveSpikeResults)+'\tFP:\t'+str(testRun.falsePositiveSpikeResults)+'\tTN:\t'+str(testRun.trueNegativeSpikeResults)+'\tFN:\t'+str(testRun.falseNegativeSpikeResults))
 		optResults.close()
