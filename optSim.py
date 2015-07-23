@@ -7,14 +7,14 @@ from decimal import Decimal
 simFile = "gupta_paper_further_formulas.py"
 optResultsFile = "optimizationResults.txt"
 trainingRunTime = 33000#1100#1100
-testingRunTime = 7800
+testingRunTime = 7900
 minRandVals = ['minRand', 0.5, 0.75]
 maxRandVals = ['maxRand', 0.76, 1.0]
-posReinfVals = ['posReinfVal', 1.0, 5.0]
-negReinfVals = ['negReinfVal', 1.0, 5.0]
+posReinfVals = ['posReinfVal', 0.0, 5.0]
+negReinfVals = ['negReinfVal', 0.0, 5.0]
 space = [hp.uniform(minRandVals[0],minRandVals[1],minRandVals[2]), hp.uniform(maxRandVals[0],maxRandVals[1],maxRandVals[2]), \
          hp.uniform(posReinfVals[0],posReinfVals[1],posReinfVals[2]), hp.uniform(negReinfVals[0],negReinfVals[1],negReinfVals[2])]
-evaluationRuns = 10;
+evaluationRuns = 6;
 
 # Clear and open output file
 optResults = open(optResultsFile, 'w')
@@ -44,9 +44,6 @@ def objective(args):
     results = snnrlWithParams("evaluateClassifier=True, optResultsFile=\'"+str(optResultsFile)+"\', standardPrint=False, verbosePrint=False, randomization="+str(randVal)+", posReinf="+str(posReinfVal)+", negReinf="+str(negReinfVal))
     accuracyPerc = Decimal(1, '.1f') - results
     print "\naccPer:\t",accuracyPerc
-    #optResults.write("\n"+str(minRand)+"\t"+str(maxRand)+"\t"+str(posReinfVal)+"\t"+str(negReinfVal))
-    #optResults.write("\n"+str(accuracyPerc))
-
     return {'loss': accuracyPerc}
 
 best = fmin(objective,

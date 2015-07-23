@@ -2,6 +2,7 @@ from architecture_further_formulas import *
 from processHDF5Data import *
 from savedWeights import *
 import re
+import time
 
 def initializeTrainedModelParameters(dendObj):
 	# Below values that have been created through prior training are used for w, tau, and r.  Those values are imported
@@ -208,6 +209,7 @@ def OutputEvaluationResults(dendObj, testRun, verbosePrint, evaluateClassifier):
 		latestResultsFile = open('./furtherFormulas/latestResults.txt', 'w')
 		latestResultsFile.write(str(totalCorrectPercentage))
 		latestResultsFile.close()
+		time.sleep(20) # Pause to ensure file write is completed before continuing
 
 def printWeights(dendObj):
 	print 'Current Weights\n'
