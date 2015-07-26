@@ -222,6 +222,7 @@ class gupta_paper:
 
 		OutputEvaluationResults(dend, self.testRun, ADDS.verbosePrint, ADDS.evaluateClassifier)
 		accuracyPerc = totalCorrectPercentage()
+		precisionPerc = precisionPercentage()
 		writeOptimizationResults(ADDS, self.testRun, accuracyPerc)
 
 		neuronToPlot = 1
@@ -237,12 +238,12 @@ class gupta_paper:
 		if (showPlot==True):
 			show()	
 
-		return evaluateClassifier, accuracyPerc
+		return evaluateClassifier, precisionPerc
 
 def main():
 	run_gupta_paper = gupta_paper()
-	evaluateClassifier, accuracyPerc = run_gupta_paper.run_model()
-	if evaluateClassifier: print accuracyPerc#2;#accuracyPerc
-	return accuracyPerc
+	evaluateClassifier, precisionPerc = run_gupta_paper.run_model()
+	if evaluateClassifier: print precisionPerc
+	return precisionPerc
 
 if  __name__ =='__main__':main()

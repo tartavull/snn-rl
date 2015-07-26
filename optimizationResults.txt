@@ -4,4 +4,4 @@ testingRunTime:		7900	Note: testingRunTime parameter passing not currently worki
 ['maxRand', 0.51, 1.0]
 ['posReinfVal', 0.0, 10.0]
 ['negReinfVal', 0.0, 10.0]
-['trainingRunTime', 33000, 45000]
+['trainingRunTime', 33000, 67000]

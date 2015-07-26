@@ -140,6 +140,10 @@ def totalCorrectPercentage():
 	totalCorrectPercentage = (Decimal(format(testRun.truePositiveSpikeResults, '.1f'))+Decimal(format(testRun.trueNegativeSpikeResults, '.1f')))/(Decimal(format(totalSpikeIntervals, '.1f'))*Decimal(format(dictionaryLongitude, '.1f')))
 	return totalCorrectPercentage
 
+def precisionPercentage():
+	precisionPercentage = (Decimal(format(testRun.truePositiveSpikeResults, '.1f'))/Decimal(format(totalSpikeIntervals, '.1f')))
+	return precisionPercentage	
+
 def OutputEvaluationResults(dendObj, testRun, verbosePrint, evaluateClassifier):
 	'''
 	If training is performed weights produced are saved to a text file.  The file
