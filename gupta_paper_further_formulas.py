@@ -1,3 +1,14 @@
+'''
+	Copyright 2015, Nate Sutton and Ignacio Tartavull
+	This is the main file for the Spiking Neual Networks
+	Reinforcement Learning simulation.  
+
+	More info:
+	https://github.com/tartavull/snn-rl/blob/master/README.md
+	http://nbviewer.ipython.org/github/tartavull/snn-rl/blob/master/notebooks/introduction.ipynb
+	http://nbviewer.ipython.org/github/tartavull/snn-rl/blob/master/FFSSN.ipynb
+'''
+
 from furtherFormulas.architecture_further_formulas import *
 from furtherFormulas.cofactorCalculations import *
 from furtherFormulas.timeAndRefracCalcs import *
@@ -9,6 +20,12 @@ from furtherFormulas.generalUtilities import *
 timeAndRefrac = timeAndRefrac	
 
 class gupta_paper:
+	'''
+		Main program variables are set the simulation is run.  Specific neuron models are
+		defined for computing processing of electrophysiology in the soma, direct to soma
+		signals, and active dendrites.  Equations with variables
+		are defined in the equations() objects.
+	'''
 	neuralnet = Network()
 	dictionary = dictionary()
 	spiketimes = dictionary.spikeTimes(dictionaryLongitude, spikeInterval, testingSpikesPerChar, testingEpochs)
@@ -75,6 +92,9 @@ class gupta_paper:
 			''')		
 
 		class ADDSNeuronModel(NeuronGroup, gupta_paper): 
+			'''
+				This is the model used for electrophysiology occuring in the Soma
+			'''
 			neuronIndex = self.neuronIndex
 			generalClockDt = self.generalClockDt
 
@@ -88,8 +108,10 @@ class gupta_paper:
 					timeAndRefrac.spikeIntervalCounter = (floor(timeAndRefrac.time/timeAndRefrac.spikeIntervalUnformatted) * timeAndRefrac.spikeIntervalUnformatted)*10
 
 					def dendCalcs(neuronIndex, ADDSObj, dendObj, spiketimes, evaluationActive):
-						# Below sequentially Dirac, Tau, then Resistance are calculated every end of a spike-time interval.
-						# The resulting Dend I is added to the Um calc for the ADDS soma.
+						'''
+							Below sequentially Dirac, Tau, then Resistance are calculated every end of a spike-time interval.
+							The resulting Dend I is added to the Um calc for the ADDS soma.
+						'''
 						timeAndRefrac = self.timeAndRefrac
 
 						# Dirac
@@ -127,9 +149,11 @@ class gupta_paper:
 						#print 'ADDSObj.t',ADDSObj.t,'ADDSObj.SynI',ADDSObj.SynI,'neuronIndex',neuronIndex,'somaDirectObj.summedWandDirac',somaDirectObj.summedWandDirac[neuronIndex],'dendObj[neuronIndex].w',dendObj[neuronIndex].w,'dendObj[neuronIndex].dirac',dendObj[neuronIndex].dirac
 
 					def mainSimulationCalcs(ADDSObj, dendObj, somaDirectObj, spiketimes, evaluationActive):
-						# dend then somaDirect calcs are done which are then used to set lat inhib.
-						# Soma Um calcs are done automatically using equations entered for brian
-						# once dend and somaDirect are updated
+						'''
+							dend then somaDirect calcs are done which are then used to set lat inhib.
+							Soma Um calcs are done automatically using equations entered for brian
+							once dend and somaDirect are updated
+						'''
 						preTNorm = self.timeAndRefrac.time
 						tNorm = preTNorm - (floor((preTNorm/.001)*.01) * .1)
 						
