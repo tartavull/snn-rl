@@ -125,3 +125,78 @@ AccuracyPerc	0.9704142011834319526627218935	TP:	43	FP:	31	TN:	1925	FN:	29
 TestTime: 48.326 s	minWeightsRand	0.0456113379569	maxWeightsRand	0.838067966753	positiveWeightReinforcement	3.81632580535	negativeWeightReinforcement	2.81845767592
 PrecisionPerc	0.5	39/78	(this is the percentage of all true positves that were found)
 AccuracyPerc	0.9684418145956607495069033531	TP:	39	FP:	35	TN:	1925	FN:	38
+TestTime: 45. s	minWeightsRand	0.117271249092	maxWeightsRand	0.700246004408	positiveWeightReinforcement	0.614958929533	negativeWeightReinforcement	9.7606992182
+PrecisionPerc	0.5384615384615384615384615385	42/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9699211045364891518737672584	TP:	42	FP:	32	TN:	1925	FN:	35
+TestTime: 53.736 s	minWeightsRand	0.0180439738892	maxWeightsRand	0.874476863854	positiveWeightReinforcement	4.93753066503	negativeWeightReinforcement	7.91042636274
+PrecisionPerc	0.4230769230769230769230769231	33/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9640039447731755424063116371	TP:	33	FP:	44	TN:	1922	FN:	42
+TestTime: 51.692 s	minWeightsRand	0.18182781377	maxWeightsRand	0.646772682586	positiveWeightReinforcement	1.46602579418	negativeWeightReinforcement	9.05259239652
+PrecisionPerc	0.5384615384615384615384615385	42/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9684418145956607495069033531	TP:	42	FP:	35	TN:	1922	FN:	31
+TestTime: 57.547 s	minWeightsRand	0.0962392641906	maxWeightsRand	0.589788637855	positiveWeightReinforcement	2.89881343261	negativeWeightReinforcement	5.89794240528
+PrecisionPerc	0.6025641025641025641025641026	47/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9709072978303747534516765286	TP:	47	FP:	30	TN:	1922	FN:	27
+TestTime: 47.212 s	minWeightsRand	0.0522546002313	maxWeightsRand	0.814396977559	positiveWeightReinforcement	2.38475039795	negativeWeightReinforcement	4.39234612339
+PrecisionPerc	0.5	39/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9669625246548323471400394477	TP:	39	FP:	38	TN:	1922	FN:	33
+TestTime: 50.43 s	minWeightsRand	0.140849634281	maxWeightsRand	0.74691826501	positiveWeightReinforcement	9.99167784876	negativeWeightReinforcement	8.56416767376
+PrecisionPerc	0.5	39/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9684418145956607495069033531	TP:	39	FP:	35	TN:	1925	FN:	34
+TestTime: 55.01 s	minWeightsRand	0.0713153990429	maxWeightsRand	0.954622634886	positiveWeightReinforcement	1.15519438006	negativeWeightReinforcement	5.44255755318
+PrecisionPerc	0.7435897435897435897435897436	58/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9778106508875739644970414201	TP:	58	FP:	16	TN:	1925	FN:	15
+TestTime: 54.62 s	minWeightsRand	0.0688009595148	maxWeightsRand	0.949621757882	positiveWeightReinforcement	6.90907817041	negativeWeightReinforcement	2.84641598176
+PrecisionPerc	0.4230769230769230769230769231	33/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9644970414201183431952662722	TP:	33	FP:	43	TN:	1923	FN:	40
+TestTime: 60.063 s	minWeightsRand	0.138323604356	maxWeightsRand	0.999547386454	positiveWeightReinforcement	3.33354913855	negativeWeightReinforcement	5.44419209869
+PrecisionPerc	0.5256410256410256410256410256	41/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9679487179487179487179487179	TP:	41	FP:	36	TN:	1922	FN:	32
+TestTime: 55.627 s	minWeightsRand	0.0119367815678	maxWeightsRand	0.909036136518	positiveWeightReinforcement	0.252915746238	negativeWeightReinforcement	3.84218359456
+PrecisionPerc	0.5128205128205128205128205128	40/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9684418145956607495069033531	TP:	40	FP:	35	TN:	1924	FN:	34
+TestTime: 52.681 s	minWeightsRand	0.183812174239	maxWeightsRand	0.886732882404	positiveWeightReinforcement	1.17311517684	negativeWeightReinforcement	1.62117916573
+PrecisionPerc	0.5384615384615384615384615385	42/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9689349112426035502958579882	TP:	42	FP:	34	TN:	1923	FN:	28
+TestTime: 61.994 s	minWeightsRand	0.082597774177	maxWeightsRand	0.969200629608	positiveWeightReinforcement	4.96064351072	negativeWeightReinforcement	4.91737740929
+PrecisionPerc	0.5256410256410256410256410256	41/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9694280078895463510848126233	TP:	41	FP:	33	TN:	1925	FN:	32
+TestTime: 63.33 s	minWeightsRand	0.236243420163	maxWeightsRand	0.528129914848	positiveWeightReinforcement	4.06144580726	negativeWeightReinforcement	6.5190135369
+PrecisionPerc	0.5769230769230769230769230769	45/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9704142011834319526627218935	TP:	45	FP:	31	TN:	1923	FN:	29
+TestTime: 57.787 s	minWeightsRand	0.0568270872955	maxWeightsRand	0.604873864774	positiveWeightReinforcement	8.27037913469	negativeWeightReinforcement	3.59393981626
+PrecisionPerc	0.4615384615384615384615384615	36/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9659763313609467455621301775	TP:	36	FP:	40	TN:	1923	FN:	30
+TestTime: 48.614 s	minWeightsRand	0.100618829378	maxWeightsRand	0.548414644925	positiveWeightReinforcement	3.14150163193	negativeWeightReinforcement	4.55590809005
+PrecisionPerc	0.5641025641025641025641025641	44/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9709072978303747534516765286	TP:	44	FP:	30	TN:	1925	FN:	33
+TestTime: 59.136 s	minWeightsRand	0.135876986969	maxWeightsRand	0.576701156017	positiveWeightReinforcement	0.319675108684	negativeWeightReinforcement	7.15969382718
+PrecisionPerc	0.5641025641025641025641025641	44/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9689349112426035502958579882	TP:	44	FP:	34	TN:	1921	FN:	28
+TestTime: 40.188 s	minWeightsRand	0.219973377879	maxWeightsRand	0.645097001363	positiveWeightReinforcement	1.13192663249	negativeWeightReinforcement	5.82236585716
+PrecisionPerc	0.5769230769230769230769230769	45/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9714003944773175542406311637	TP:	45	FP:	29	TN:	1925	FN:	31
+TestTime: 35.435 s	minWeightsRand	0.163337813693	maxWeightsRand	0.855613034791	positiveWeightReinforcement	1.65446866386	negativeWeightReinforcement	2.32542647058
+PrecisionPerc	0.5384615384615384615384615385	42/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9699211045364891518737672584	TP:	42	FP:	32	TN:	1925	FN:	31
+TestTime: 56.44 s	minWeightsRand	0.0347695057675	maxWeightsRand	0.921026731423	positiveWeightReinforcement	0.924150440716	negativeWeightReinforcement	0.510899511362
+PrecisionPerc	0.6025641025641025641025641026	47/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9718934911242603550295857988	TP:	47	FP:	28	TN:	1924	FN:	29
+TestTime: 45.766 s	minWeightsRand	0.0104287796326	maxWeightsRand	0.99310872018	positiveWeightReinforcement	4.67986859824	negativeWeightReinforcement	9.31750313867
+PrecisionPerc	0.7435897435897435897435897436	58/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9778106508875739644970414201	TP:	58	FP:	16	TN:	1925	FN:	18
+TestTime: 38.777 s	minWeightsRand	0.0893020076497	maxWeightsRand	0.995954722799	positiveWeightReinforcement	6.25097328468	negativeWeightReinforcement	9.31386474563
+PrecisionPerc	0.5512820512820512820512820513	43/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9684418145956607495069033531	TP:	43	FP:	35	TN:	1921	FN:	29
+TestTime: 44.058 s	minWeightsRand	0.0647558904421	maxWeightsRand	0.971839251449	positiveWeightReinforcement	7.95089221438	negativeWeightReinforcement	9.98568334438
+PrecisionPerc	0.6025641025641025641025641026	47/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9718934911242603550295857988	TP:	47	FP:	28	TN:	1924	FN:	26
+TestTime: 41.64 s	minWeightsRand	0.416735165819	maxWeightsRand	0.952623438219	positiveWeightReinforcement	6.68263583502	negativeWeightReinforcement	1.29174507174
+PrecisionPerc	0.4743589743589743589743589744	37/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9669625246548323471400394477	TP:	37	FP:	38	TN:	1924	FN:	34
+TestTime: 46.402 s	minWeightsRand	0.014733343898	maxWeightsRand	0.982365242099	positiveWeightReinforcement	4.67997895131	negativeWeightReinforcement	7.97621368508
+PrecisionPerc	0.6282051282051282051282051282	49/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9733727810650887573964497041	TP:	49	FP:	25	TN:	1925	FN:	26
+TestTime: 37.511 s	minWeightsRand	0.122933833169	maxWeightsRand	0.930928503618	positiveWeightReinforcement	5.77236873091	negativeWeightReinforcement	2.61422392968
+PrecisionPerc	0.4358974358974358974358974359	34/78	(this is the percentage of all true positves that were found)
+AccuracyPerc	0.9644970414201183431952662722	TP:	34	FP:	43	TN:	1922	FN:	36
