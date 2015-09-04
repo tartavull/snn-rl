@@ -54,6 +54,7 @@ class gupta_paper:
 	minWeightsRand = minWeightsRand
 	maxWeightsRand = maxWeightsRand
 	totalSpikeIntervals = totalSpikeIntervals
+	showPlot = showPlot
 
 	def run_model(self):
 		neuralnet = self.neuralnet
@@ -259,7 +260,7 @@ class gupta_paper:
 		plot(UmM.t, UmM.v2.T/mV)	
 		xlabel('Time (ms)')
 		ylabel('Membrane Potential (mV)')
-		if (showPlot==True):
+		if (ADDS.showPlot==True):
 			show()	
 
 		return evaluateClassifier, precisionPerc
