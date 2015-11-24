@@ -1,4 +1,4 @@
-from brian2 import *
+from brian import *
 
 #In the matlab implementation the fisrt layer consited of 15 leaky integrate and fire in which 
 #the input was a constant current in case the pixel was "on" or a null current in case the pixel 
