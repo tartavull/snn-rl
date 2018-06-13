@@ -1,0 +1,9 @@
+{
+	"cmd": ["/home/nmsutton/anaconda2/bin/python", "-u", "$file"],
+	"working_dir":"/comp_neuro/software/snn-rl/",
+	"path":"PATH:/home/nmsutton/anaconda2/",
+    "env": {
+      "PYTHONPATH":"/home/nmsutton/anaconda2/:/comp_neuro/software/snn-rl/furtherFormulas",
+      "PATH":"PATH:/home/nmsutton/anaconda2/:/comp_neuro/software/snn-rl/furtherFormulas"
+     } 
+}
