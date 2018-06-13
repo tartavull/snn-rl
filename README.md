@@ -44,11 +44,11 @@ Users should have a Python environment with [Brian2](http://brian2.readthedocs.i
 $ conda install brian2
 ```
 
-2. Clone the project and run it in your Python environment. For instance, [Sublime Text](https://www.sublimetext.com/) can be used with a buildfile such as [this example](https://github.com/tartavull/snn-rl/blob/master/utilities/python_snnrl.sublime-build). gupta_paper_further_formulas.py is the main file to run to start the project.
+2. Clone the project and run it in your Python environment. For instance, [Sublime Text](https://www.sublimetext.com/) can be used with a buildfile such as [this example](https://github.com/tartavull/snn-rl/blob/master/utilities/python_snnrl.sublime-build). gupta_paper_further_formulas.py is the main file to run to start the main project code.
 
 3. After the software has completed running graphical plots will be created that show the results. Command line output also will report statistics on the simulation. An example of training and then testing the simulation can be run by executing the shell script trainTestSim.sh in the base project directory.
 
-4. Some notebooks have been created to illustrate the design of the experiments. These notebooks include: general overview - [introduction.ipynb](http://nbviewer.jupyter.org/github/tartavull/snn-rl/blob/master/notebooks/introduction.ipynb), simulation code - [simulation.ipynb](https://github.com/tartavull/snn-rl/blob/master/notebooks/simulation.ipynb), performance analyses - [analysis.ipynb](http://nbviewer.jupyter.org/github/tartavull/snn-rl/blob/master/notebooks/analysis.ipynb), and others in the /notebooks folder. These notebooks may not be updated with the main project code and should only be be used for explanatory purposes; their code should not be used to run the project.
+4. Some notebooks have been created to illustrate the design of the experiments. These notebooks include: general overview - [introduction.ipynb](http://nbviewer.jupyter.org/github/tartavull/snn-rl/blob/master/notebooks/introduction.ipynb), simulation code - [simulation.ipynb](https://github.com/tartavull/snn-rl/blob/master/notebooks/simulation.ipynb), performance analyses - [analysis.ipynb](http://nbviewer.jupyter.org/github/tartavull/snn-rl/blob/master/notebooks/analysis.ipynb), and others in the /notebooks folder. These notebooks may not be updated with the main project code and should only be be used for explanatory purposes; their code should not be used to run the main project code.
 
 ======
 File descriptions and organization
