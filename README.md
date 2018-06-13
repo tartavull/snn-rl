@@ -33,16 +33,22 @@ Authors:
 * Nate Sutton
 * Ignacio Tartavull
 
-This is **work in progress** and is currently to be treated as a Proof of Concept. If you find this project interesting please **join us** and help out.
+This is a **work in progress** and if you find this project interesting please **join us** and help out.
 
 ======
 Getting Started
 
-1. introduction.ipynb has some further explanations of what we are trying to achive. We are basing our work in [this paper](http://www.personal.psu.edu/lnl/papers/Gupta_Long_2007.pdf).
+1. The project is based on [this paper](http://www.personal.psu.edu/lnl/papers/Gupta_Long_2007.pdf). We use a clock-driven simulator for spiking neural networks called [Brian](http://briansimulator.org/).
+Users should have a Python environment with [Brian2](http://brian2.readthedocs.io/en/stable/introduction/install.html) installed. [Anaconda](https://conda.io/docs/user-guide/install/index.html) is suggested and can install [Brian2](http://brian2.readthedocs.io/en/stable/introduction/install.html) through:
+```
+$ conda install brian2
+```
 
-2. simulation.ipynb and gupta_paper_further_formulas.py are where the actual simulation is performed. We are using a clock-driven simulator for spiking neural networks called [brian](https://github.com/brian-team/brian).
+2. Clone the project and run it in your Python environment. For instance, [Sublime Text](https://www.sublimetext.com/) can be used with a buildfile such as [this example](https://github.com/tartavull/snn-rl/blob/master/utilities/python_snnrl.sublime-build). gupta_paper_further_formulas.py is the main file to run to start the project.
 
-3. analysis.ipynb is what we run after the simulation is finished, it helps us to analyse the performance of the network.
+3. After the software has completed running graphical plots will be created that show the results. Command line output also will report statistics on the simulation. An example of training and then testing the simulation can be run by executing the shell script trainTestSim.sh in the base project directory.
+
+4. Some notebooks have been created to illustrate the design of the experiments. These notebooks include: general overview - [introduction.ipynb](http://nbviewer.jupyter.org/github/tartavull/snn-rl/blob/master/notebooks/introduction.ipynb), simulation code - [simulation.ipynb](https://github.com/tartavull/snn-rl/blob/master/notebooks/simulation.ipynb), performance analyses - [analysis.ipynb](http://nbviewer.jupyter.org/github/tartavull/snn-rl/blob/master/notebooks/analysis.ipynb), and others in the /notebooks folder. These notebooks may not be updated with the main project code and should only be be used for explanatory purposes; their code should not be used to run the project.
 
 ======
 File descriptions and organization
@@ -57,7 +63,7 @@ File descriptions and organization
 
 /img images
 
-/notebooks notebooks to describe the project
+/notebooks notebooks to describe the project (not code for use with the main project)
 
 /originalVersion initial version of the work, the new version is in gupta_paper_further_formulas.py 
 
