@@ -1,6 +1,6 @@
 Reinforcement Learning for Spiking Neural Networks
 ======
-Check out some of the latest results [at this link](http://nbviewer.ipython.org/github/tartavull/snn-rl/blob/master/FFSSN.ipynb) .
+Check out some of the latest results [at this link](http://nmsutton.herokuapp.com/nmsuttondetails/Snnrl) .
 
 See the bottom of this document for file descriptions and organization of the project.
 
