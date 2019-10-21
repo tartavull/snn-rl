@@ -8,7 +8,8 @@
 	http://nbviewer.ipython.org/github/tartavull/snn-rl/blob/master/notebooks/introduction.ipynb
 	http://nbviewer.ipython.org/github/tartavull/snn-rl/blob/master/FFSSN.ipynb
 '''
-
+import sys
+sys.path.insert(0,'./furtherFormulas')
 from furtherFormulas.architecture_further_formulas import *
 from furtherFormulas.cofactorCalculations import *
 from furtherFormulas.timeAndRefracCalcs import *
@@ -268,7 +269,7 @@ class gupta_paper:
 def main():
 	run_gupta_paper = gupta_paper()
 	evaluateClassifier, precisionPerc = run_gupta_paper.run_model()
-	if evaluateClassifier: print precisionPerc
+	if evaluateClassifier: print(precisionPerc)
 	return precisionPerc
 
 if  __name__ =='__main__':main()

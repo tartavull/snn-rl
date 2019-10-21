@@ -58,7 +58,7 @@ def evaluateClassifierPerf(ADDSObj, testRun):
 				if (ADDSObj.UmSpikeFired[neuronIndex] == 1*mV):
 					if (testRun.correctSpikes[neuronIndex][(timeAndRefrac.spikeIntervalCounter-1)] == 1):
 						testRun.truePositiveSpikeResults = testRun.truePositiveSpikeResults + 1	
-						print 'TP found\t','self.testSpikeIntervalCounter-1\t',timeAndRefrac.spikeIntervalCounter-1,'neuronIndex\t',neuronIndex
+						print('TP found\t','self.testSpikeIntervalCounter-1\t',timeAndRefrac.spikeIntervalCounter-1,'neuronIndex\t',neuronIndex)
 					else:
 						testRun.falsePositiveSpikeResults = testRun.falsePositiveSpikeResults + 1	
 				elif (ADDSObj.UmSpikeFired[neuronIndex] == 0*mV):
@@ -188,25 +188,25 @@ def OutputEvaluationResults(dendObj, testRun, verbosePrint, evaluateClassifier):
 
 	totalCorrectPercentage = (Decimal(format(testRun.truePositiveSpikeResults, '.1f'))+Decimal(format(testRun.trueNegativeSpikeResults, '.1f')))/(Decimal(format(totalSpikeIntervals, '.1f'))*Decimal(format(dictionaryLongitude, '.1f')))
 	if (verbosePrint == True):
-		print 'Final Weights\n'
+		print('Final Weights\n')
 		for printIndex in range(dictionaryLongitude):
-			print dendObj[printIndex].w[:]/volt
-		print 'Final Tau\n'
+			print(dendObj[printIndex].w[:]/volt)
+		print('Final Tau\n')
 		for printIndex in range(dictionaryLongitude):
-			print dendObj[printIndex].tau[:]/ms
-		print 'Final Res\n'
+			print(dendObj[printIndex].tau[:]/ms)
+		print('Final Res\n')
 		for printIndex in range(dictionaryLongitude):
-			print dendObj[printIndex].r[:]/mV		
-		print '\n'
-		print 'testRun.firedSpikes\t',testRun.firedSpikes
-		print 'testRun.assignedSpikeWindows\t',testRun.assignedSpikeWindows
-		print '\n'			
-		print '+++ Results +++'
-		print 'Spike results: TP:\t',testRun.truePositiveSpikeResults,'\tFP:\t',testRun.falsePositiveSpikeResults,'\tTN:\t',testRun.trueNegativeSpikeResults,'\tFN:\t',testRun.falseNegativeSpikeResults
-		print 'totalSpikeIntervalsTested:\t',totalSpikeIntervals,'\ttotalCharsPresented:\t',dictionaryLongitude
-		print 'True positives correct percentage (TP/totalSpikeIntervalsTested):\t',Decimal(format(testRun.truePositiveSpikeResults, '.1f'))/Decimal(format(totalSpikeIntervals, '.1f')),'\t(this is the percentage of all true positves that were found)'
-		print 'Total correct percentage (TP+TN/(totalSpikeIntervals*totalCharsPresented)):\t',totalCorrectPercentage
-		print '+++++++++++++++'	
+			print(dendObj[printIndex].r[:]/mV)
+		print('\n')
+		print('testRun.firedSpikes\t',testRun.firedSpikes)
+		print('testRun.assignedSpikeWindows\t',testRun.assignedSpikeWindows)
+		print('\n'			)
+		print('+++ Results +++')
+		print('Spike results: TP:\t',testRun.truePositiveSpikeResults,'\tFP:\t',testRun.falsePositiveSpikeResults,'\tTN:\t',testRun.trueNegativeSpikeResults,'\tFN:\t',testRun.falseNegativeSpikeResults)
+		print('totalSpikeIntervalsTested:\t',totalSpikeIntervals,'\ttotalCharsPresented:\t',dictionaryLongitude)
+		print('True positives correct percentage (TP/totalSpikeIntervalsTested):\t',Decimal(format(testRun.truePositiveSpikeResults, '.1f'))/Decimal(format(totalSpikeIntervals, '.1f')),'\t(this is the percentage of all true positves that were found)')
+		print('Total correct percentage (TP+TN/(totalSpikeIntervals*totalCharsPresented)):\t',totalCorrectPercentage)
+		print('+++++++++++++++'	)
 
 	if (evaluateClassifier == True):
 		#print ">>>>>>>>>TrueEvalClass<<<<<<<<<<<"
@@ -216,9 +216,9 @@ def OutputEvaluationResults(dendObj, testRun, verbosePrint, evaluateClassifier):
 		time.sleep(20) # Pause to ensure file write is completed before continuing
 
 def printWeights(dendObj):
-	print 'Current Weights\n'
+	print('Current Weights\n')
 	for printIndex in range(dictionaryLongitude):
-		print dendObj[printIndex].w[:]/volt	
+		print(dendObj[printIndex].w[:]/volt	)
 
 def writeOptimizationResults(self, testRun, accuracyPerc):
 	if (self.optResultsFile != ""):
