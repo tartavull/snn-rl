@@ -1,6 +1,6 @@
 Reinforcement Learning for Spiking Neural Networks
 ======
-Check out some of the latest results [at this link](http://nmsutton.herokuapp.com/nmsuttondetails/Snnrl) .
+Check out some of the latest results [at this link](https://nsutton.com/reinforcement-learning-using-spiking-neural-networks/) .
 
 See the bottom of this document for file descriptions and organization of the project.
 
