@@ -38,7 +38,7 @@ This is a **work in progress** and if you find this project interesting please *
 ======
 Getting Started
 
-1. The project is based on [this paper](http://www.personal.psu.edu/lnl/papers/Gupta_Long_2007.pdf). We use a clock-driven simulator for spiking neural networks called [Brian](http://briansimulator.org/).
+1. The project is based on [this paper](https://ieeexplore.ieee.org/document/4370930). We use a clock-driven simulator for spiking neural networks called [Brian](http://briansimulator.org/).
 Users should have a Python environment with [Brian2](http://brian2.readthedocs.io/en/stable/introduction/install.html) installed. [Anaconda](https://conda.io/docs/user-guide/install/index.html) is suggested and can install [Brian2](http://brian2.readthedocs.io/en/stable/introduction/install.html) through:
 ```
 $ conda install brian2
